@@ -24,18 +24,35 @@
             height: 100vh;
             background-size: cover;
             background-position: center;
-            opacity: 0;
-            transition: opacity 0.5s ease;
+            opacity: 1;
+            transition: opacity 1s ease-in-out;
             display: none;
+            pointer-events: none;
         }
 
         .screen.active {
-            opacity: 1;
             display: flex;
+            pointer-events: auto;
+        }
+
+        #black-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        #black-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         #start-screen {
-            background-image: url('assets/start_screen.png');
+            background-image: url('assets/start_screen.jpg');
             justify-content: center;
             align-items: center;
         }
@@ -85,6 +102,12 @@
             border-radius: 10px;
             font-size: 1.2rem;
             line-height: 1.5;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        #text-box.visible {
+            opacity: 1;
         }
 
         #text-content {
@@ -107,6 +130,7 @@
     </style>
 </head>
 <body>
+    <div id="black-overlay"></div>
     <div id="start-screen" class="screen active">
         <div id="start-menu">
             <h1>Viking Game</h1>
@@ -133,8 +157,28 @@
         };
 
         function transitionToScreen(fromScreen, toScreen) {
-            fromScreen.classList.remove('active');
-            toScreen.classList.add('active');
+            const blackOverlay = document.getElementById('black-overlay');
+            
+            // First fade to black
+            blackOverlay.classList.add('active');
+            
+            // Wait for fade to black
+            setTimeout(() => {
+                // Hide the current screen
+                fromScreen.classList.remove('active');
+                
+                // Show the new screen
+                toScreen.classList.add('active');
+                
+                // Fade out the black overlay
+                blackOverlay.classList.remove('active');
+                
+                // Finally, show the text box
+                setTimeout(() => {
+                    const textBox = document.getElementById('text-box');
+                    textBox.classList.add('visible');
+                }, 1000);
+            }, 1000);
         }
 
         // Start game button handler
