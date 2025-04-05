@@ -6,6 +6,8 @@
     <title>Viking Game - Visual Novel</title>
     <style>
         * {
+            --text-box-background: #19152C;
+
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -16,6 +18,9 @@
             height: 100vh;
             overflow: hidden;
             background-color: #000;
+            display: grid;
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr;
         }
 
         .screen {
@@ -31,8 +36,10 @@
         }
 
         .screen.active {
-            display: flex;
+            display: grid;
             pointer-events: auto;
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr;
         }
 
         #black-overlay {
@@ -53,12 +60,16 @@
 
         #start-screen {
             background-image: url('assets/start_screen.jpg');
-            justify-content: center;
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr;
+            justify-items: center;
             align-items: center;
         }
 
         #prologue-screen {
             background-image: url('assets/prologue_screen.png');
+            grid-template-rows: 1fr;
+            grid-template-columns: 1fr 50%;
         }
 
         #start-menu {
@@ -67,6 +78,7 @@
             border-radius: 10px;
             text-align: center;
             color: white;
+            width: minmax(300px, 40vw);
         }
 
         .btn {
@@ -92,18 +104,26 @@
         }
 
         #text-box {
-            position: absolute;
-            bottom: 50px;
-            right: 50px;
-            width: 400px;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
+            grid-row: 1;
+            grid-column: 2;
+            align-self: center;
+            justify-self: end;
+            margin-right: 20px;
+            width: 100%;
             padding: 20px;
-            border-radius: 10px;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
             line-height: 1.5;
-            opacity: 0;
             transition: opacity 1s ease-in-out;
+            color: white;
+            opacity: 0;
+
+            border: 9px solid transparent;
+            border-image-source: url('assets/Text_Box.png');
+            border-image-slice: 9;
+            border-image-width: 1;
+            border-image-outset: 0.4;
+            border-image-repeat: stretch;
+            background-color: var(--text-box-background);
         }
 
         #text-box.visible {
