@@ -289,41 +289,142 @@
             2: {
                 text: "Following the barked commands and surefooted actions of your more seasoned crewmates, you and Erik prepare to land... *Crash* … The ship bucks suddenly, tilting and causing men left and right to stumble and fall...",
                 choices: [
-                    { text: "Grab onto the ship's rail", nextNode: 3 },
-                    { text: "Help Erik keep his balance", nextNode: 4 },
-                    { text: "Brace yourself against the deck", nextNode: 5 }
+                    { text: "Try to keep your balance", nextNode: 3 },
+                    { text: "Brace against the tide", nextNode: 4 }
                 ]
             },
             3: {
-                text: "You lunge for the rail, fingers wrapping around the salt-crusted wood just as the ship lurches violently. You manage to stay upright while others tumble around you. From your stable position, you see what happened - the ship has struck a submerged rock, and water is already beginning to seep through the hull.",
-                next: 6
+                text: "You struggle to maintain your footing, but the ship's violent motion throws you off balance. You tumble to the deck, banging your knee painfully against the wood. Several of your comrades snicker as you pick yourself up, your pride more wounded than your body.",
+                next: 5
             },
             4: {
-                text: "You reach for Erik, grabbing his arm as he begins to pitch forward. He clutches at you gratefully as the ship stabilizes. 'Thanks, friend,' he mutters, his face pale. Your act of loyalty hasn't gone unnoticed - you catch Hersir Olaf nodding approvingly from the stern of the ship.",
-                next: 6
+                text: "As others lose their balance around you, you widen your stance and lower your center of gravity. You remain standing even as the ship bucks and tilts. Several of your crewmates nod approvingly at your display of seamanship. Your reputation among the warband increases slightly.",
+                next: 5
             },
             5: {
-                text: "You widen your stance and lower your center of gravity, bracing against the deck planks. The sudden shift throws even veteran warriors off balance, but you remain steady. Your quick instincts mark you as one with a natural feel for the sea, earning respectful glances from the older crew members.",
-                next: 6
-            },
-            6: {
-                text: "The ship settles, but the damage is done. 'LAND! NOW!' bellows Hersir Olaf, pointing to the nearby shore. 'Everyone row! We're taking on water!' The crew leaps into action, and you join them at the oars, muscles straining as you race against the slowly rising water in the hull...",
+                text: "Steps away, the steering ore sits vacant as the shore approaches at a menacing pace...",
                 choices: [
-                    { text: "Row with all your might", nextNode: 7 },
-                    { text: "Help bail out water", nextNode: 8 }
+                    { text: "Fall in line, obeying the scattered commands of more experienced seamen", nextNode: 6 },
+                    { text: "Seize the steering ore, taking matters into your own hands", nextNode: 7 }
                 ]
             },
+            6: {
+                text: "You follow the shouted orders of the more experienced warriors around you, helping to secure ropes and prepare for landing. The situation gradually comes under control as the ship lurches toward the shore. Your actions, while helpful, go largely unnoticed in the chaos.",
+                next: 10
+            },
             7: {
-                text: "You throw your back into the rowing, joining the rhythmic grunt and pull of the oarsmen. Your shoulders burn with the effort, but the shore grows closer with each stroke. The ship's master nods at your effort - such strength will be remembered.",
-                next: 9
+                text: "You leap toward the unmanned steering ore, gripping it firmly in your hands. The weight of it surprises you as you struggle to control the direction of the ship...",
+                choices: [
+                    { text: "Push through the struggle", nextNode: 8 },
+                    { text: "Give up and let someone else handle it", nextNode: 9 }
+                ]
             },
             8: {
-                text: "While others row, you grab a bucket and start bailing. The cold seawater soaks your boots, but your quick action helps keep the ship from sinking too quickly. 'Good thinking,' grunts a grizzled warrior next to you, as you both work to keep the vessel afloat.",
-                next: 9
+                text: "Summoning your resolve, you wrestle with the heavy steering ore. Your muscles strain as you fight against the current, but you manage to guide the groaning vessel safely toward the shore. As the calamity dissipates, your comrades grumble quiet words of approval. Your reputation has increased among the warband.",
+                next: 10
             },
             9: {
-                text: "With a grinding crunch, the ship beaches itself on the rocky shore. 'Everyone out!' commands Olaf. 'Salvage what you can!' You've reached the strange new land, though not quite as planned. Your journey has only just begun...",
+                text: "You struggle with the ore in an embarrassing display of weakness. Your arms shake with the effort before you're unceremoniously shoved aside by a pair of stronger hands. 'Out of the way, weakling!' growls a bearded warrior as he takes control. Your cheeks burn with shame as several crewmates smirk at your failure.",
+                next: 10
+            },
+            10: {
+                text: "Just as the third and final Snekkja anchors to the shore, a rush of excitement breaks through the disorganized mass of your warband... 'SAXONS!' The cry goes up, and warriors scramble for their weapons. Through the trees, you glimpse figures moving—local defenders rushing to repel your landing.",
+                next: 11
+            },
+            11: {
+                text: "[Battle with Saxons - Your first real combat experience]",
+                next: 12
+            },
+            12: {
+                text: "The clash of steel fades as the last Saxon falls. Breathing heavily, you contemplate your actions in the battle...",
+                choices: [
+                    { text: "Rejoice in your victory", nextNode: 13 },
+                    { text: "Question the senseless violence", nextNode: 14 }
+                ]
+            },
+            13: {
+                text: "You raise your weapon and let out a victorious cry that is echoed by your comrades. The thrill of battle still courses through your veins, and you feel a deep satisfaction in your triumph over the enemy. The Black Raven's shadow seems to pass over you, approving of your warrior spirit.",
+                next: 15
+            },
+            14: {
+                text: "As your comrades celebrate around you, you stare down at the bodies of the fallen with unease. Was this slaughter necessary? These people were simply defending their homes. A strange feeling washes over you, as if a White Raven watches your moment of doubt with interest.",
+                next: 15
+            },
+            15: {
+                text: "With the immediate threat dispatched, you must decide how to use the brief moment of respite...",
+                choices: [
+                    { text: "Search for loot among the dead", nextNode: 16 },
+                    { text: "Take the opportunity to rest", nextNode: 17 }
+                ]
+            },
+            16: {
+                text: "You move among the fallen Saxons, searching their bodies for anything of value. You find a few small trinkets and coins, but the effort leaves you more exhausted than before. Your fatigue increases, but your small haul might prove useful later.",
+                next: 18
+            },
+            17: {
+                text: "You find a quiet spot to sit and catch your breath. The brief rest revitalizes you somewhat, clearing your mind and reducing your fatigue. Erik joins you, grateful for the moment of peace before the next challenge.",
+                next: 18
+            },
+            18: {
+                text: "The Saxon insurgence was desperate and disorganized... victory here is only the beginning. Hersir Olaf assigns a small party of mysterious warriors to scout the area while the rest of your party makes camp. It won't be long before you see more serious combat...",
+                next: 19
+            },
+            19: {
+                text: "[Camp - Time to rest, train, and prepare]",
+                next: 20
+            },
+            20: {
+                text: "The time has come to move on. Your warband breaks camp at dawn, moving inland with purpose. By midday, a church on a hill comes into view, with a modest if not idyllic town surrounding it. The Hersir maintains a tight grip on your eager companions, but it won't last forever...",
+                next: 21
+            },
+            21: {
+                text: "The Saxon resistance forms even as your party closes the gap between them and the village. Before long, your party is standing face to face with a Saxon contingent of roughly equal size, their weapons drawn and faces grim with determination.",
+                next: 22
+            },
+            22: {
+                text: "[Battle with Saxon defenders]",
+                next: 23
+            },
+            23: {
+                text: "The Saxon resistance shatters, their warriors no match for your own... what had been a disciplined cohort of Viking warriors devolves into a wave of blood-red savagery... a free-for-all...",
+                next: 24
+            },
+            24: {
+                text: "You find yourself at the foot of the town, violent activity surrounding you. The screams of villagers mix with the triumphant shouts of your fellow warriors. What will you do next?",
+                choices: [
+                    { text: "Go straight for the church", nextNode: 25 },
+                    { text: "Go into the nearest house", nextNode: 26 },
+                    { text: "Walk around aimlessly", nextNode: 27 },
+                    { text: "Listen to Erik", nextNode: 28 }
+                ]
+            },
+            25: {
+                text: "You make your way toward the church on the hill, drawn to the prominent structure overlooking the town. As you approach, you notice several of your fellow warriors heading in the same direction, likely expecting valuable treasures inside...",
+                next: 29
+            },
+            26: {
+                text: "You push open the door to the nearest house. Inside, you find simple furnishings and signs of a hasty departure. You search through some personal belongings but find little of value. Time passes, and you hear the continued sounds of chaos outside.",
+                next: 30
+            },
+            27: {
+                text: "You wander through the streets of the small town, observing the destruction around you. Warriors pillage homes while terrified villagers flee or hide. You spend some time taking in the scene, but accomplish little. The day wears on.",
+                next: 30
+            },
+            28: {
+                text: "Erik gestures for you to follow him. 'I heard the Hersir mention that the church would have the most valuable items,' he says with a gleam in his eye. 'We should head there before the others take everything!'",
+                next: 25
+            },
+            29: {
+                text: "[Church scene - continues to Chapter 1 Church]",
                 end: true
+            },
+            30: {
+                text: "As you finish exploring, you realize that most of your warband seems to be converging on the church. Perhaps that's where you should go next...",
+                choices: [
+                    { text: "Go to the church", nextNode: 25 },
+                    { text: "Check another house", nextNode: 26 },
+                    { text: "Continue wandering", nextNode: 27 }
+                ]
             }
         };
 
