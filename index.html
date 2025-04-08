@@ -7,7 +7,6 @@
     <style>
         * {
             --text-box-background: #19152C;
-
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -15,37 +14,29 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            background-color: #000;
-            display: grid;
-            grid-template-rows: 1fr;
-            grid-template-columns: 1fr;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #232830, #222933);
+            position: relative;
+            padding: 20px;
         }
 
         .screen {
             position: absolute;
-            width: 100%;
-            height: 100vh;
+            inset: 0;
             background-size: cover;
             background-position: center;
             opacity: 1;
             transition: opacity 1s ease-in-out;
             display: none;
-            pointer-events: none;
         }
 
         .screen.active {
-            display: grid;
-            pointer-events: auto;
-            grid-template-rows: 1fr;
-            grid-template-columns: 1fr;
+            display: block;
         }
 
         #black-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100vh;
+            position: fixed;
+            inset: 0;
             background-color: black;
             opacity: 0;
             transition: opacity 1s ease-in-out;
@@ -60,16 +51,9 @@
 
         #start-screen {
             background-image: url('assets/start_screen.jpg');
-            grid-template-rows: 1fr;
-            grid-template-columns: 1fr;
-            justify-items: center;
+            display: flex;
+            justify-content: center;
             align-items: center;
-        }
-
-        #prologue-screen {
-            background-image: url('assets/prologue_screen.png');
-            grid-template-rows: 1fr;
-            grid-template-columns: 1fr 50%;
         }
 
         #start-menu {
@@ -78,7 +62,111 @@
             border-radius: 10px;
             text-align: center;
             color: white;
-            width: minmax(300px, 40vw);
+            max-width: 40vw;
+        }
+
+        #cinematic-ui {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Remove the previous pseudo-element approach */
+        .opacity-transition::before {
+            content: none;
+        }
+
+        .screen:not(.active) {
+            display: none !important;
+        }
+
+        #cinematic-frame {
+            width: 95%;
+            max-height: 95vh;
+            aspect-ratio: 620/360;
+            position: relative;
+            margin: 0 auto;
+
+            /* Use padding instead of border to create space for the border image */
+            padding: 9px;
+            box-sizing: border-box;
+            background-origin: padding-box;
+            background-clip: padding-box;
+            
+            /* Apply border image */
+            border: none;
+            background-image: 
+                url('assets/Cinematic_UI_Frame.png'),
+                url('assets/prologue_screen.png');
+            background-size: 
+                100% 100%,  /* Border image size */
+                calc(100% - 18px) calc(100% - 18px);  /* Content image size */
+            background-position: 
+                center center,  /* Border image position */
+                center center;  /* Content image position */
+            background-repeat: no-repeat, no-repeat;
+            
+            /* Remove other potentially conflicting properties */
+            overflow: visible;
+        }
+
+        /* Remove the pseudo-element since we're using multiple backgrounds */
+        #cinematic-frame::before {
+            content: none;
+        }
+
+        #cinematic-text-box {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            min-height: 150px;
+            width: calc(100% - 40px);
+            padding: 20px;
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            line-height: 1.5;
+            color: white;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+
+            border: 9px solid transparent;
+            border-image-source: url('assets/Text_Box.png');
+            border-image-slice: 9;
+            border-image-width: 1;
+            border-image-outset: 0.4;
+            border-image-repeat: stretch;
+            background-color: rgba(25, 21, 44, 0);
+            transition: background-color 1s ease-in-out, opacity 1s ease-in-out;
+        }
+
+        #cinematic-text-box.visible {
+            opacity: 1;
+            background-color: rgba(25, 21, 44, 0.8);
+        }
+
+        #cinematic-ui.opacity-transition #cinematic-text-box {
+            opacity: 1;
+            background-color: rgba(25, 21, 44, 0.8);
+        }
+
+        #cinematic-text-content {
+            margin-bottom: 15px;
+        }
+
+        #next-button {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            float: right;
+        }
+
+        #next-button:hover {
+            background-color: #357abd;
         }
 
         .btn {
@@ -103,49 +191,18 @@
             margin-bottom: 2rem;
         }
 
-        #text-box {
-            grid-row: 1;
-            grid-column: 2;
-            align-self: center;
-            justify-self: end;
-            margin-right: 20px;
-            width: 100%;
-            padding: 20px;
-            font-size: clamp(1rem, 1.5vw, 1.2rem);
-            line-height: 1.5;
-            transition: opacity 1s ease-in-out;
-            color: white;
-            opacity: 0;
-
-            border: 9px solid transparent;
-            border-image-source: url('assets/Text_Box.png');
-            border-image-slice: 9;
-            border-image-width: 1;
-            border-image-outset: 0.4;
-            border-image-repeat: stretch;
-            background-color: var(--text-box-background);
+        .click-indicator {
+            text-align: right;
+            margin-top: 10px;
+            color: #e3e3e3;
+            animation: pulse 1.5s infinite;
+            font-size: 1.2rem;
         }
-
-        #text-box.visible {
-            opacity: 1;
-        }
-
-        #text-content {
-            margin-bottom: 15px;
-        }
-
-        #next-button {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            float: right;
-        }
-
-        #next-button:hover {
-            background-color: #357abd;
+        
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
         }
     </style>
 </head>
@@ -160,12 +217,14 @@
         </div>
     </div>
 
-    <div id="prologue-screen" class="screen">
-        <div id="text-box">
-            <div id="text-content">
-                Welcome to the world of Vikings! Your journey begins here...
+    <div id="cinematic-ui" class="screen">
+        <div id="cinematic-frame">
+            <div id="cinematic-text-box">
+                <div id="cinematic-text-content"></div>
             </div>
-            <button id="next-button">Next</button>
+            <div id="cinematic-button-box">
+
+            </div>
         </div>
     </div>
 
@@ -173,31 +232,41 @@
         // Screen management
         const screens = {
             start: document.getElementById('start-screen'),
-            prologue: document.getElementById('prologue-screen')
+            prologue: document.getElementById('cinematic-ui')
         };
 
         function transitionToScreen(fromScreen, toScreen) {
             const blackOverlay = document.getElementById('black-overlay');
-            
+
             // First fade to black
             blackOverlay.classList.add('active');
-            
+
             // Wait for fade to black
             setTimeout(() => {
                 // Hide the current screen
                 fromScreen.classList.remove('active');
-                
+
                 // Show the new screen
                 toScreen.classList.add('active');
-                
+
                 // Fade out the black overlay
                 blackOverlay.classList.remove('active');
-                
-                // Finally, show the text box
-                setTimeout(() => {
-                    const textBox = document.getElementById('text-box');
-                    textBox.classList.add('visible');
-                }, 1000);
+
+                // Wait for the black overlay to finish fading out
+                blackOverlay.addEventListener('transitionend', function onTransitionEnd() {
+                    blackOverlay.removeEventListener('transitionend', onTransitionEnd);
+                    
+                    // Start the opacity effect transition
+                    const cinematicUI = document.getElementById('cinematic-ui');
+                    if (cinematicUI.classList.contains('active')) {
+                        cinematicUI.classList.add('opacity-transition');
+                        
+                        // After UI is active, display the first story text
+                        setTimeout(() => {
+                            displayStoryText(0);
+                        }, 500);
+                    }
+                });
             }, 1000);
         }
 
@@ -208,36 +277,71 @@
 
         // Text box management
         const storyText = [
-            "Welcome to the Tale of Two Ravens...",
-            "This adventure is set in quasi-historical fictional universe based on the Viking Age...Death is Permanent, and every decision matters... how your tale unfolds is up to you...",
-            "and the will of the gods..."
+            "..You emerge from vague, unsatisfying fever dream... The crossroads, the ravens... a choice... resonance... faces... delirium...",
+            "You awaken, uncharacteristically thankful for the ceaseless salt-spit breeze. Your fever recedes... You've been sailing for 8 days now, aboard one of the three Snekkja comprising Hersir Olaf's warband. Erik stirs before waking up with a familiar groan of dissatisfaction, he hasn't taken well to the sea... an embarrassing detail noted by your proud crewmates, but he is still your friend after all.",
+            "Following the barked commands and surefooted actions of your more seasoned crewmates, you and Erik prepare to land... *Crash* … The ship bucks suddenly, tilting and causing men left and right to stumble and fall... "
         ];
 
         let currentTextIndex = 0;
-        const textContent = document.getElementById('text-content');
-        const nextButton = document.getElementById('next-button');
-
-        nextButton.addEventListener('click', () => {
-            if (currentTextIndex < storyText.length - 1) {
-                currentTextIndex++;
-                textContent.textContent = storyText[currentTextIndex];
+        const textBox = document.getElementById('cinematic-text-box');
+        const textContent = document.getElementById('cinematic-text-content');
+        
+        // Function to display story text
+        function displayStoryText(index) {
+            if (index < storyText.length) {
+                // Make text box visible
+                textBox.classList.add('visible');
+                
+                // Display text with typewriter effect
+                const text = storyText[index];
+                textContent.textContent = '';
+                
+                let i = 0;
+                const typeSpeed = 25; // milliseconds per character
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        textContent.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, typeSpeed);
+                    } else {
+                        // Show visual indicator that clicking will advance
+                        const indicator = document.createElement('div');
+                        indicator.className = 'click-indicator';
+                        indicator.textContent = '▼';
+                        textContent.appendChild(document.createElement('br'));
+                        textContent.appendChild(indicator);
+                    }
+                }
+                
+                typeWriter();
+                currentTextIndex = index;
             } else {
-                // Handle end of prologue
-                console.log('End of prologue reached');
-                // Add transition to next scene here
+                // End of story reached
+                textBox.classList.remove('visible');
+                currentTextIndex = 0;
+                // Here you could transition to the next scene or chapter
+                console.log('End of story segment reached');
             }
-        });
-
-        // Other button handlers
-        document.getElementById('load-game').addEventListener('click', () => {
-            console.log('Loading game...');
-            // Load game logic will go here
-        });
-
-        document.getElementById('options').addEventListener('click', () => {
-            console.log('Opening options...');
-            // Options menu logic will go here
+        }
+        
+        // Click handler for advancing text
+        document.getElementById('cinematic-frame').addEventListener('click', () => {
+            // If text is still typing, complete it instantly
+            if (textContent.textContent.length < storyText[currentTextIndex].length) {
+                textContent.textContent = storyText[currentTextIndex];
+                
+                // Show visual indicator that clicking will advance
+                const indicator = document.createElement('div');
+                indicator.className = 'click-indicator';
+                indicator.textContent = '▼';
+                textContent.appendChild(document.createElement('br'));
+                textContent.appendChild(indicator);
+            } else {
+                // Otherwise, advance to next text
+                displayStoryText(currentTextIndex + 1);
+            }
         });
     </script>
 </body>
-</html> 
+</html>
