@@ -204,6 +204,206 @@
             50% { opacity: 1; }
             100% { opacity: 0.3; }
         }
+        
+        /* Camp UI Styles */
+        #camp-ui {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('assets/prologue_screen.png');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        #camp-container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+        
+        #camp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4a90e2;
+            padding-bottom: 10px;
+        }
+        
+        #time-remaining {
+            background-color: #4a90e2;
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        #time-value {
+            font-size: 1.2em;
+        }
+        
+        #camp-activity-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .camp-activity {
+            background-color: rgba(25, 21, 44, 0.8);
+            border: 2px solid #4a90e2;
+            border-radius: 5px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .camp-activity:hover {
+            transform: scale(1.05);
+            background-color: rgba(74, 144, 226, 0.3);
+        }
+        
+        .activity-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .activity-name {
+            font-weight: bold;
+        }
+        
+        .camp-activity.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            border-color: #666;
+        }
+        
+        .camp-activity.locked:hover {
+            transform: none;
+            background-color: rgba(25, 21, 44, 0.8);
+        }
+        
+        .locked-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #ccc;
+        }
+        
+        #camp-result {
+            background-color: rgba(25, 21, 44, 0.8);
+            border: 9px solid transparent;
+            border-image-source: url('assets/Text_Box.png');
+            border-image-slice: 9;
+            border-image-width: 1;
+            border-image-outset: 0.4;
+            border-image-repeat: stretch;
+            padding: 15px;
+            margin-bottom: 20px;
+            min-height: 120px;
+            color: white;
+        }
+        
+        #continue-journey {
+            background-color: #4a90e2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        #continue-journey:hover {
+            background-color: #357abd;
+            transform: scale(1.05);
+        }
+        
+        /* Activity Modals */
+        .activity-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .activity-modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: rgba(25, 21, 44, 0.9);
+            border: 9px solid transparent;
+            border-image-source: url('assets/Text_Box.png');
+            border-image-slice: 9;
+            border-image-width: 1;
+            border-image-outset: 0.4;
+            border-image-repeat: stretch;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+            color: white;
+        }
+        
+        .modal-content h3 {
+            border-bottom: 2px solid #4a90e2;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .modal-description {
+            margin-bottom: 20px;
+        }
+        
+        .modal-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option-btn {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option-btn:hover {
+            background-color: #357abd;
+            transform: scale(1.05);
+        }
+        
+        .modal-close {
+            background-color: #666;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: block;
+            margin-left: auto;
+        }
+        
+        .modal-close:hover {
+            background-color: #888;
+        }
     </style>
 </head>
 <body>
@@ -227,12 +427,138 @@
             </div>
         </div>
     </div>
+    
+    <!-- Camp UI Screen -->
+    <div id="camp-ui" class="screen">
+        <div id="camp-container">
+            <div id="camp-header">
+                <h2>Camp</h2>
+                <div id="time-remaining">
+                    <span>Time Remaining: </span>
+                    <span id="time-value">5</span>
+                </div>
+            </div>
+            
+            <div id="camp-activity-grid">
+                <!-- Training -->
+                <div class="camp-activity" data-activity="training">
+                    <div class="activity-icon">T</div>
+                    <div class="activity-name">Training</div>
+                </div>
+                
+                <!-- Rest -->
+                <div class="camp-activity" data-activity="rest">
+                    <div class="activity-icon">R</div>
+                    <div class="activity-name">Rest</div>
+                </div>
+                
+                <!-- Companions -->
+                <div class="camp-activity" data-activity="companions">
+                    <div class="activity-icon">C</div>
+                    <div class="activity-name">Companions</div>
+                </div>
+                
+                <!-- Random Events -->
+                <div class="camp-activity" data-activity="events">
+                    <div class="activity-icon">E</div>
+                    <div class="activity-name">Events</div>
+                </div>
+                
+                <!-- Scavenge -->
+                <div class="camp-activity" data-activity="scavenge">
+                    <div class="activity-icon">S</div>
+                    <div class="activity-name">Scavenge</div>
+                </div>
+                
+                <!-- Shop (Locked) -->
+                <div class="camp-activity locked" data-activity="shop">
+                    <div class="activity-icon">$</div>
+                    <div class="activity-name">Shop</div>
+                    <div class="locked-overlay">Locked</div>
+                </div>
+                
+                <!-- Crafting -->
+                <div class="camp-activity" data-activity="crafting">
+                    <div class="activity-icon">Cr</div>
+                    <div class="activity-name">Crafting</div>
+                </div>
+                
+                <!-- Crew Management (Locked) -->
+                <div class="camp-activity locked" data-activity="crew">
+                    <div class="activity-icon">CM</div>
+                    <div class="activity-name">Crew</div>
+                    <div class="locked-overlay">Locked</div>
+                </div>
+                
+                <!-- Medic -->
+                <div class="camp-activity" data-activity="medic">
+                    <div class="activity-icon">M</div>
+                    <div class="activity-name">Medic</div>
+                </div>
+            </div>
+            
+            <div id="camp-result">
+                <div id="camp-result-content"></div>
+            </div>
+            
+            <button id="continue-journey" class="btn">Continue Journey</button>
+        </div>
+        
+        <!-- Activity Detail Modals -->
+        <div id="training-modal" class="activity-modal">
+            <div class="modal-content">
+                <h3>Training</h3>
+                <div class="modal-description">
+                    <p>Choose your training method:</p>
+                </div>
+                <div class="modal-options">
+                    <button class="option-btn" data-option="solo">Solo Training</button>
+                    <button class="option-btn" data-option="tier1">Train with Crew (Tier 1)</button>
+                    <button class="option-btn" data-option="tier2">Train with Veterans (Tier 2)</button>
+                    <button class="option-btn" data-option="tier3">Train with Hersir (Tier 3)</button>
+                </div>
+                <button class="modal-close">Cancel</button>
+            </div>
+        </div>
+        
+        <div id="rest-modal" class="activity-modal">
+            <div class="modal-content">
+                <h3>Rest & Recreation</h3>
+                <div class="modal-description">
+                    <p>Choose how to spend your downtime:</p>
+                </div>
+                <div class="modal-options">
+                    <button class="option-btn" data-option="sleep">Sleep</button>
+                    <button class="option-btn" data-option="drink">Drinking</button>
+                    <button class="option-btn" data-option="pray">Prayer</button>
+                    <button class="option-btn" data-option="gamble">Gambling</button>
+                </div>
+                <button class="modal-close">Cancel</button>
+            </div>
+        </div>
+        
+        <div id="companions-modal" class="activity-modal">
+            <div class="modal-content">
+                <h3>Companions</h3>
+                <div class="modal-description">
+                    <p>Speak with:</p>
+                </div>
+                <div class="modal-options">
+                    <button class="option-btn" data-option="erik">Erik</button>
+                    <button class="option-btn" data-option="olaf">Hersir Olaf</button>
+                    <button class="option-btn" data-option="random">Other Warriors</button>
+                </div>
+                <button class="modal-close">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Screen management
         const screens = {
             start: document.getElementById('start-screen'),
-            prologue: document.getElementById('cinematic-ui')
+            prologue: document.getElementById('cinematic-ui'),
+            camp: document.getElementById('camp-ui')
         };
 
         function transitionToScreen(fromScreen, toScreen) {
@@ -601,13 +927,357 @@
             // Only allow advancing if we're not showing choices
             if (!currentNode.choices) {
                 if (currentNode.next) {
-                    displayStoryText(currentNode.next);
+                    // If the next node is the camp node, transition to camp UI
+                    if (currentNode.next === 19) {
+                        transitionToScreen(screens.prologue, screens.camp);
+                        initCamp();
+                    } else {
+                        displayStoryText(currentNode.next);
+                    }
                 } else if (currentNode.end) {
                     console.log("End of story reached"); 
                     // Here you could add code to end the game or move to the next chapter
                 }
             }
         });
+        
+        // Player character state
+        const playerState = {
+            strength: 5,
+            agility: 5,
+            intelligence: 5,
+            charisma: 5,
+            health: 100,
+            fatigue: 0,
+            reputation: 0,
+            blackRaven: 0,
+            whiteRaven: 0,
+            gold: 10,
+            inventory: []
+        };
+        
+        // Camp UI Logic
+        let campTimeRemaining = 5; // Start with 5 time units
+        const campResultContent = document.getElementById('camp-result-content');
+        
+        // Initialize camp UI
+        function initCamp() {
+            // Reset camp time
+            campTimeRemaining = 5;
+            updateTimeDisplay();
+            
+            // Clear any previous results
+            campResultContent.innerHTML = '<p>Welcome to camp. Choose an activity to begin.</p>';
+            
+            // Set up event listeners for camp activities
+            setupCampEventListeners();
+        }
+        
+        function updateTimeDisplay() {
+            document.getElementById('time-value').textContent = campTimeRemaining;
+        }
+        
+        function setupCampEventListeners() {
+            // Activity buttons
+            document.querySelectorAll('.camp-activity:not(.locked)').forEach(activity => {
+                activity.addEventListener('click', () => {
+                    const activityType = activity.dataset.activity;
+                    openActivityModal(activityType);
+                });
+            });
+            
+            // Modal close buttons
+            document.querySelectorAll('.modal-close').forEach(button => {
+                button.addEventListener('click', closeAllModals);
+            });
+            
+            // Continue journey button
+            document.getElementById('continue-journey').addEventListener('click', () => {
+                // Return to story at node 20
+                transitionToScreen(screens.camp, screens.prologue);
+                displayStoryText(20);
+            });
+            
+            // Training modal options
+            document.querySelectorAll('#training-modal .option-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const option = button.dataset.option;
+                    handleTraining(option);
+                    closeAllModals();
+                });
+            });
+            
+            // Rest modal options
+            document.querySelectorAll('#rest-modal .option-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const option = button.dataset.option;
+                    handleRest(option);
+                    closeAllModals();
+                });
+            });
+            
+            // Companions modal options
+            document.querySelectorAll('#companions-modal .option-btn').forEach(button => {
+                button.addEventListener('click', () => {
+                    const option = button.dataset.option;
+                    handleCompanions(option);
+                    closeAllModals();
+                });
+            });
+        }
+        
+        function openActivityModal(activityType) {
+            // Check if we have time for activities
+            if (campTimeRemaining <= 0) {
+                campResultContent.innerHTML = '<p>You have no more time remaining. You must continue your journey.</p>';
+                return;
+            }
+            
+            // Open the appropriate modal based on activity type
+            switch (activityType) {
+                case 'training':
+                    document.getElementById('training-modal').classList.add('active');
+                    break;
+                case 'rest':
+                    document.getElementById('rest-modal').classList.add('active');
+                    break;
+                case 'companions':
+                    document.getElementById('companions-modal').classList.add('active');
+                    break;
+                case 'events':
+                    handleRandomEvent();
+                    break;
+                case 'scavenge':
+                    handleScavenge();
+                    break;
+                case 'crafting':
+                    handleCrafting();
+                    break;
+                case 'medic':
+                    handleMedic();
+                    break;
+                default:
+                    campResultContent.innerHTML = '<p>That activity is not available.</p>';
+            }
+        }
+        
+        function closeAllModals() {
+            document.querySelectorAll('.activity-modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+        
+        // Roll a random number between 1 and 20 (D20)
+        function rollD20() {
+            return Math.floor(Math.random() * 20) + 1;
+        }
+        
+        // Handle training activities
+        function handleTraining(option) {
+            // Deduct time
+            campTimeRemaining -= 1;
+            updateTimeDisplay();
+            
+            const roll = rollD20();
+            let result = '';
+            
+            switch (option) {
+                case 'solo':
+                    if (roll + playerState.strength > 15) {
+                        playerState.strength += 1;
+                        result = '<p>You push yourself hard in training, focusing on your form. Your strength has increased!</p>';
+                    } else {
+                        playerState.fatigue += 5;
+                        result = '<p>You train hard but make little progress. You feel more fatigued.</p>';
+                    }
+                    break;
+                    
+                case 'tier1':
+                    if (roll + playerState.reputation > 12) {
+                        playerState.strength += 1;
+                        playerState.reputation += 1;
+                        result = '<p>You train with your crewmates, showing your skills. Both your strength and reputation have improved!</p>';
+                    } else {
+                        result = '<p>The training session is awkward. Your crewmates don\'t seem impressed.</p>';
+                    }
+                    break;
+                    
+                case 'tier2':
+                    if (roll + playerState.reputation > 15) {
+                        playerState.strength += 2;
+                        playerState.agility += 1;
+                        result = '<p>The veterans share valuable techniques with you. Your strength and agility have improved significantly!</p>';
+                    } else {
+                        result = '<p>The veterans find you lacking. They spend little time showing you their techniques.</p>';
+                        playerState.reputation -= 1;
+                    }
+                    break;
+                    
+                case 'tier3':
+                    if (roll + playerState.reputation > 18) {
+                        playerState.strength += 2;
+                        playerState.agility += 1;
+                        playerState.reputation += 2;
+                        result = '<p>Hersir Olaf personally instructs you. His guidance greatly improves your skills and standing in the warband!</p>';
+                    } else {
+                        result = '<p>Hersir Olaf quickly loses patience with your fumbling. He walks away disappointed.</p>';
+                        playerState.reputation -= 2;
+                    }
+                    break;
+            }
+            
+            campResultContent.innerHTML = result;
+        }
+        
+        // Handle rest activities
+        function handleRest(option) {
+            // Deduct time
+            campTimeRemaining -= 1;
+            updateTimeDisplay();
+            
+            const roll = rollD20();
+            let result = '';
+            
+            switch (option) {
+                case 'sleep':
+                    playerState.fatigue = Math.max(0, playerState.fatigue - 10);
+                    result = '<p>You find a quiet spot and get some much-needed rest. Your fatigue is reduced.</p>';
+                    break;
+                    
+                case 'drink':
+                    if (roll > 15) {
+                        playerState.fatigue = Math.max(0, playerState.fatigue - 5);
+                        playerState.reputation += 1;
+                        result = '<p>You share mead with your crewmates, telling boastful stories of your exploits. Your reputation increases!</p>';
+                    } else {
+                        playerState.fatigue += 5;
+                        result = '<p>You drink too much and make a fool of yourself. You wake up with a headache.</p>';
+                    }
+                    break;
+                    
+                case 'pray':
+                    if (playerState.blackRaven > playerState.whiteRaven) {
+                        playerState.blackRaven += 1;
+                        result = '<p>You offer prayers to Odin for victory in battle. You feel the Black Raven\'s gaze upon you.</p>';
+                    } else {
+                        playerState.whiteRaven += 1;
+                        result = '<p>You contemplate the nature of fate and your place in it. The White Raven\'s wisdom fills your thoughts.</p>';
+                    }
+                    playerState.fatigue = Math.max(0, playerState.fatigue - 5);
+                    break;
+                    
+                case 'gamble':
+                    if (roll > 10) {
+                        playerState.gold += 5;
+                        result = '<p>Your luck holds! You win 5 gold in the games of chance.</p>';
+                    } else {
+                        playerState.gold = Math.max(0, playerState.gold - 3);
+                        result = '<p>Fortune does not favor you today. You lose 3 gold.</p>';
+                    }
+                    break;
+            }
+            
+            campResultContent.innerHTML = result;
+        }
+        
+        // Handle companion interactions
+        function handleCompanions(option) {
+            // Deduct time
+            campTimeRemaining -= 1;
+            updateTimeDisplay();
+            
+            let result = '';
+            
+            switch (option) {
+                case 'erik':
+                    result = '<p>"I don\'t know about you," Erik says, cleaning his blade, "but I\'m looking forward to seeing what treasures that church holds. The Saxons value their religious artifacts highly."</p>';
+                    break;
+                    
+                case 'olaf':
+                    result = '<p>Hersir Olaf looks up from his map. "We move at dawn," he says gruffly. "Make sure you\'re prepared. I won\'t wait for stragglers."</p>';
+                    playerState.reputation += 1;
+                    break;
+                    
+                case 'random':
+                    const conversations = [
+                        '<p>A grizzled warrior tells you tales of his many raids in Frankia. You listen attentively, noting useful tactics.</p>',
+                        '<p>Two brothers argue about the best way to split their loot. They ask for your opinion, but seem dissatisfied with any suggestion.</p>',
+                        '<p>A young warrior boasts about his first kill today. His enthusiasm makes you reflect on your own feelings about combat.</p>'
+                    ];
+                    result = conversations[Math.floor(Math.random() * conversations.length)];
+                    break;
+            }
+            
+            campResultContent.innerHTML = result;
+        }
+        
+        // Handle random events
+        function handleRandomEvent() {
+            // Deduct time
+            campTimeRemaining -= 1;
+            updateTimeDisplay();
+            
+            const events = [
+                '<p>A heated argument breaks out between two warriors over a missing trinket. You help resolve it before blades are drawn.</p>',
+                '<p>You spot Saxon scouts watching the camp from the treeline. You alert the guards, who chase them off.</p>',
+                '<p>An unexpected rain shower soaks the camp. You help secure shelters and keep the fire going.</p>',
+                '<p>Mysterious lights appear in the distant forest. Some warriors see it as an omen, others dismiss it as natural.</p>'
+            ];
+            
+            const result = events[Math.floor(Math.random() * events.length)];
+            campResultContent.innerHTML = result;
+        }
+        
+        // Handle scavenging
+        function handleScavenge() {
+            // Deduct time
+            campTimeRemaining -= 1;
+            updateTimeDisplay();
+            
+            const roll = rollD20();
+            let result = '';
+            
+            if (roll > 15) {
+                playerState.gold += 3;
+                result = '<p>You find a small cache of Saxon valuables hidden nearby! You gain 3 gold.</p>';
+            } else if (roll > 10) {
+                playerState.inventory.push('Herbs');
+                result = '<p>You gather some useful medicinal herbs from the forest edge.</p>';
+            } else if (roll > 5) {
+                playerState.inventory.push('Wood');
+                result = '<p>You collect some good firewood and materials that could be useful for crafting.</p>';
+            } else {
+                playerState.fatigue += 3;
+                result = '<p>You search for hours but find nothing of value. The fruitless effort has tired you.</p>';
+            }
+            
+            campResultContent.innerHTML = result;
+        }
+        
+        // Handle crafting
+        function handleCrafting() {
+            // Deduct time
+            campTimeRemaining -= 1;
+            updateTimeDisplay();
+            
+            // Simple crafting for now
+            campResultContent.innerHTML = '<p>You spend time maintaining your equipment, sharpening your blade and repairing your armor. Your gear is in better condition now.</p>';
+        }
+        
+        // Handle medic activities
+        function handleMedic() {
+            // Deduct time
+            campTimeRemaining -= 1;
+            updateTimeDisplay();
+            
+            if (playerState.health < 100) {
+                playerState.health = Math.min(100, playerState.health + 10);
+                campResultContent.innerHTML = '<p>You tend to your wounds, cleaning and bandaging them properly. Your health improves.</p>';
+            } else {
+                campResultContent.innerHTML = '<p>You have no wounds that need tending. You help others in the camp with their injuries instead.</p>';
+                playerState.reputation += 1;
+            }
+        }
     </script>
 </body>
 </html>
