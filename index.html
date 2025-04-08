@@ -276,70 +276,179 @@
         });
 
         // Text box management
-        const storyText = [
-            "..You emerge from vague, unsatisfying fever dream... The crossroads, the ravens... a choice... resonance... faces... delirium...",
-            "You awaken, uncharacteristically thankful for the ceaseless salt-spit breeze. Your fever recedes... You've been sailing for 8 days now, aboard one of the three Snekkja comprising Hersir Olaf's warband. Erik stirs before waking up with a familiar groan of dissatisfaction, he hasn't taken well to the sea... an embarrassing detail noted by your proud crewmates, but he is still your friend after all.",
-            "Following the barked commands and surefooted actions of your more seasoned crewmates, you and Erik prepare to land... *Crash* … The ship bucks suddenly, tilting and causing men left and right to stumble and fall... "
-        ];
+        // Replace linear storyText array with a structured story object
+        const storyNodes = {
+            0: {
+                text: "..You emerge from vague, unsatisfying fever dream... The crossroads, the ravens... a choice... resonance... faces... delirium...",
+                next: 1
+            },
+            1: {
+                text: "You awaken, uncharacteristically thankful for the ceaseless salt-spit breeze. Your fever recedes... You've been sailing for 8 days now, aboard one of the three Snekkja comprising Hersir Olaf's warband. Erik stirs before waking up with a familiar groan of dissatisfaction, he hasn't taken well to the sea... an embarrassing detail noted by your proud crewmates, but he is still your friend after all.",
+                next: 2
+            },
+            2: {
+                text: "Following the barked commands and surefooted actions of your more seasoned crewmates, you and Erik prepare to land... *Crash* … The ship bucks suddenly, tilting and causing men left and right to stumble and fall...",
+                choices: [
+                    { text: "Grab onto the ship's rail", nextNode: 3 },
+                    { text: "Help Erik keep his balance", nextNode: 4 },
+                    { text: "Brace yourself against the deck", nextNode: 5 }
+                ]
+            },
+            3: {
+                text: "You lunge for the rail, fingers wrapping around the salt-crusted wood just as the ship lurches violently. You manage to stay upright while others tumble around you. From your stable position, you see what happened - the ship has struck a submerged rock, and water is already beginning to seep through the hull.",
+                next: 6
+            },
+            4: {
+                text: "You reach for Erik, grabbing his arm as he begins to pitch forward. He clutches at you gratefully as the ship stabilizes. 'Thanks, friend,' he mutters, his face pale. Your act of loyalty hasn't gone unnoticed - you catch Hersir Olaf nodding approvingly from the stern of the ship.",
+                next: 6
+            },
+            5: {
+                text: "You widen your stance and lower your center of gravity, bracing against the deck planks. The sudden shift throws even veteran warriors off balance, but you remain steady. Your quick instincts mark you as one with a natural feel for the sea, earning respectful glances from the older crew members.",
+                next: 6
+            },
+            6: {
+                text: "The ship settles, but the damage is done. 'LAND! NOW!' bellows Hersir Olaf, pointing to the nearby shore. 'Everyone row! We're taking on water!' The crew leaps into action, and you join them at the oars, muscles straining as you race against the slowly rising water in the hull...",
+                choices: [
+                    { text: "Row with all your might", nextNode: 7 },
+                    { text: "Help bail out water", nextNode: 8 }
+                ]
+            },
+            7: {
+                text: "You throw your back into the rowing, joining the rhythmic grunt and pull of the oarsmen. Your shoulders burn with the effort, but the shore grows closer with each stroke. The ship's master nods at your effort - such strength will be remembered.",
+                next: 9
+            },
+            8: {
+                text: "While others row, you grab a bucket and start bailing. The cold seawater soaks your boots, but your quick action helps keep the ship from sinking too quickly. 'Good thinking,' grunts a grizzled warrior next to you, as you both work to keep the vessel afloat.",
+                next: 9
+            },
+            9: {
+                text: "With a grinding crunch, the ship beaches itself on the rocky shore. 'Everyone out!' commands Olaf. 'Salvage what you can!' You've reached the strange new land, though not quite as planned. Your journey has only just begun...",
+                end: true
+            }
+        };
 
-        let currentTextIndex = 0;
+        let currentNodeId = 0;
         const textBox = document.getElementById('cinematic-text-box');
         const textContent = document.getElementById('cinematic-text-content');
+        const choiceBox = document.getElementById('cinematic-button-box');
+
+        // Functions for the story progression
         
-        // Function to display story text
-        function displayStoryText(index) {
-            if (index < storyText.length) {
-                // Make text box visible
-                textBox.classList.add('visible');
-                
-                // Display text with typewriter effect
-                const text = storyText[index];
-                textContent.textContent = '';
-                
-                let i = 0;
-                const typeSpeed = 25; // milliseconds per character
-                
-                function typeWriter() {
+        // Typewriter effect for text display
+        function typewriterEffect(element, text, speed = 9) {
+            element.innerHTML = '';
+            let i = 0;
+            
+            return new Promise(resolve => {
+                function typeNextChar() {
                     if (i < text.length) {
-                        textContent.textContent += text.charAt(i);
+                        element.innerHTML += text.charAt(i);
                         i++;
-                        setTimeout(typeWriter, typeSpeed);
+                        setTimeout(typeNextChar, speed);
                     } else {
-                        // Show visual indicator that clicking will advance
-                        const indicator = document.createElement('div');
-                        indicator.className = 'click-indicator';
-                        indicator.textContent = '▼';
-                        textContent.appendChild(document.createElement('br'));
-                        textContent.appendChild(indicator);
+                        resolve();
+                        // Add click indicator after text is fully typed
+                        if (!document.querySelector('.click-indicator')) {
+                            const indicator = document.createElement('div');
+                            indicator.className = 'click-indicator';
+                            indicator.textContent = 'Click to continue...';
+                            textBox.appendChild(indicator);
+                        }
                     }
                 }
-                
-                typeWriter();
-                currentTextIndex = index;
-            } else {
-                // End of story reached
-                textBox.classList.remove('visible');
-                currentTextIndex = 0;
-                // Here you could transition to the next scene or chapter
-                console.log('End of story segment reached');
+                typeNextChar();
+            });
+        }
+
+        // Display story text for the current node
+        async function displayStoryText(nodeId) {
+            currentNodeId = nodeId;
+            const currentNode = storyNodes[nodeId];
+            
+            // Clear any existing choices
+            choiceBox.innerHTML = '';
+            
+            // Remove any existing click indicators
+            const existingIndicator = document.querySelector('.click-indicator');
+            if (existingIndicator) {
+                existingIndicator.remove();
+            }
+            
+            // Make text box visible
+            textBox.classList.add('visible');
+            
+            // Display the text with typewriter effect
+            await typewriterEffect(textContent, currentNode.text);
+            
+            // Check if this node has choices
+            if (currentNode.choices) {
+                displayChoices(currentNode.choices);
             }
         }
         
-        // Click handler for advancing text
-        document.getElementById('cinematic-frame').addEventListener('click', () => {
-            // If text is still typing, complete it instantly
-            if (textContent.textContent.length < storyText[currentTextIndex].length) {
-                textContent.textContent = storyText[currentTextIndex];
+        // Display choices for the current node
+        function displayChoices(choices) {
+            choiceBox.innerHTML = '';
+            
+            // Create a styled container for the choices
+            const choiceContainer = document.createElement('div');
+            choiceContainer.style.position = 'absolute';
+            choiceContainer.style.bottom = '20px';
+            choiceContainer.style.left = '0';
+            choiceContainer.style.right = '0';
+            choiceContainer.style.display = 'flex';
+            choiceContainer.style.justifyContent = 'center';
+            choiceContainer.style.flexWrap = 'wrap';
+            choiceContainer.style.gap = '10px';
+            
+            choices.forEach(choice => {
+                const button = document.createElement('button');
+                button.textContent = choice.text;
+                button.style.padding = '10px 20px';
+                button.style.margin = '5px';
+                button.style.backgroundColor = '#4a90e2';
+                button.style.color = 'white';
+                button.style.border = 'none';
+                button.style.borderRadius = '5px';
+                button.style.cursor = 'pointer';
+                button.style.fontSize = '16px';
+                button.style.transition = 'transform 0.2s';
                 
-                // Show visual indicator that clicking will advance
-                const indicator = document.createElement('div');
-                indicator.className = 'click-indicator';
-                indicator.textContent = '▼';
-                textContent.appendChild(document.createElement('br'));
-                textContent.appendChild(indicator);
-            } else {
-                // Otherwise, advance to next text
-                displayStoryText(currentTextIndex + 1);
+                button.addEventListener('mouseover', () => {
+                    button.style.transform = 'scale(1.05)';
+                });
+                
+                button.addEventListener('mouseout', () => {
+                    button.style.transform = 'scale(1.0)';
+                });
+                
+                button.addEventListener('click', () => {
+                    handleChoiceSelection(choice.nextNode);
+                });
+                
+                choiceContainer.appendChild(button);
+            });
+            
+            choiceBox.appendChild(choiceContainer);
+        }
+        
+        // Handle the player's choice selection
+        function handleChoiceSelection(nextNodeId) {
+            displayStoryText(nextNodeId);
+        }
+        
+        // Handle click to advance text when there are no choices
+        document.getElementById('cinematic-frame').addEventListener('click', () => {
+            const currentNode = storyNodes[currentNodeId];
+            
+            // Only allow advancing if we're not showing choices
+            if (!currentNode.choices) {
+                if (currentNode.next) {
+                    displayStoryText(currentNode.next);
+                } else if (currentNode.end) {
+                    console.log("End of story reached"); 
+                    // Here you could add code to end the game or move to the next chapter
+                }
             }
         });
     </script>
