@@ -404,6 +404,216 @@
         .modal-close:hover {
             background-color: #888;
         }
+
+        /* Battle UI Styles */
+        #battle-ui {
+            background-image: url('assets/prologue_screen.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #battle-container {
+            width: 95%;
+            max-width: 800px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        #battle-scene {
+            flex: 1;
+            background-color: rgba(0, 0, 0, 0.6);
+            border: 9px solid transparent;
+            border-image-source: url('assets/Text_Box.png');
+            border-image-slice: 9;
+            border-image-width: 1;
+            border-image-outset: 0.4;
+            border-image-repeat: stretch;
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .character-placeholder {
+            width: 100px;
+            height: 150px;
+            position: relative;
+        }
+        
+        .character-placeholder.viking {
+            background-color: #4a90e2;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+        
+        .character-placeholder.viking::before {
+            content: "";
+            position: absolute;
+            top: -20px;
+            left: 25px;
+            width: 50px;
+            height: 30px;
+            background-color: #ddd;
+            clip-path: polygon(20% 0%, 50% 100%, 80% 0%);
+        }
+        
+        .character-placeholder.saxon {
+            background-color: #a83232;
+            clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
+        }
+        
+        #battle-text-box {
+            height: 100px;
+            border: 9px solid transparent;
+            border-image-source: url('assets/Text_Box.png');
+            border-image-slice: 9;
+            border-image-width: 1;
+            border-image-outset: 0.4;
+            border-image-repeat: stretch;
+            padding: 20px;
+            background-color: rgba(25, 21, 44, 0.8);
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            overflow-y: auto;
+        }
+        
+        #battle-status-container {
+            display: flex;
+            height: 150px;
+            border: 9px solid transparent;
+            border-image-source: url('assets/Text_Box.png');
+            border-image-slice: 9;
+            border-image-width: 1;
+            border-image-outset: 0.4;
+            border-image-repeat: stretch;
+            background-color: rgba(25, 21, 44, 0.8);
+            padding: 10px;
+        }
+        
+        #player-status {
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .status-name {
+            font-size: 1.2rem;
+            color: white;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .status-bars {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .status-bar-label {
+            width: 30px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-bar {
+            flex: 1;
+            height: 20px;
+            background-color: #222;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s;
+        }
+        
+        .hp-fill {
+            background-color: #e74c3c;
+        }
+        
+        .energy-fill {
+            background-color: #2ecc71;
+        }
+        
+        .bar-text {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 1px black;
+        }
+        
+        #battle-actions {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px;
+        }
+        
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .battle-action {
+            flex: 1;
+            margin: 5px;
+            padding: 10px 5px;
+            background-color: #4a90e2;
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .battle-action:hover {
+            background-color: #357abd;
+            transform: scale(1.05);
+        }
+        
+        #battle-weapon {
+            flex: 0.5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .weapon-icon {
+            font-size: 2rem;
+        }
+        
+        /* Battle Animation Classes */
+        .attack-animation {
+            animation: attack-move 0.5s forwards;
+        }
+        
+        .hurt-animation {
+            animation: hurt-flash 0.5s;
+        }
+        
+        @keyframes attack-move {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(50px); }
+            100% { transform: translateX(0); }
+        }
+        
+        @keyframes hurt-flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -552,57 +762,76 @@
             </div>
         </div>
     </div>
-
+    
+    <!-- Battle UI Screen -->
+    <div id="battle-ui" class="screen">
+        <div id="battle-container">
+            <!-- Battle Scene -->
+            <div id="battle-scene">
+                <div id="player-character">
+                    <!-- Player character sprite will go here -->
+                    <div class="character-placeholder viking"></div>
+                </div>
+                <div id="enemy-character">
+                    <!-- Enemy character sprite will go here -->
+                    <div class="character-placeholder saxon"></div>
+                </div>
+            </div>
+            
+            <!-- Battle Text Area -->
+            <div id="battle-text-box">
+                <div id="battle-text-content">The Saxon warrior stands before you, weapon raised and ready to fight!</div>
+            </div>
+            
+            <!-- Battle Status and Actions -->
+            <div id="battle-status-container">
+                <div id="player-status">
+                    <div class="status-name">Viking Warrior</div>
+                    <div class="status-bars">
+                        <div class="status-bar-label">HP</div>
+                        <div class="status-bar hp-bar">
+                            <div class="bar-fill hp-fill" style="width: 100%;"></div>
+                            <div class="bar-text">100 / 100</div>
+                        </div>
+                    </div>
+                    <div class="status-bars">
+                        <div class="status-bar-label">EN</div>
+                        <div class="status-bar energy-bar">
+                            <div class="bar-fill energy-fill" style="width: 100%;"></div>
+                            <div class="bar-text">65 / 65</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="battle-actions">
+                    <div class="action-row">
+                        <button class="battle-action" data-action="attack">Attack</button>
+                        <button class="battle-action" data-action="feint">Feint</button>
+                        <button class="battle-action" data-action="throw">Throw</button>
+                    </div>
+                    <div class="action-row">
+                        <button class="battle-action" data-action="defend">Defend</button>
+                        <button class="battle-action" data-action="recover">Recover</button>
+                        <button class="battle-action" data-action="evade">Evade</button>
+                    </div>
+                </div>
+                
+                <div id="battle-weapon">
+                    <div class="weapon-icon">⚔️</div>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         // Screen management
         const screens = {
             start: document.getElementById('start-screen'),
             prologue: document.getElementById('cinematic-ui'),
-            camp: document.getElementById('camp-ui')
+            camp: document.getElementById('camp-ui'),
+            battle: document.getElementById('battle-ui')
         };
-
-        function transitionToScreen(fromScreen, toScreen) {
-            const blackOverlay = document.getElementById('black-overlay');
-
-            // First fade to black
-            blackOverlay.classList.add('active');
-
-            // Wait for fade to black
-            setTimeout(() => {
-                // Hide the current screen
-                fromScreen.classList.remove('active');
-
-                // Show the new screen
-                toScreen.classList.add('active');
-
-                // Fade out the black overlay
-                blackOverlay.classList.remove('active');
-
-                // Wait for the black overlay to finish fading out
-                blackOverlay.addEventListener('transitionend', function onTransitionEnd() {
-                    blackOverlay.removeEventListener('transitionend', onTransitionEnd);
-                    
-                    // Start the opacity effect transition
-                    const cinematicUI = document.getElementById('cinematic-ui');
-                    if (cinematicUI.classList.contains('active')) {
-                        cinematicUI.classList.add('opacity-transition');
-                        
-                        // After UI is active, display the first story text
-                        setTimeout(() => {
-                            displayStoryText(0);
-                        }, 500);
-                    }
-                });
-            }, 1000);
-        }
-
-        // Start game button handler
-        document.getElementById('start-game').addEventListener('click', () => {
-            transitionToScreen(screens.start, screens.prologue);
-        });
-
-        // Text box management
-        // Replace linear storyText array with a structured story object
+        
+        // Structured story object
         const storyNodes = {
             0: {
                 text: "..You emerge from vague, unsatisfying fever dream... The crossroads, the ravens... a choice... resonance... faces... delirium...",
@@ -658,7 +887,7 @@
                 next: 11
             },
             11: {
-                text: "[Battle with Saxons - Your first real combat experience]",
+                text: "The Saxons charge from the treeline, their weapons glinting in the sunlight. Your heart pounds as you grip your weapon, preparing for your first real battle on Saxon soil.",
                 next: 12
             },
             12: {
@@ -696,7 +925,7 @@
                 next: 19
             },
             19: {
-                text: "[Camp - Time to rest, train, and prepare]",
+                text: "As evening approaches, your warband establishes a camp in a clearing near the shore. Tents are erected, fires are lit, and the smell of cooking food fills the air. You have some time before you must rest for tomorrow's march.",
                 next: 20
             },
             20: {
@@ -708,7 +937,7 @@
                 next: 22
             },
             22: {
-                text: "[Battle with Saxon defenders]",
+                text: "Tension fills the air as both sides measure each other. Then, with a thunderous war cry, Hersir Olaf signals the attack. Your warband surges forward, and you find yourself charging toward the Saxon line.",
                 next: 23
             },
             23: {
@@ -741,7 +970,7 @@
                 next: 25
             },
             29: {
-                text: "[Church scene - continues to Chapter 1 Church]",
+                text: "You approach the church, its stone walls looming above you. The wooden doors stand ajar, and you can hear voices inside. This seems to be where the real treasures of the village are kept. Chapter 1 continues...",
                 end: true
             },
             30: {
@@ -758,8 +987,6 @@
         const textBox = document.getElementById('cinematic-text-box');
         const textContent = document.getElementById('cinematic-text-content');
         const choiceBox = document.getElementById('cinematic-button-box');
-
-        // Functions for the story progression
         
         // Typewriter effect for text display
         let typewriterActive = false;
@@ -931,7 +1158,13 @@
                     if (currentNode.next === 19) {
                         transitionToScreen(screens.prologue, screens.camp);
                         initCamp();
-                    } else {
+                    } 
+                    // If the next node is a battle node, transition to battle UI
+                    else if (currentNode.next === 11 || currentNode.next === 22) {
+                        transitionToScreen(screens.prologue, screens.battle);
+                        initBattle(currentNode.next === 11 ? 'first' : 'second');
+                    } 
+                    else {
                         displayStoryText(currentNode.next);
                     }
                 } else if (currentNode.end) {
@@ -948,6 +1181,9 @@
             intelligence: 5,
             charisma: 5,
             health: 100,
+            maxHealth: 100,
+            energy: 65,
+            maxEnergy: 65,
             fatigue: 0,
             reputation: 0,
             blackRaven: 0,
@@ -1278,6 +1514,411 @@
                 playerState.reputation += 1;
             }
         }
+
+        // Battle System
+        const battleState = {
+            playerHealth: 100,
+            playerMaxHealth: 100,
+            playerEnergy: 65,
+            playerMaxEnergy: 65,
+            enemyHealth: 100,
+            enemyMaxHealth: 100,
+            enemyName: 'Saxon Warrior',
+            turnCount: 0,
+            battlePhase: 'player', // 'player', 'enemy', 'end'
+            battleType: 'first', // 'first', 'second'
+            battleLog: [],
+            isActive: false
+        };
+        
+        function initBattle(battleType) {
+            // Reset battle state
+            battleState.playerHealth = playerState.health;
+            battleState.playerMaxHealth = playerState.maxHealth;
+            battleState.playerEnergy = playerState.energy;
+            battleState.playerMaxEnergy = playerState.maxEnergy;
+            battleState.turnCount = 0;
+            battleState.battlePhase = 'player';
+            battleState.battleType = battleType;
+            battleState.battleLog = [];
+            battleState.isActive = true;
+            
+            // Set enemy stats based on battle type
+            if (battleType === 'first') {
+                battleState.enemyName = 'Saxon Scout';
+                battleState.enemyHealth = 80;
+                battleState.enemyMaxHealth = 80;
+                
+                // Set initial battle message
+                updateBattleText("A Saxon scout charges at you, wielding a short sword. The clash of steel rings through the air as your warband engages the enemy.");
+            } else {
+                battleState.enemyName = 'Saxon Defender';
+                battleState.enemyHealth = 120;
+                battleState.enemyMaxHealth = 120;
+                
+                // Set initial battle message
+                updateBattleText("A battle-hardened Saxon defender blocks your path to the village. His chainmail glints in the sunlight as he raises his axe, ready to defend his home.");
+            }
+            
+            // Update UI
+            updateBattleUI();
+            
+            // Add event listeners to battle actions
+            setupBattleEventListeners();
+        }
+        
+        function setupBattleEventListeners() {
+            document.querySelectorAll('.battle-action').forEach(button => {
+                button.addEventListener('click', () => {
+                    const action = button.dataset.action;
+                    if (battleState.battlePhase === 'player') {
+                        handlePlayerAction(action);
+                    }
+                });
+            });
+        }
+        
+        function updateBattleText(text) {
+            document.getElementById('battle-text-content').textContent = text;
+        }
+        
+        function appendBattleText(text) {
+            const currentText = document.getElementById('battle-text-content').textContent;
+            document.getElementById('battle-text-content').textContent = currentText + " " + text;
+        }
+        
+        function updateBattleUI() {
+            // Update health and energy bars
+            const hpFill = document.querySelector('.hp-fill');
+            const energyFill = document.querySelector('.energy-fill');
+            const hpText = document.querySelector('.hp-bar .bar-text');
+            const energyText = document.querySelector('.energy-bar .bar-text');
+            
+            const hpPercentage = (battleState.playerHealth / battleState.playerMaxHealth) * 100;
+            const energyPercentage = (battleState.playerEnergy / battleState.playerMaxEnergy) * 100;
+            
+            hpFill.style.width = hpPercentage + '%';
+            energyFill.style.width = energyPercentage + '%';
+            
+            hpText.textContent = `${battleState.playerHealth} / ${battleState.playerMaxHealth}`;
+            energyText.textContent = `${battleState.playerEnergy} / ${battleState.playerMaxEnergy}`;
+            
+            // Update player name
+            document.querySelector('.status-name').textContent = 'Viking Warrior';
+            
+            // Update action buttons based on available energy
+            document.querySelectorAll('.battle-action').forEach(button => {
+                const action = button.dataset.action;
+                let energyCost = 0;
+                
+                switch (action) {
+                    case 'attack': energyCost = 10; break;
+                    case 'feint': energyCost = 15; break;
+                    case 'throw': energyCost = 20; break;
+                    case 'defend': energyCost = 5; break;
+                    case 'recover': energyCost = 0; break;
+                    case 'evade': energyCost = 10; break;
+                }
+                
+                if (energyCost > battleState.playerEnergy) {
+                    button.disabled = true;
+                    button.style.opacity = '0.5';
+                } else {
+                    button.disabled = false;
+                    button.style.opacity = '1';
+                }
+            });
+            
+            // If battle is over, disable all actions
+            if (battleState.battlePhase === 'end') {
+                document.querySelectorAll('.battle-action').forEach(button => {
+                    button.disabled = true;
+                    button.style.opacity = '0.5';
+                });
+            }
+        }
+        
+        function handlePlayerAction(action) {
+            // Prevent actions during enemy turn or when battle is over
+            if (battleState.battlePhase !== 'player' || battleState.isActive === false) {
+                return;
+            }
+            
+            let damage = 0;
+            let energyCost = 0;
+            let actionText = '';
+            
+            // Calculate damage and energy cost based on action
+            switch (action) {
+                case 'attack':
+                    damage = Math.floor(5 + Math.random() * 10) + Math.floor(playerState.strength / 2);
+                    energyCost = 10;
+                    actionText = `You swing your weapon at the ${battleState.enemyName}, dealing ${damage} damage!`;
+                    break;
+                    
+                case 'feint':
+                    damage = Math.floor(8 + Math.random() * 15) + Math.floor(playerState.agility / 2);
+                    energyCost = 15;
+                    actionText = `You fake a move and catch the ${battleState.enemyName} off guard, striking for ${damage} damage!`;
+                    break;
+                    
+                case 'throw':
+                    damage = Math.floor(12 + Math.random() * 20);
+                    energyCost = 20;
+                    actionText = `You throw your weapon with precision, striking the ${battleState.enemyName} for ${damage} damage!`;
+                    break;
+                    
+                case 'defend':
+                    damage = 0;
+                    energyCost = 5;
+                    battleState.playerDefending = true;
+                    actionText = `You raise your shield, preparing to block the next attack.`;
+                    break;
+                    
+                case 'recover':
+                    damage = 0;
+                    energyCost = 0;
+                    const energyRecovered = Math.floor(10 + Math.random() * 10);
+                    battleState.playerEnergy = Math.min(battleState.playerMaxEnergy, battleState.playerEnergy + energyRecovered);
+                    actionText = `You take a moment to catch your breath, recovering ${energyRecovered} energy.`;
+                    break;
+                    
+                case 'evade':
+                    damage = 0;
+                    energyCost = 10;
+                    battleState.playerEvading = true;
+                    actionText = `You prepare to dodge the next attack, making yourself harder to hit.`;
+                    break;
+            }
+            
+            // Apply energy cost
+            battleState.playerEnergy = Math.max(0, battleState.playerEnergy - energyCost);
+            
+            // Update battle text
+            updateBattleText(actionText);
+            
+            // Apply damage to enemy
+            if (damage > 0) {
+                // Play attack animation
+                const playerCharacter = document.querySelector('.character-placeholder.viking');
+                playerCharacter.classList.add('attack-animation');
+                setTimeout(() => {
+                    playerCharacter.classList.remove('attack-animation');
+                    
+                    // Play enemy hurt animation
+                    const enemyCharacter = document.querySelector('.character-placeholder.saxon');
+                    enemyCharacter.classList.add('hurt-animation');
+                    setTimeout(() => {
+                        enemyCharacter.classList.remove('hurt-animation');
+                    }, 500);
+                    
+                    battleState.enemyHealth = Math.max(0, battleState.enemyHealth - damage);
+                    
+                    // Check if enemy is defeated
+                    if (battleState.enemyHealth <= 0) {
+                        handleEnemyDefeated();
+                        return;
+                    }
+                    
+                    // Enemy turn after a short delay
+                    setTimeout(() => {
+                        handleEnemyTurn();
+                    }, 1000);
+                }, 500);
+            } else {
+                // Enemy turn after a short delay
+                setTimeout(() => {
+                    handleEnemyTurn();
+                }, 1000);
+            }
+            
+            // Update UI
+            updateBattleUI();
+        }
+        
+        function handleEnemyTurn() {
+            battleState.battlePhase = 'enemy';
+            
+            // Reset defense and evasion flags
+            const wasDefending = battleState.playerDefending || false;
+            const wasEvading = battleState.playerEvading || false;
+            battleState.playerDefending = false;
+            battleState.playerEvading = false;
+            
+            // Enemy AI - simple random choice
+            const enemyActions = ['attack', 'heavy_attack', 'special'];
+            const enemyAction = enemyActions[Math.floor(Math.random() * enemyActions.length)];
+            
+            let damage = 0;
+            let actionText = '';
+            
+            // Calculate enemy damage based on action
+            switch (enemyAction) {
+                case 'attack':
+                    damage = Math.floor(5 + Math.random() * 8);
+                    actionText = `The ${battleState.enemyName} swings their weapon at you`;
+                    break;
+                    
+                case 'heavy_attack':
+                    damage = Math.floor(10 + Math.random() * 5);
+                    actionText = `The ${battleState.enemyName} delivers a powerful blow`;
+                    break;
+                    
+                case 'special':
+                    if (battleState.battleType === 'first') {
+                        damage = Math.floor(8 + Math.random() * 7);
+                        actionText = `The ${battleState.enemyName} attempts a quick thrust with their sword`;
+                    } else {
+                        damage = Math.floor(12 + Math.random() * 8);
+                        actionText = `The ${battleState.enemyName} swings their axe in a wide arc`;
+                    }
+                    break;
+            }
+            
+            // Apply defense or evasion effects
+            if (wasDefending) {
+                damage = Math.floor(damage * 0.5);
+                actionText += `, but your shield absorbs much of the impact`;
+            } else if (wasEvading) {
+                if (Math.random() > 0.3) {
+                    damage = 0;
+                    actionText += `, but you successfully dodge out of the way`;
+                } else {
+                    actionText += `, and despite your attempt to dodge, the attack connects`;
+                }
+            }
+            
+            // Play enemy attack animation
+            const enemyCharacter = document.querySelector('.character-placeholder.saxon');
+            enemyCharacter.classList.add('attack-animation');
+            
+            setTimeout(() => {
+                enemyCharacter.classList.remove('attack-animation');
+                
+                if (damage > 0) {
+                    // Play player hurt animation
+                    const playerCharacter = document.querySelector('.character-placeholder.viking');
+                    playerCharacter.classList.add('hurt-animation');
+                    setTimeout(() => {
+                        playerCharacter.classList.remove('hurt-animation');
+                    }, 500);
+                    
+                    // Apply damage to player
+                    battleState.playerHealth = Math.max(0, battleState.playerHealth - damage);
+                    actionText += `, dealing ${damage} damage!`;
+                } else {
+                    actionText += `.`;
+                }
+                
+                // Update battle text
+                updateBattleText(actionText);
+                
+                // Check if player is defeated
+                if (battleState.playerHealth <= 0) {
+                    handlePlayerDefeated();
+                    return;
+                }
+                
+                // Return to player turn
+                setTimeout(() => {
+                    battleState.battlePhase = 'player';
+                    battleState.turnCount++;
+                    updateBattleUI();
+                    appendBattleText(" What will you do?");
+                }, 1000);
+            }, 500);
+            
+            // Update UI
+            updateBattleUI();
+        }
+        
+        function handlePlayerDefeated() {
+            battleState.battlePhase = 'end';
+            battleState.isActive = false;
+            
+            // Show defeat message
+            updateBattleText(`You have fallen in battle. The world grows dark around you...`);
+            
+            // After a delay, show game over or restart option
+            setTimeout(() => {
+                appendBattleText(" (Click to try again)");
+                document.getElementById('battle-scene').addEventListener('click', restartBattle);
+            }, 2000);
+            
+            // Update UI
+            updateBattleUI();
+        }
+        
+        function handleEnemyDefeated() {
+            battleState.battlePhase = 'end';
+            battleState.isActive = false;
+            
+            // Update player state with battle results
+            playerState.health = battleState.playerHealth;
+            playerState.energy = battleState.playerEnergy;
+            
+            // Show victory message
+            updateBattleText(`The ${battleState.enemyName} falls before your might! Victory is yours!`);
+            
+            // After a delay, return to story
+            setTimeout(() => {
+                appendBattleText(" (Click to continue)");
+                document.getElementById('battle-scene').addEventListener('click', returnToStory);
+            }, 2000);
+            
+            // Update UI
+            updateBattleUI();
+        }
+        
+        function restartBattle() {
+            // Remove event listener to prevent multiple calls
+            document.getElementById('battle-scene').removeEventListener('click', restartBattle);
+            
+            // Reset player health
+            playerState.health = playerState.maxHealth;
+            playerState.energy = playerState.maxEnergy;
+            
+            // Restart the battle
+            initBattle(battleState.battleType);
+        }
+        
+        function returnToStory() {
+            // Remove event listener to prevent multiple calls
+            document.getElementById('battle-scene').removeEventListener('click', returnToStory);
+            
+            // Determine which story node to return to based on battle type
+            let nextNodeId;
+            if (battleState.battleType === 'first') {
+                nextNodeId = 12; // After first battle
+            } else {
+                nextNodeId = 23; // After second battle
+            }
+            
+            // Transition back to story screen
+            transitionToScreen(screens.battle, screens.prologue);
+            displayStoryText(nextNodeId);
+        }
+        
+        // Transition between screens
+        function transitionToScreen(fromScreen, toScreen) {
+            const overlay = document.getElementById('black-overlay');
+            overlay.classList.add('active');
+            
+            setTimeout(() => {
+                fromScreen.classList.remove('active');
+                toScreen.classList.add('active');
+                
+                setTimeout(() => {
+                    overlay.classList.remove('active');
+                }, 500);
+            }, 500);
+        }
+        
+        // Initialize the game
+        document.getElementById('start-game').addEventListener('click', () => {
+            transitionToScreen(screens.start, screens.prologue);
+            displayStoryText(0);
+        });
     </script>
 </body>
 </html>
