@@ -335,17 +335,41 @@
         // Functions for the story progression
         
         // Typewriter effect for text display
-        function typewriterEffect(element, text, speed = 9) {
+        let typewriterActive = false;
+        let typewriterCancel = false;
+
+        function typewriterEffect(element, text, speed = 30) {
+            // If there's already a typewriter effect running, cancel it
+            if (typewriterActive) {
+                typewriterCancel = true;
+                // Give a small delay to ensure the previous typewriter is properly stopped
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        typewriterCancel = false;
+                        return typewriterEffect(element, text, speed).then(resolve);
+                    }, 50);
+                });
+            }
+
             element.innerHTML = '';
             let i = 0;
+            typewriterActive = true;
+            typewriterCancel = false;
             
             return new Promise(resolve => {
                 function typeNextChar() {
+                    if (typewriterCancel) {
+                        typewriterActive = false;
+                        resolve();
+                        return;
+                    }
+
                     if (i < text.length) {
                         element.innerHTML += text.charAt(i);
                         i++;
                         setTimeout(typeNextChar, speed);
                     } else {
+                        typewriterActive = false;
                         resolve();
                         // Add click indicator after text is fully typed
                         if (!document.querySelector('.click-indicator')) {
@@ -362,6 +386,12 @@
 
         // Display story text for the current node
         async function displayStoryText(nodeId) {
+            // Cancel any active typewriter effect
+            typewriterCancel = true;
+            
+            // Small delay to ensure typewriter is cancelled
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
             currentNodeId = nodeId;
             const currentNode = storyNodes[nodeId];
             
@@ -376,6 +406,9 @@
             
             // Make text box visible
             textBox.classList.add('visible');
+            
+            // Clear text content before starting new typewriter effect
+            textContent.innerHTML = '';
             
             // Display the text with typewriter effect
             await typewriterEffect(textContent, currentNode.text);
