@@ -423,45 +423,68 @@
         function displayChoices(choices) {
             choiceBox.innerHTML = '';
             
-            // Create a styled container for the choices
+            // Create a styled container for the choices that resembles the text box
             const choiceContainer = document.createElement('div');
             choiceContainer.style.position = 'absolute';
             choiceContainer.style.bottom = '20px';
-            choiceContainer.style.left = '0';
-            choiceContainer.style.right = '0';
-            choiceContainer.style.display = 'flex';
-            choiceContainer.style.justifyContent = 'center';
-            choiceContainer.style.flexWrap = 'wrap';
-            choiceContainer.style.gap = '10px';
+            choiceContainer.style.left = '20px';
+            choiceContainer.style.right = '20px';
+            choiceContainer.style.padding = '20px';
+            choiceContainer.style.color = 'white';
+            choiceContainer.style.fontSize = 'clamp(1rem, 1.5vw, 1.2rem)';
             
-            choices.forEach(choice => {
-                const button = document.createElement('button');
-                button.textContent = choice.text;
-                button.style.padding = '10px 20px';
-                button.style.margin = '5px';
-                button.style.backgroundColor = '#4a90e2';
-                button.style.color = 'white';
-                button.style.border = 'none';
-                button.style.borderRadius = '5px';
-                button.style.cursor = 'pointer';
-                button.style.fontSize = '16px';
-                button.style.transition = 'transform 0.2s';
+            // Apply the same border image as the text box
+            choiceContainer.style.border = '9px solid transparent';
+            choiceContainer.style.borderImageSource = 'url(\'assets/Text_Box.png\')';
+            choiceContainer.style.borderImageSlice = '9';
+            choiceContainer.style.borderImageWidth = '1';
+            choiceContainer.style.borderImageOutset = '0.4';
+            choiceContainer.style.borderImageRepeat = 'stretch';
+            choiceContainer.style.backgroundColor = 'rgba(25, 21, 44, 0.8)';
+            
+            // Create a header for choices
+            const choiceHeader = document.createElement('div');
+            choiceHeader.textContent = 'What will you do?';
+            choiceHeader.style.marginBottom = '15px';
+            choiceHeader.style.fontStyle = 'italic';
+            choiceHeader.style.textAlign = 'center';
+            choiceContainer.appendChild(choiceHeader);
+            
+            // Create a list for choices
+            const choiceList = document.createElement('ul');
+            choiceList.style.listStyleType = 'none';
+            choiceList.style.padding = '0';
+            choiceList.style.margin = '0';
+            choiceList.style.display = 'flex';
+            choiceList.style.flexDirection = 'column';
+            choiceList.style.gap = '10px';
+            
+            choices.forEach((choice, index) => {
+                const choiceItem = document.createElement('li');
+                choiceItem.textContent = `${index + 1}. ${choice.text}`;
+                choiceItem.style.cursor = 'pointer';
+                choiceItem.style.transition = 'transform 0.2s, color 0.2s';
+                choiceItem.style.padding = '5px 10px';
                 
-                button.addEventListener('mouseover', () => {
-                    button.style.transform = 'scale(1.05)';
+                // Highlight effect on hover
+                choiceItem.addEventListener('mouseover', () => {
+                    choiceItem.style.transform = 'translateX(10px)';
+                    choiceItem.style.color = '#4a90e2';
                 });
                 
-                button.addEventListener('mouseout', () => {
-                    button.style.transform = 'scale(1.0)';
+                choiceItem.addEventListener('mouseout', () => {
+                    choiceItem.style.transform = 'translateX(0)';
+                    choiceItem.style.color = 'white';
                 });
                 
-                button.addEventListener('click', () => {
+                choiceItem.addEventListener('click', () => {
                     handleChoiceSelection(choice.nextNode);
                 });
                 
-                choiceContainer.appendChild(button);
+                choiceList.appendChild(choiceItem);
             });
             
+            choiceContainer.appendChild(choiceList);
             choiceBox.appendChild(choiceContainer);
         }
         
