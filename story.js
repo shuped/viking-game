@@ -4,6 +4,32 @@ import { initCamp } from './camp.js';
 import { initBattle } from './battle.js';
 import { playerState } from './player.js';
 
+// Story state tracking
+const storyState = {
+    visitedNodes: new Set(),
+    completedChoices: new Set(),
+    
+    // Mark a node as visited
+    visitNode(nodeId) {
+        this.visitedNodes.add(nodeId);
+    },
+    
+    // Check if a node has been visited
+    hasVisited(nodeId) {
+        return this.visitedNodes.has(nodeId);
+    },
+    
+    // Mark a specific choice as completed
+    completeChoice(nodeId, choiceIndex) {
+        this.completedChoices.add(`${nodeId}-${choiceIndex}`);
+    },
+    
+    // Check if a specific choice has been completed
+    hasCompletedChoice(nodeId, choiceIndex) {
+        return this.completedChoices.has(`${nodeId}-${choiceIndex}`);
+    }
+};
+
 // Structured story object
 const storyNodes = {
     0: {
@@ -123,7 +149,11 @@ const storyNodes = {
             { text: "Go straight for the church", nextNode: 25 },
             { text: "Go into the nearest house", nextNode: 26 },
             { text: "Walk around aimlessly", nextNode: 27 },
-            { text: "Listen to Erik", nextNode: 28 }
+            { 
+                text: "Listen to Erik", 
+                nextNode: 28,
+                condition: () => !storyState.hasVisited(28)
+            }
         ]
     },
     25: {
@@ -142,7 +172,7 @@ const storyNodes = {
         text: "Erik has always had a nose for trouble. He tugs at your sleeve and points to a lone farmhouse on the edge of the settlement. 'There's something... interesting over there,' he says with an odd glint in his eye. 'Come with me, away from the others.'",
         choices: [
             { text: "Accompany Erik", nextNode: 31 },
-            { text: "Disagree and return to the town", nextNode: 30 }
+            { text: "Disagree and return to the town", nextNode: 24 }
         ]
     },
     29: {
@@ -218,6 +248,9 @@ async function displayStoryText(nodeId) {
     
     currentNodeId = nodeId;
     const currentNode = storyNodes[nodeId];
+    
+    // Mark this node as visited in our story state
+    storyState.visitNode(nodeId);
     
     // Clear any existing choices
     choiceBox.innerHTML = '';
@@ -296,7 +329,16 @@ function displayChoices(choices) {
     choiceList.style.flexDirection = 'column';
     choiceList.style.gap = '10px';
     
-    choices.forEach((choice, index) => {
+    // Filter choices based on conditions
+    const availableChoices = choices.filter((choice) => {
+        if (choice.condition && !choice.condition()) {
+            return false;
+        }
+        return true;
+    });
+    
+    // Create UI elements for available choices
+    availableChoices.forEach((choice, index) => {
         const choiceItem = document.createElement('li');
         choiceItem.textContent = `${index + 1}. ${choice.text}`;
         choiceItem.style.cursor = 'pointer';
@@ -315,6 +357,9 @@ function displayChoices(choices) {
         });
         
         choiceItem.addEventListener('click', () => {
+            // Find the original index of this choice in the unfiltered list
+            const originalIndex = choices.findIndex(c => c.text === choice.text);
+            storyState.completeChoice(currentNodeId, originalIndex);            
             handleChoiceSelection(choice.nextNode);
         });
         
@@ -361,4 +406,4 @@ function setupStoryListeners(screens) {
     });
 }
 
-export { displayStoryText, setupStoryListeners, storyNodes, currentNodeId };
+export { displayStoryText, setupStoryListeners, storyNodes, currentNodeId, storyState };
