@@ -24,6 +24,21 @@ export const storyState = {
     }
 };
 
+const townPillagingChoices = [
+    { text: "Go straight for the church", nextNode: 25 },
+    {
+        text: "Go into the nearest house",
+        nextNode: 26,
+        condition: () => !storyState.hasVisited(26)
+    },
+    { text: "Walk around aimlessly", nextNode: 27 },
+    {
+        text: "Listen to Erik",
+        nextNode: 28,
+        condition: () => !storyState.hasVisited(28)
+    }
+];
+
 // Structured story object
 export const storyNodes = {
     0: {
@@ -139,24 +154,18 @@ export const storyNodes = {
     },
     24: {
         text: "You find yourself at the foot of the town, violent activity surrounding you. The screams of villagers mix with the triumphant shouts of your fellow warriors. What will you do next?",
-        choices: [
-            { text: "Go straight for the church", nextNode: 25 },
-            { text: "Go into the nearest house", nextNode: 26 },
-            { text: "Walk around aimlessly", nextNode: 27 },
-            { 
-                text: "Listen to Erik", 
-                nextNode: 28,
-                condition: () => !storyState.hasVisited(28)
-            }
-        ]
+        choices: townPillagingChoices
     },
     25: {
         text: "You make your way toward the church on the hill, drawn to the prominent structure overlooking the town. As you approach, you notice several of your fellow warriors heading in the same direction, likely expecting valuable treasures inside...",
         next: 29
     },
     26: {
-        text: "You push open the door to the nearest house. Inside, you find simple furnishings and signs of a hasty departure. You search through some personal belongings but find little of value. Time passes, and you hear the continued sounds of chaos outside.",
-        next: 30
+        text: "Rushing into the nearest abode, your eyes adjust to the dust and dark... A sound of shuffling ahead alerts you to danger.",
+        choices: [
+            { text: "Agility Check Success: Deftly avoid the incoming attack", nextNode: 40 },
+            { text: "Agility Check Failure: Fail to react in time", nextNode: 41 }
+        ]
     },
     27: {
         text: "You wander through the streets of the small town, observing the destruction around you. Warriors pillage homes while terrified villagers flee or hide. You spend some time taking in the scene, but accomplish little. The day wears on.",
@@ -175,11 +184,7 @@ export const storyNodes = {
     },
     30: {
         text: "As you finish exploring, you realize that most of your warband seems to be converging on the church. Perhaps that's where you should go next...",
-        choices: [
-            { text: "Go to the church", nextNode: 25 },
-            { text: "Check another house", nextNode: 26 },
-            { text: "Continue wandering", nextNode: 27 }
-        ]
+        choices: townPillagingChoices
     },
     31: {
         text: "You follow Erik to the farmhouse, moving contraposed to the inertia of all the activity around you. As you reach the edge of the settlement, Erik pauses and puts his finger to his lips, gesturing for quiet. A strange rhythmic thumping emanates from within the humble structure. It shows no sign of stopping or slowing. Erik urges you to step inside with a series of hastened gestures.",
@@ -224,5 +229,53 @@ export const storyNodes = {
     39: {
         text: "You return to the town, the encounter at the farmhouse weighing heavily on your mind. The raid continues around you, but your thoughts keep returning to Grimr and what you witnessed.",
         next: 24
+    },
+    40: {
+        text: "You react instantly, sidestepping the clumsy blow of a desperate townsman. The axe swings wide, missing you entirely. A terrified man holding the simple axe stands trembling before you... his two small children cowering behind him... he waves the axe threateningly, preparing for another attempt.",
+        next: 42
+    },
+    41: {
+        text: "You fail to react in time as the axe catches you on the shoulder. Pain shoots through your arm as you stagger back. Though the wound isn't deep, blood seeps through your tunic. A terrified townsman stands trembling before you... his two small children cowering behind him... he waves the axe threateningly, emboldened by his successful strike.",
+        next: 42
+    },
+    42: {
+        text: "The townsman lunges at you with his axe, desperation in his eyes...",
+        choices: [
+            { text: "Battle: Victory", nextNode: 43 },
+            { text: "Battle: Death", nextNode: 44 }
+        ]
+    },
+    43: {
+        text: "The townsman's lifeless body crumples to the floor with a sickening exhale until only the sound of your heaving breaths occupy the small abode... you look at the drained and horrified faces of the children... a young boy and girl...",
+        choices: [
+            { text: "Spare them", nextNode: 45 },
+            { text: "Spare them and give them something to help", nextNode: 46 },
+            { text: "Apprehend them to be taken as slaves", nextNode: 47 },
+            { text: "Put them out of their misery", nextNode: 48 }
+        ]
+    },
+    44: {
+        text: "The townsman fights with unexpected ferocity, his desperate need to protect his children lending him strength. His axe finds a vital spot, and you collapse to the floor. As darkness claims you, the last thing you see is the man gathering his children and fleeing the house. Your saga ends here...",
+        end: true
+    },
+    45: {
+        text: "You lower your weapon and back away from the children, gesturing toward the door. They remain frozen in fear, unsure of your intentions. After a few tense moments, you simply turn and leave, allowing them to live. As you exit, you feel as though a White Raven watches with approval.",
+        next: 49
+    },
+    46: {
+        text: "You reach into your pouch and pull out a few coins, placing them on a nearby table. It's not much, but it might help them survive in the chaos to come. The children stare at you with confusion and lingering terror as you back away and leave the house. You feel a strange sense of peace, as if a White Raven nods in approval at your rare act of mercy.",
+        next: 49
+    },
+    47: {
+        text: "You grab the children by their arms, ignoring their terrified cries as you drag them outside. Other warriors nod approvingly at your capture - young slaves fetch a good price. As you hand them off to be secured with the other captives, you feel a dark satisfaction, as if a Black Raven's wings brush against your soul.",
+        next: 49
+    },
+    48: {
+        text: "You approach the cowering children, your weapon raised. Their cries are short-lived. As you leave the house, you feel a cold certainty in your actions - no witnesses, no problems. The shadow of a Black Raven seems to follow you approvingly as you rejoin your fellow warriors.",
+        next: 49
+    },
+    49: {
+        text: "You return to the chaotic streets of the town, the encounter in the house still fresh in your mind. Time has passed, and the initial frenzy of the raid has begun to settle into methodical plundering.",
+        next: 30
     },
 };
