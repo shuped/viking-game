@@ -139,8 +139,11 @@ const storyNodes = {
         next: 30
     },
     28: {
-        text: "Erik gestures for you to follow him. 'I heard the Hersir mention that the church would have the most valuable items,' he says with a gleam in his eye. 'We should head there before the others take everything!'",
-        next: 25
+        text: "Erik has always had a nose for trouble. He tugs at your sleeve and points to a lone farmhouse on the edge of the settlement. 'There's something... interesting over there,' he says with an odd glint in his eye. 'Come with me, away from the others.'",
+        choices: [
+            { text: "Accompany Erik", nextNode: 31 },
+            { text: "Disagree and return to the town", nextNode: 30 }
+        ]
     },
     29: {
         text: "You approach the church, its stone walls looming above you. The wooden doors stand ajar, and you can hear voices inside. This seems to be where the real treasures of the village are kept. Chapter 1 continues...",
@@ -153,7 +156,51 @@ const storyNodes = {
             { text: "Check another house", nextNode: 26 },
             { text: "Continue wandering", nextNode: 27 }
         ]
-    }
+    },
+    31: {
+        text: "You follow Erik to the farmhouse, moving contraposed to the inertia of all the activity around you. As you reach the edge of the settlement, Erik pauses and puts his finger to his lips, gesturing for quiet. A strange rhythmic thumping emanates from within the humble structure. It shows no sign of stopping or slowing. Erik urges you to step inside with a series of hastened gestures.",
+        next: 32
+    },
+    32: {
+        text: "Gunnar's lifeless body heaves stiffly with each successive stab... Grimr is hovering over him, facing away from you... Erik freezes, a morbid grimace etched in the lines of his face... It's immediately apparent to you that Gunnar has been dead for quite some time already as Grimr, and the farmhouse floor are uniformly soaked with blood... Thump...Thump...Thump...",
+        next: 33
+    },
+    33: {
+        text: "Grimr stops... and slowly turns to face you, the madness in his eyes sends a jolt through your spine and you and Erik both take up a martial stance. But Grimr's expression seems to morph impossibly from one of raving murderous glee, to his usual placid, if colorless demeanor. He stands up, leaving the dagger embedded in Gunnar's chest. Offering you an apologetic half smile, Grimr wordlessly subjects himself to your judgment...",
+        choices: [
+            { text: "Execute this lunatic", nextNode: 34 },
+            { text: "Let him go (back away slowly)", nextNode: 35 },
+            { text: "Demand an explanation", nextNode: 36 }
+        ]
+    },
+    34: {
+        text: "Without hesitation, you draw your weapon and deliver swift justice to Grimr. His blood mingles with Gunnar's on the farmhouse floor. Erik nods grimly, approving of your decision. 'He was too far gone,' he mutters. 'It had to be done.' You leave the farmhouse, the image of Grimr's final moments etched in your memory.",
+        next: 39
+    },
+    35: {
+        text: "You and Erik exchange a nervous glance before slowly backing toward the door. Grimr remains motionless, watching you leave with empty eyes. As you exit the farmhouse, Erik grips your arm tightly. 'We should keep an eye on him,' he whispers. 'Who knows what he might do next...' The encounter leaves you unsettled, knowing that Grimr still walks among your warband.",
+        next: 39
+    },
+    36: {
+        text: "You steady your weapon but don't strike. 'Explain yourself,' you demand, voice tight with tension. Grimr's eyes shift to the corpse, then back to you. 'Gunnar violated our agreement,' he says flatly. 'He took what was promised to me. I merely collected my due.' His cold logic chills you more than any display of madness could. Erik shifts uncomfortably beside you.",
+        choices: [
+            { text: "Execute him anyway", nextNode: 34 },
+            { text: "Let him go after his explanation", nextNode: 35 },
+            { text: "Invite Grimr to join you and Erik", nextNode: 37 }
+        ]
+    },
+    37: {
+        text: "Something about Grimr's brutal efficiency intrigues you. 'Join us,' you say, surprising even yourself. 'We could use someone with your... dedication.' Erik's eyes widen in disbelief, but he says nothing. Grimr studies you for a long moment before nodding. 'I will come,' he says simply. 'And your secret is safe with me.' As you leave the farmhouse together, you feel you've made either a powerful ally or a dangerous mistake.",
+        next: 38
+    },
+    38: {
+        text: "The three of you return to the town, Grimr now part of your inner circle. Erik remains uneasy, but Grimr shows no further signs of the madness you witnessed. Still, you can't help but wonder what you've gotten yourself into by keeping his bloody secret.",
+        next: 24
+    },
+    39: {
+        text: "You return to the town, the encounter at the farmhouse weighing heavily on your mind. The raid continues around you, but your thoughts keep returning to Grimr and what you witnessed.",
+        next: 24
+    },
 };
 
 let currentNodeId = 0;
