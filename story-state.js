@@ -31,7 +31,11 @@ const townPillagingChoices = [
         nextNode: 26,
         condition: () => !storyState.hasVisited(26)
     },
-    { text: "Walk around aimlessly", nextNode: 27 },
+    {
+        text: "Walk around aimlessly",
+        nextNode: 27,
+        condition: () => !storyState.hasVisited(27)
+    },
     {
         text: "Listen to Erik",
         nextNode: 28,
@@ -168,8 +172,11 @@ export const storyNodes = {
         ]
     },
     27: {
-        text: "You wander through the streets of the small town, observing the destruction around you. Warriors pillage homes while terrified villagers flee or hide. You spend some time taking in the scene, but accomplish little. The day wears on.",
-        next: 30
+        text: "You decide to wander through the chaos of the raid. Which path do you take?",
+        choices: [
+            { text: "Wander through the streets looking for valuables", nextNode: 50 },
+            { text: "Follow the sound of a nearby scuffle", nextNode: 55 }
+        ]
     },
     28: {
         text: "Erik has always had a nose for trouble. He tugs at your sleeve and points to a lone farmhouse on the edge of the settlement. 'There's something... interesting over there,' he says with an odd glint in his eye. 'Come with me, away from the others.'",
@@ -278,4 +285,96 @@ export const storyNodes = {
         text: "You return to the chaotic streets of the town, the encounter in the house still fresh in your mind. Time has passed, and the initial frenzy of the raid has begun to settle into methodical plundering.",
         next: 30
     },
+    50: {
+        text: "You wander aimlessly through the carnage-ridden street looking for anything that might be valuable...",
+        choices: [
+            { text: "Check fails: You waste time searching", nextNode: 51 },
+            { text: "Critical fail: You injure yourself while searching", nextNode: 52 },
+            { text: "Check passes: Your search is successful", nextNode: 53 }
+        ]
+    },
+    51: {
+        text: "You spend considerable time rummaging through abandoned homes and stalls, but find nothing of value. The commotion from the church grows louder as your frustration mounts. You've wasted precious time with nothing to show for it.",
+        next: 54
+    },
+    52: {
+        text: "While searching through debris, you cut your hand on a jagged piece of metal. Pain shoots up your arm as blood seeps from the wound. You curse your luck as you bind the injury with a strip of cloth. This will hinder your ability to fight effectively for a while.",
+        next: 54
+    },
+    53: {
+        text: "Fortune smiles upon you! Hidden beneath the floorboards of an abandoned home, you discover a small pouch of silver coins and a decorative brooch. This valuable find will serve you well when you return home.",
+        next: 54
+    },
+    54: {
+        text: "Time passes... you know that most of the action is centered around the church... you shouldn't tarry long...",
+        next: 24
+    },
+    55: {
+        text: "As you wander around, your attention is captured by the sound of a nearby scuffle... following the sounds to an isolated alleyway, you discover a pitiable sight. Three of your Viking companions have a small party of five peasants cornered against a wooden fence. A woman lies dead and blood-soaked, three women and two pitchfork-brandishing men face the Vikings in a doomed standoff.\n\n'Eh? Bugger off man, there's only enough for the three of us!' One of the Vikings, a gaunt and vicious looking Bondi, growls at you.",
+        choices: [
+            { text: "Agree, and walk away (-Rep)", nextNode: 56 },
+            { text: "Intervene, brandishing your own weapon (-Rep)", nextNode: 57 }
+        ]
+    },
+    56: {
+        text: "You shrug and turn away, leaving the peasants to their fate. The screams that follow haunt you as you make your way back through the town. Your reputation among some of your comrades diminishes slightly for your unwillingness to challenge your fellow Vikings.",
+        next: 54
+    },
+    57: {
+        text: "You draw your weapon and step forward, placing yourself between the Vikings and the terrified peasants. The leader scoffs, 'This shouldn't take long...' as his two companions hold the peasants at bay, he moves to confront you.",
+        choices: [
+            { text: "Battle: Victory", nextNode: 58 },
+            { text: "Battle: Death", nextNode: 59 }
+        ]
+    },
+    58: {
+        text: "The Viking leader falls before your superior combat skills. Blood pools around his body as you turn to face his companions. The other two look at you, then at each other... their resolve weakening. Your reputation increases among those who value strength above all.",
+        choices: [
+            { text: "Tell them to leave or suffer the same fate", nextNode: 60 }
+        ]
+    },
+    59: {
+        text: "Despite your bravery, the Viking proves to be the better warrior. His blade finds a gap in your defense, and you fall to the ground as life drains from your body. The peasants' fate is sealed, and your saga ends here...",
+        end: true
+    },
+    60: {
+        text: "You stand over the body of their leader, your weapon still wet with his blood. 'Leave now,' you growl at the remaining Vikings, 'or join him.'",
+        choices: [
+            { text: "They refuse and attack (Rep Check: FAIL)", nextNode: 61 },
+            { text: "They back down and leave (Rep Check: SUCCESS)", nextNode: 64 }
+        ]
+    },
+    61: {
+        text: "The Vikings refuse to back down, emboldened by their numbers. They release the peasants and rush toward you, weapons raised. Unexpectedly, the peasants seize the opportunity, grabbing their pitchforks and joining your side against the two remaining Vikings.",
+        choices: [
+            { text: "Battle: Victory", nextNode: 62 },
+            { text: "Battle: Death", nextNode: 63 }
+        ]
+    },
+    62: {
+        text: "Together with the peasants, you manage to defeat the remaining Vikings. As the last one falls, the peasants look at you with a mixture of fear, confusion, and gratitude. They clearly didn't expect to be saved by one of the raiders.",
+        choices: [
+            { text: "Nod to the grateful peasants wordlessly and take your leave (+White Raven)", nextNode: 65 },
+            { text: "Slaughter the peasants, looting them and the fallen Vikings (+Black Raven/+Loot)", nextNode: 66 }
+        ]
+    },
+    63: {
+        text: "Despite the aid of the peasants, the Vikings prove too skilled. A blade slides between your ribs, and you collapse to the ground. The peasants scatter as you fall, and darkness claims you. Your saga ends here...",
+        end: true
+    },
+    64: {
+        text: "The Vikings grumble under their breath, but your victory over their leader has made an impression. They back away slowly before turning to seek easier targets elsewhere. The peasants stare at you in disbelief, unsure whether to flee or thank you.",
+        choices: [
+            { text: "Nod to the grateful peasants wordlessly and take your leave (+White Raven)", nextNode: 65 },
+            { text: "Slaughter the peasants, looting them and the fallen Vikings (+Black Raven/+Loot)", nextNode: 66 }
+        ]
+    },
+    65: {
+        text: "You give the peasants a simple nod and turn to leave, ignoring their whispered thanks. As you walk away, you feel a strange sensation, as if a White Raven watches your act of mercy with approval. The peasants will live to see another day because of your intervention.",
+        next: 54
+    },
+    66: {
+        text: "You consider the peasants for a moment, then make your decision. They have no place in the new world your people are creating here. Your blade makes quick work of them, and afterward, you loot both their bodies and those of the fallen Vikings. As you walk away with your spoils, you feel as though a Black Raven's shadow passes over you approvingly.",
+        next: 54
+    }
 };
