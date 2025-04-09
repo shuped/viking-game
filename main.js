@@ -26,6 +26,11 @@ function initGame() {
     // Set up story navigation listeners
     setupStoryListeners(screens);
 }
+window.goToNode = function(node) {
+    transitionToScreen(screens.start, screens.prologue, () => {
+        displayStoryText(node);
+    });
+};
 
 // Export what other modules will need
 export { screens, initGame };
