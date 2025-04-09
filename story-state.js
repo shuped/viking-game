@@ -186,7 +186,7 @@ export const storyNodes = {
         ]
     },
     29: {
-        text: "You approach the church, its stone walls looming above you. The wooden doors stand ajar, and you can hear voices inside. This seems to be where the real treasures of the village are kept. Chapter 1 continues...",
+        text: "Whatever scene you expected you'd fine upon entering the church, this was a far cry. A stand off between the mysterious stranger with his party on one side. The Hersir flanked by Sven and Astrid and the larger portion of housecarls on the other. The mysterious stranger kneels in anguish, his blood drenched hand clutched to his eye...",
         end: true
     },
     30: {
