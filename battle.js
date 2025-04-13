@@ -385,7 +385,7 @@ function returnToStory() {
     }
     
     // Transition back to story screen
-    transitionToScreen(screens.battle, screens.prologue, () => {
+    transitionToScreen(screens.battle, screens.cinematicUI, () => {
         displayStoryText(nextNodeId);
     });
 }

@@ -1,7 +1,7 @@
 // Screen management
 const screens = {
     start: document.getElementById('start-screen'),
-    prologue: document.getElementById('cinematic-ui'),
+    cinematicUI: document.getElementById('cinematic-ui'),
     camp: document.getElementById('camp-ui'),
     battle: document.getElementById('battle-ui')
 };
@@ -18,7 +18,7 @@ function initGame() {
     
     // Set up event listeners
     document.getElementById('start-game').addEventListener('click', () => {
-        transitionToScreen(screens.start, screens.prologue, () => {
+        transitionToScreen(screens.start, screens.cinematicUI, () => {
             displayStoryText(0);
         });
     });
@@ -27,7 +27,7 @@ function initGame() {
     setupStoryListeners(screens);
 }
 window.goToNode = function(node) {
-    transitionToScreen(screens.start, screens.prologue, () => {
+    transitionToScreen(screens.start, screens.cinematicUI, () => {
         displayStoryText(node);
     });
 };

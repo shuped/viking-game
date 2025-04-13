@@ -40,7 +40,7 @@ function setupCampEventListeners() {
     // Continue journey button
     document.getElementById('continue-journey').addEventListener('click', () => {
         // Return to story at node 20
-        transitionToScreen(screens.camp, screens.prologue, () => {
+        transitionToScreen(screens.camp, screens.cinematicUI, () => {
             displayStoryText(20);
         });
     });

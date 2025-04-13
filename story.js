@@ -158,13 +158,13 @@ function setupStoryListeners(screens) {
             if (currentNode.next) {
                 // If the next node is the camp node, transition to camp UI
                 if (currentNode.next === 19) {
-                    transitionToScreen(screens.prologue, screens.camp, () => {
+                    transitionToScreen(screens.cinematicUI, screens.camp, () => {
                         initCamp();
                     });
                 } 
                 // If the next node is a battle node, transition to battle UI
                 else if (currentNode.next === 11 || currentNode.next === 22) {
-                    transitionToScreen(screens.prologue, screens.battle, () => {
+                    transitionToScreen(screens.cinematicUI, screens.battle, () => {
                         initBattle(currentNode.next === 11 ? 'first' : 'second');
                     });
                 } 
