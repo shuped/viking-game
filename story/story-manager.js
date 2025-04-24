@@ -27,6 +27,7 @@ async function loadChapter(chapterName) {
     // Update current chapter and nodes
     currentChapter = chapterName;
     currentStoryNodes = chapters[chapterName];
+    storyState.initChapter(chapterName);
     return true;
 }
 

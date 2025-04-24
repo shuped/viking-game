@@ -1,25 +1,46 @@
 // Story state tracking
 export const storyState = {
-    visitedNodes: new Set(),
-    completedChoices: new Set(),
-    
+    chapterStates: {},
+    currentChapter: null,
+
+    // Initialize state for a new chapter
+    initChapter(chapterName) {
+        if (!this.chapterStates[chapterName]) {
+            this.chapterStates[chapterName] = {
+                visitedNodes: new Set(),
+                completedChoices: new Set()
+            };
+        }
+        this.currentChapter = chapterName;
+    },
+
     // Mark a node as visited
     visitNode(nodeId) {
-        this.visitedNodes.add(nodeId);
+        if (this.currentChapter) {
+            this.chapterStates[this.currentChapter].visitedNodes.add(nodeId);
+        }
     },
-    
+
     // Check if a node has been visited
     hasVisited(nodeId) {
-        return this.visitedNodes.has(nodeId);
+        return this.currentChapter && this.chapterStates[this.currentChapter].visitedNodes.has(nodeId);
     },
-    
+
     // Mark a specific choice as completed
     completeChoice(nodeId, choiceIndex) {
-        this.completedChoices.add(`${nodeId}-${choiceIndex}`);
+        if (this.currentChapter) {
+            this.chapterStates[this.currentChapter].completedChoices.add(`${nodeId}-${choiceIndex}`);
+        }
     },
-    
+
     // Check if a specific choice has been completed
     hasCompletedChoice(nodeId, choiceIndex) {
-        return this.completedChoices.has(`${nodeId}-${choiceIndex}`);
+        return this.currentChapter && this.chapterStates[this.currentChapter].completedChoices.has(`${nodeId}-${choiceIndex}`);
+    },
+
+    // Get state for a specific chapter
+    getChapterState(chapterName) {
+        return this.chapterStates[chapterName] || { visitedNodes: new Set(), completedChoices: new Set() };
     }
 };
+window.storystate = storyState; // For debugging purposes
