@@ -3,8 +3,12 @@ import { transitionToScreen } from './transitions.js';
 import { initCamp } from './camp.js';
 import { initBattle } from './battle.js';
 import { playerState } from './player.js';
-import { storyNodes } from './story/chapter-one.js'
 import { storyState } from './story/story-state.js';
+import { 
+    getCurrentStoryNodes, 
+    getCurrentChapter,
+    transitionToChapter 
+} from './story/story-manager.js';
 
 let currentNodeId = 0;
 const textBox = document.getElementById('cinematic-text-box');
@@ -20,6 +24,7 @@ async function displayStoryText(nodeId) {
     await new Promise(resolve => setTimeout(resolve, 10));
     
     currentNodeId = nodeId;
+    const storyNodes = getCurrentStoryNodes();
     const currentNode = storyNodes[nodeId];
     
     // Mark this node as visited in our story state
@@ -64,6 +69,7 @@ async function displayStoryText(nodeId) {
 
 // Display choices for the current node
 function displayChoices(choices) {
+    // Existing code remains the same
     choiceBox.innerHTML = '';
     
     // Create a styled container for the choices that resembles the text box
@@ -150,7 +156,8 @@ function handleChoiceSelection(nextNodeId) {
 
 // Setup story navigation listeners
 function setupStoryListeners(screens) {
-    document.getElementById('cinematic-frame').addEventListener('click', () => {
+    document.getElementById('cinematic-frame').addEventListener('click', async () => {
+        const storyNodes = getCurrentStoryNodes();
         const currentNode = storyNodes[currentNodeId];
         
         // Only allow advancing if we're not showing choices
@@ -172,11 +179,23 @@ function setupStoryListeners(screens) {
                     displayStoryText(currentNode.next);
                 }
             } else if (currentNode.end) {
-                console.log("End of story reached"); 
-                // Here you could add code to end the game or move to the next chapter
+                // Check if there's a next chapter to transition to
+                if (currentNode.nextChapter) {
+                    console.log(`Transitioning to chapter: ${currentNode.nextChapter}`);
+                    const success = await transitionToChapter(currentNode.nextChapter);
+                    if (success) {
+                        // Start at the beginning of the new chapter (node 0)
+                        displayStoryText(0);
+                    } else {
+                        console.error("Failed to load next chapter");
+                    }
+                } else {
+                    console.log("End of story reached"); 
+                    // Here you could add code to end the game or show credits
+                }
             }
         }
     });
 }
 
-export { displayStoryText, setupStoryListeners, storyNodes, currentNodeId, storyState };
+export { displayStoryText, setupStoryListeners, currentNodeId, storyState };
