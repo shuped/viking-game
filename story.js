@@ -3,8 +3,8 @@ import { transitionToScreen } from './transitions.js';
 import { initCamp } from './camp.js';
 import { initBattle } from './battle.js';
 import { playerState } from './player.js';
-import { storyState, storyNodes } from './story-state.js'
-
+import { storyNodes } from './story/chapter-one.js'
+import { storyState } from './story/story-state.js';
 
 let currentNodeId = 0;
 const textBox = document.getElementById('cinematic-text-box');
@@ -161,7 +161,7 @@ function setupStoryListeners(screens) {
                     transitionToScreen(screens.cinematicUI, screens.camp, () => {
                         initCamp();
                     });
-                } 
+                }
                 // If the next node is a battle node, transition to battle UI
                 else if (currentNode.next === 11 || currentNode.next === 22) {
                     transitionToScreen(screens.cinematicUI, screens.battle, () => {
