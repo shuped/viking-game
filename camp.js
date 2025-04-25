@@ -2,6 +2,10 @@ import { playerState } from './player.js';
 import { transitionToScreen } from './transitions.js';
 import { displayStoryText } from './story.js';
 import { screens } from './main.js';
+import { getCurrentChapter } from './story/story-manager.js';
+import { storyState } from './story/story-state.js';
+import { showTravelMap } from './travel.js';
+
 // Camp UI Logic
 let campTimeRemaining = 5; // Start with 5 time units
 const campResultContent = document.getElementById('camp-result-content');
@@ -91,17 +95,8 @@ function openActivityModal(activityType) {
         case 'companions':
             document.getElementById('companions-modal').classList.add('active');
             break;
-        case 'events':
-            handleRandomEvent();
-            break;
-        case 'scavenge':
-            handleScavenge();
-            break;
-        case 'crafting':
-            handleCrafting();
-            break;
-        case 'medic':
-            handleMedic();
+        case 'travel':
+            handleTravel();
             break;
         default:
             campResultContent.innerHTML = '<p>That activity is not available.</p>';
@@ -258,21 +253,23 @@ function handleCompanions(option) {
     campResultContent.innerHTML = result;
 }
 
-// Handle random events
-function handleRandomEvent() {
-    // Deduct time
+// Handle travel
+function handleTravel() {
+    // Check if we have time for activities
+    if (campTimeRemaining <= 0) {
+        campResultContent.innerHTML = '<p>You have no more time remaining. You must continue your journey.</p>';
+        return;
+    }
+
+    // Deduct time for traveling
     campTimeRemaining -= 1;
     updateTimeDisplay();
     
-    const events = [
-        '<p>A heated argument breaks out between two warriors over a missing trinket. You help resolve it before blades are drawn.</p>',
-        '<p>You spot Saxon scouts watching the camp from the treeline. You alert the guards, who chase them off.</p>',
-        '<p>An unexpected rain shower soaks the camp. You help secure shelters and keep the fire going.</p>',
-        '<p>Mysterious lights appear in the distant forest. Some warriors see it as an omen, others dismiss it as natural.</p>'
-    ];
+    // Show the travel map
+    showTravelMap();
     
-    const result = events[Math.floor(Math.random() * events.length)];
-    campResultContent.innerHTML = result;
+    // Updated message for the camp screen that will be visible when they return
+    campResultContent.innerHTML = '<p>Select a destination on the map to travel there.</p>';
 }
 
 // Handle scavenging
