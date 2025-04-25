@@ -16,6 +16,14 @@ const travelDestinations = {
             requiredNode: null, // Always available
             storyNode: 10,
             position: { x: 70, y: 40 } // % of map width/height
+        },
+        {
+            id: 'town-square',
+            name: 'Víkstad Town Square',
+            description: 'The bustling center of Víkstad where warriors gather. Your friend Erik might be there.',
+            requiredNode: 12, // Available after initial camp transition
+            storyNode: 13, // Takes you to Erik conversation
+            position: { x: 40, y: 60 }
         }
     ],
     'chapter-one': [

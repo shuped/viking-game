@@ -162,27 +162,26 @@ function setupStoryListeners(screens) {
         
         // Only allow advancing if we're not showing choices
         if (!currentNode.choices) {
-            if (currentNode.next) {
-                // Check if this node has a transition property
-                if (currentNode.transitionTo) {
-                    // Handle different screen transitions based on transitionTo property
-                    if (currentNode.transitionTo === 'camp') {
-                        transitionToScreen(screens.cinematicUI, screens.camp, () => {
-                            initCamp();
-                        });
-                    }
-                    else if (currentNode.transitionTo === 'battle') {
-                        transitionToScreen(screens.cinematicUI, screens.battle, () => {
-                            // Use the battleType property to determine which battle to initialize
-                            initBattle(currentNode.battleType || 'first');
-                        });
-                    }
-                } 
-                else {
-                    // Normal progression to next story node
-                    displayStoryText(currentNode.next);
+            // Check if this node has a transition property
+            if (currentNode.transitionTo) {
+                // Handle different screen transitions based on transitionTo property
+                if (currentNode.transitionTo === 'camp') {
+                    transitionToScreen(screens.cinematicUI, screens.camp, () => {
+                        initCamp();
+                    });
                 }
-            } else if (currentNode.end) {
+                else if (currentNode.transitionTo === 'battle') {
+                    transitionToScreen(screens.cinematicUI, screens.battle, () => {
+                        // Use the battleType property to determine which battle to initialize
+                        initBattle(currentNode.battleType || 'first');
+                    });
+                }
+            } 
+            else {
+                // Normal progression to next story node
+                displayStoryText(currentNode.next);
+            }
+            if (currentNode.end) {
                 // Check if there's a next chapter to transition to
                 if (currentNode.nextChapter) {
                     console.log(`Transitioning to chapter: ${currentNode.nextChapter}`);

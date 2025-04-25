@@ -65,9 +65,9 @@ export const storyNodes = {
         transitionTo: 'camp'
     },
 
-    // JOIN UP QUEST SECTION
+    // JOIN UP QUEST SECTION - Accessible via Travel Menu
     13: {
-        text: "The streets bustle with young, unproven warriors... and vendors of all types looking to capitalize on the uproar of activity... As you make your way to the Hersir's recruiter, you bump into your childhood friend Erik in the crowd.",
+        text: "The town square bustles with young, unproven warriors... and vendors of all types looking to capitalize on the uproar of activity... As you make your way through the crowd, you bump into your childhood friend Erik.",
         next: 14
     },
     14: {
@@ -213,5 +213,11 @@ export const storyNodes = {
         text: "The prologue of your story ends here, but your true journey is just beginning...",
         end: true,
         nextChapter: "chapter-one"  // This tells the story system to load chapter-one next
+    },
+    
+    // Return to camp node
+    40: {
+        text: "You've completed your business with Erik for now and decided to return to camp.",
+        transitionTo: 'camp'
     }
 };
