@@ -7,7 +7,7 @@ const chapters = {
 };
 
 // Track current chapter
-let currentChapter = 'prologue';
+let currentChapter = null;
 let currentStoryNodes = null;
 
 // Lazy-load chapter modules when needed
@@ -27,7 +27,10 @@ async function loadChapter(chapterName) {
     // Update current chapter and nodes
     currentChapter = chapterName;
     currentStoryNodes = chapters[chapterName];
+    
+    // Initialize story state for this chapter
     storyState.initChapter(chapterName);
+    
     return true;
 }
 
@@ -43,8 +46,7 @@ function getCurrentChapter() {
 
 // Transition to next chapter
 async function transitionToChapter(chapterName) {
-    // Reset certain aspects of story state if needed
-    // storyState.resetForNewChapter();
+    console.log(`Transitioning from ${currentChapter} to ${chapterName}`);
     
     // Load the new chapter
     const success = await loadChapter(chapterName);
