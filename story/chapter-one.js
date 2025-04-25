@@ -70,7 +70,9 @@ export const storyNodes = {
     },
     10: {
         text: "Just as the third and final Snekkja anchors to the shore, a rush of excitement breaks through the disorganized mass of your warband... 'SAXONS!' The cry goes up, and warriors scramble for their weapons. Through the trees, you glimpse figures moving—local defenders rushing to repel your landing.",
-        next: 11
+        next: 11,
+        transitionTo: 'battle',
+        battleType: 'first'
     },
     11: {
         text: "The Saxons charge from the treeline, their weapons glinting in the sunlight. Your heart pounds as you grip your weapon, preparing for your first real battle on Saxon soil.",
@@ -108,7 +110,8 @@ export const storyNodes = {
     },
     18: {
         text: "The Saxon insurgence was desperate and disorganized... victory here is only the beginning. Hersir Olaf assigns a small party of mysterious warriors to scout the area while the rest of your party makes camp. It won't be long before you see more serious combat...",
-        next: 19
+        next: 19,
+        transitionTo: 'camp'
     },
     19: {
         text: "As evening approaches, your warband establishes a camp in a clearing near the shore. Tents are erected, fires are lit, and the smell of cooking food fills the air. You have some time before you must rest for tomorrow's march.",
@@ -120,7 +123,9 @@ export const storyNodes = {
     },
     21: {
         text: "The Saxon resistance forms even as your party closes the gap between them and the village. Before long, your party is standing face to face with a Saxon contingent of roughly equal size, their weapons drawn and faces grim with determination.",
-        next: 22
+        next: 22,
+        transitionTo: 'battle',
+        battleType: 'second'
     },
     22: {
         text: "Tension fills the air as both sides measure each other. Then, with a thunderous war cry, Hersir Olaf signals the attack. Your warband surges forward, and you find yourself charging toward the Saxon line.",

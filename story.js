@@ -163,19 +163,23 @@ function setupStoryListeners(screens) {
         // Only allow advancing if we're not showing choices
         if (!currentNode.choices) {
             if (currentNode.next) {
-                // If the next node is the camp node, transition to camp UI
-                if (currentNode.next === 19) {
-                    transitionToScreen(screens.cinematicUI, screens.camp, () => {
-                        initCamp();
-                    });
-                }
-                // If the next node is a battle node, transition to battle UI
-                else if (currentNode.next === 11 || currentNode.next === 22) {
-                    transitionToScreen(screens.cinematicUI, screens.battle, () => {
-                        initBattle(currentNode.next === 11 ? 'first' : 'second');
-                    });
+                // Check if this node has a transition property
+                if (currentNode.transitionTo) {
+                    // Handle different screen transitions based on transitionTo property
+                    if (currentNode.transitionTo === 'camp') {
+                        transitionToScreen(screens.cinematicUI, screens.camp, () => {
+                            initCamp();
+                        });
+                    }
+                    else if (currentNode.transitionTo === 'battle') {
+                        transitionToScreen(screens.cinematicUI, screens.battle, () => {
+                            // Use the battleType property to determine which battle to initialize
+                            initBattle(currentNode.battleType || 'first');
+                        });
+                    }
                 } 
                 else {
+                    // Normal progression to next story node
                     displayStoryText(currentNode.next);
                 }
             } else if (currentNode.end) {
