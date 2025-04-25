@@ -10,20 +10,30 @@ import { getCurrentChapter } from './story/story-manager.js';
 const travelDestinations = {
     'prologue': [
         {
-            id: 'village',
-            name: 'Saxon Village',
-            description: 'A small Saxon settlement with limited defenses.',
-            requiredNode: null, // Always available
-            storyNode: 10,
-            position: { x: 70, y: 40 } // % of map width/height
-        },
-        {
             id: 'town-square',
             name: 'Víkstad Town Square',
             description: 'The bustling center of Víkstad where warriors gather. Your friend Erik might be there.',
-            requiredNode: 12, // Available after initial camp transition
+            isAvailable: () => storyState.hasVisited(12), // Available after initial camp transition
             storyNode: 13, // Takes you to Erik conversation
             position: { x: 40, y: 60 }
+        },
+        {
+            id: 'training-grounds',
+            name: 'Training Grounds',
+            description: 'Where warriors practice their combat skills. Erik asked you to meet him here.',
+            // Only available if player chose to help Erik AND hasn't visited the training grounds yet
+            isAvailable: () => storyState.hasCompletedChoice(17, 0) && !storyState.hasVisited(20),
+            storyNode: 20,
+            position: { x: 20, y: 80 }
+        },
+        {
+            id: 'housecarl',
+            name: 'Housecarl Barracks',
+            description: 'The barracks where the Housecarls are gathering their warband',
+            isAvailable: () => storyState.hasVisited(30),
+            storyNode: 38,
+            position: { x: 40, y: 30 }
+
         }
     ],
     'chapter-one': [
@@ -31,7 +41,7 @@ const travelDestinations = {
             id: 'monastery',
             name: 'Lindisfarne Monastery',
             description: 'A wealthy monastery with valuable religious artifacts.',
-            requiredNode: 5, // Only available after node 5
+            isAvailable: () => storyState.hasVisited(5), // Only available after node 5
             storyNode: 25,
             position: { x: 30, y: 20 }
         },
@@ -39,7 +49,7 @@ const travelDestinations = {
             id: 'forest',
             name: 'Deep Forest',
             description: 'A dark forest rumored to have hidden treasures and dangers.',
-            requiredNode: 10,
+            isAvailable: () => storyState.hasVisited(10),
             storyNode: 35,
             position: { x: 60, y: 50 }
         },
@@ -47,7 +57,7 @@ const travelDestinations = {
             id: 'town',
             name: 'Fortified Town',
             description: 'A well-defended Saxon town with a garrison of soldiers.',
-            requiredNode: 15,
+            isAvailable: () => storyState.hasVisited(15),
             storyNode: 45,
             position: { x: 80, y: 70 }
         }
@@ -190,7 +200,6 @@ function updateTravelLocations() {
     
     const currentChapter = getCurrentChapter();
     const locations = travelDestinations[currentChapter] || [];
-    const chapterState = storyState.getChapterState(currentChapter);
     
     locations.forEach(location => {
         const locationElement = document.createElement('div');
@@ -201,9 +210,9 @@ function updateTravelLocations() {
         locationElement.style.left = `${location.position.x}%`;
         locationElement.style.top = `${location.position.y}%`;
         
-        // Check if location is available based on story progress
-        const isAvailable = !location.requiredNode || 
-                            chapterState.visitedNodes.has(location.requiredNode);
+        // Check if location is available based on availability function
+        const isAvailable = typeof location.isAvailable === 'function' ? 
+                           location.isAvailable() : true;
         
         if (!isAvailable) {
             locationElement.classList.add('unavailable');

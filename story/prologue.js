@@ -68,7 +68,7 @@ export const storyNodes = {
     // JOIN UP QUEST SECTION - Accessible via Travel Menu
     13: {
         text: "The town square bustles with young, unproven warriors... and vendors of all types looking to capitalize on the uproar of activity... As you make your way through the crowd, you bump into your childhood friend Erik.",
-        next: 14
+        next: 14,
     },
     14: {
         text: "Erik: \"Hey! I thought it was you! You're signing up too eh? This seems like a real chance to change my luck, things have been pretty tough around here lately.\"",
@@ -76,10 +76,6 @@ export const storyNodes = {
     },
     15: {
         text: "You've always known Erik to be a decent sort... but he has a real knack for getting into all sorts of trouble, it seems he's fallen on hard times. You make your way to the Housecarl in charge of recruiting.",
-        next: 16
-    },
-    16: {
-        text: "Housecarl: *A gruff, bearded veteran looks at you both with disdain* \"And what are you two after eh? If you want to join the war party, you've got to have at least some armor and a weapon of your own! Come back when you're more prepared...\"",
         next: 17
     },
     17: {
@@ -93,13 +89,13 @@ export const storyNodes = {
     // ERIK'S PLAN PATH
     18: {
         text: "Erik's eyes gleam with a familiar scoundrel's charm as he chuckles approvingly. \"I knew I could count on you! Listen, meet me at the training grounds behind the old Hersir's place... I'll explain later...\"",
-        next: 20
+        transitionTo: 'camp'
     },
     
     // HONEST PATH
     19: {
         text: "Shooting you a melancholic half smile, Erik nods. \"Suit yourself old friend, as for me... I'll get what I need one way or another, I'm not gonna be left behind... not this time.\"",
-        next: 30 // Skip ahead to the camp UI
+        transitionTo: 'camp'
     },
     
     // ERIK'S SCHEME CONTINUES
@@ -164,60 +160,44 @@ export const storyNodes = {
     
     // CAMP UI SECTION
     30: {
-        text: "Welcome to Vikstad - From here, you must manage your time wisely. The warband embarks tomorrow morning...",
-        next: 31
-    },
-    31: {
-        text: "The Eve\n\nVikstad is alight with activity even as the day draws to a close, camp fires and frivolity abound tonight as so many warriors anxiously await the dawn of a new adventure... You look around with curiosity at scores of new faces, but several characters seem to stand out from the gestalt.",
-        next: 32
-    },
-    32: {
-        text: "- Sven is arm wrestling and drinking merrily, the center of attention within the bulk of the Hersir's local forces\n- Astrid is sitting alone by the shoreline, gazing out towards the placid sea... a pair of stern guards blocking the way to her\n- The mysterious strangers sit around their own fire in quietude, seemingly disinterested in mingling with the others\n- Erik is playing dice, likely swindling one group or another of bright eyed young Vikings...\n- Grimr is attending his master diligently as ever, while Gunnar drinks and feasts at a table consisting of the few highborn's present tonight.",
-        choices: [
-            { text: "Speak with Sven", nextNode: 33 },
-            { text: "Approach Astrid", nextNode: 34 },
-            { text: "Observe the mysterious strangers", nextNode: 35 },
-            { text: "Join Erik's dice game", nextNode: 36 },
-            { text: "Approach Grimr and Gunnar", nextNode: 37 }
-        ]
+        text: "Weapon and armor aquired. Erik's trust gained.",
+        transitionTo: 'camp'
     },
     
     // VARIOUS SOCIAL INTERACTIONS
     33: {
         text: "[Conversation with Sven would occur here]",
-        next: 38
+        transitionTo: 'camp'
     },
     34: {
         text: "[Conversation with Astrid would occur here]",
-        next: 38
+        transitionTo: 'camp'
     },
     35: {
         text: "[Observations of the mysterious strangers would occur here]",
-        next: 38
+        transitionTo: 'camp'
     },
     36: {
         text: "[Interaction with Erik at the dice game would occur here]",
-        next: 38
+        transitionTo: 'camp'
     },
     37: {
         text: "[Conversation with Grimr and Gunnar would occur here]",
-        next: 38
+        transitionTo: 'camp'
     },
     
     // FINAL TRANSITION TO CHAPTER ONE
     38: {
-        text: "After many days at sea, fever takes hold of you. Strange visions plague your dreams...",
+        text: `==Housecarl== *The grizzled veteran looks you over with a disinterested sneer* "Well... that's more like it, at least now you might actually prove useful in Saxia... if only as a distraction... (+Rep)`,
         next: 39
     },
     39: {
+        text: "After many days at sea, fever takes hold of you. Strange visions plague your dreams...",
+        next: 40
+    },
+    40: {
         text: "The prologue of your story ends here, but your true journey is just beginning...",
         end: true,
         nextChapter: "chapter-one"  // This tells the story system to load chapter-one next
     },
-    
-    // Return to camp node
-    40: {
-        text: "You've completed your business with Erik for now and decided to return to camp.",
-        transitionTo: 'camp'
-    }
 };
