@@ -188,7 +188,7 @@ export const storyNodes = {
     
     // FINAL TRANSITION TO CHAPTER ONE
     38: {
-        text: `==Housecarl== *The grizzled veteran looks you over with a disinterested sneer* "Well... that's more like it, at least now you might actually prove useful in Saxia... if only as a distraction... (+Rep)`,
+        text: `Housecarl: *The grizzled veteran looks you over with a disinterested sneer* "Well... that's more like it, at least now you might actually prove useful in Saxia... if only as a distraction... (+Rep)`,
         next: 39
     },
     39: {
