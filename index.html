@@ -8,6 +8,12 @@
 </head>
 <body>
     <div id="black-overlay"></div>
+    
+    <!-- Character Button (visible across screens) -->
+    <div id="character-button">
+        <div class="character-icon">👤</div>
+    </div>
+    
     <div id="start-screen" class="screen active">
         <div id="start-menu">
             <h1>Viking Game</h1>
@@ -208,6 +214,109 @@
                 
                 <div id="battle-weapon">
                     <div class="weapon-icon">⚔️</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Character Management Screen -->
+    <div id="character-screen" class="screen">
+        <div id="character-container">
+            <div id="character-header">
+                <h2>Character</h2>
+                <button id="close-character" class="close-button">×</button>
+            </div>
+            
+            <div id="character-content">
+                <div id="character-avatar">
+                    <div class="avatar-placeholder viking"></div>
+                    <div class="character-name">Ragnar</div>
+                </div>
+                
+                <div id="character-stats">
+                    <h3>Stats</h3>
+                    <div class="stat-container">
+                        <div class="stat-name">Strength</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill strength-fill"></div>
+                            <span class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-container">
+                        <div class="stat-name">Agility</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill agility-fill"></div>
+                            <span class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-container">
+                        <div class="stat-name">Intelligence</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill intelligence-fill"></div>
+                            <span class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-container">
+                        <div class="stat-name">Charisma</div>
+                        <div class="stat-bar">
+                            <div class="stat-fill charisma-fill"></div>
+                            <span class="stat-value">0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="character-health">
+                    <h3>Health & Energy</h3>
+                    <div class="resource-container">
+                        <div class="resource-name">Health</div>
+                        <div class="resource-bar">
+                            <div class="resource-fill health-fill"></div>
+                            <span class="resource-value">0/0</span>
+                        </div>
+                    </div>
+                    <div class="resource-container">
+                        <div class="resource-name">Energy</div>
+                        <div class="resource-bar">
+                            <div class="resource-fill energy-fill"></div>
+                            <span class="resource-value">0/0</span>
+                        </div>
+                    </div>
+                    <div class="resource-container">
+                        <div class="resource-name">Fatigue</div>
+                        <div class="resource-bar">
+                            <div class="resource-fill fatigue-fill"></div>
+                            <span class="resource-value">0/0</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="character-reputation">
+                    <h3>Reputation</h3>
+                    <div class="reputation-container">
+                        <div class="raven-container">
+                            <div class="raven white-raven">
+                                <div class="raven-level">0</div>
+                            </div>
+                            <div class="raven-label">White Raven</div>
+                        </div>
+                        <div class="reputation-bar">
+                            <div class="reputation-fill"></div>
+                        </div>
+                        <div class="raven-container">
+                            <div class="raven black-raven">
+                                <div class="raven-level">0</div>
+                            </div>
+                            <div class="raven-label">Black Raven</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="character-inventory">
+                    <h3>Inventory</h3>
+                    <div id="inventory-items">
+                        <!-- Inventory items will be dynamically added here -->
+                        <div class="empty-inventory">Your inventory is empty.</div>
+                    </div>
                 </div>
             </div>
         </div>

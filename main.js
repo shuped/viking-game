@@ -3,7 +3,8 @@ const screens = {
     start: document.getElementById('start-screen'),
     cinematicUI: document.getElementById('cinematic-ui'),
     camp: document.getElementById('camp-ui'),
-    battle: document.getElementById('battle-ui')
+    battle: document.getElementById('battle-ui'),
+    character: document.getElementById('character-screen')
 };
 
 // Import all necessary modules
@@ -11,6 +12,7 @@ import { transitionToScreen } from './transitions.js';
 import { displayStoryText, setupStoryListeners } from './story.js';
 import { initCamp } from './camp.js';
 import { initBattle } from './battle.js';
+import { initCharacter } from './character.js';
 
 // Initialize the game
 function initGame() {
@@ -25,6 +27,11 @@ function initGame() {
     
     // Set up story navigation listeners
     setupStoryListeners(screens);
+    
+    // Initialize all game subsystems
+    initCamp();
+    initBattle();
+    initCharacter();
 }
 window.goToNode = function(node) {
     transitionToScreen(screens.start, screens.cinematicUI, () => {

@@ -129,3 +129,46 @@ We've replaced the "Events" camp option with a dynamic travel system that enable
 5. **Debugging**: The storyState object is exposed as window.storystate for debugging in the browser console.
 
 This travel system creates a more dynamic and immersive game experience by allowing players to make meaningful choices about where to go, when to pursue storylines, and enabling non-linear progression through the game's narrative.
+
+## Character Management System - April 26, 2025
+
+We've implemented a character management screen that allows players to view their character stats, resources, reputation, and inventory at any time during gameplay.
+
+### Key Components:
+
+1. **Global Access Button**
+   - A persistent character button appears in the top-left corner of all game screens
+   - Clicking this button opens the character screen overlay while preserving the current game state
+   - When closing the character screen, the game returns to the previous screen
+
+2. **UI Architecture Considerations**
+   - Character screen uses z-index management to appear above other UI elements (z-index: 1001)
+   - Screen transitions properly store/restore the previous active screen
+   - Automatic closing of any open modals (e.g., camp activity modals) when opening character screen
+   - Explicit display and visibility properties ensure consistent rendering across all contexts
+
+3. **Character Stats Display**
+   - Core attributes: strength, agility, intelligence, charisma (displayed as stat bars)
+   - Resources: health, energy, fatigue (displayed as resource bars with current/max values)
+   - Reputation system: White Raven and Black Raven levels with visual representation
+   - Inventory: grid-based display of collected items with tooltips for descriptions
+
+4. **Data Integration**
+   - Character screen reads directly from the player state in player.js
+   - UI updates automatically when the character screen is opened
+   - Other modules can trigger UI updates with refreshCharacterUI() function
+   - Robust error handling prevents UI glitches when player state changes
+
+### Implementation Best Practices:
+
+1. **Screen Transitions**: When implementing new UI screens that need to interact with the character screen, ensure proper z-index management and screen state preservation.
+
+2. **Modal Management**: Always close any active modals when transitioning between screens to prevent UI conflicts.
+
+3. **Error Handling**: Include robust error checking when updating UI elements to prevent null reference errors.
+
+4. **Specific Selectors**: Use specific DOM selectors when working with complex UI structures to ensure the correct elements are updated.
+
+5. **Consistent Styling**: Follow the established visual language with border images, color schemes, and layout patterns.
+
+The character management system provides players with clear feedback on their character's development throughout the game, making progression more tangible and rewarding.
