@@ -172,3 +172,43 @@ We've implemented a character management screen that allows players to view thei
 5. **Consistent Styling**: Follow the established visual language with border images, color schemes, and layout patterns.
 
 The character management system provides players with clear feedback on their character's development throughout the game, making progression more tangible and rewarding.
+
+## Stat Change Display System - April 27, 2025
+
+We've implemented an improved system for displaying character stat changes directly within the story text flow instead of using floating notifications. This creates a more integrated narrative experience.
+
+### Key Components:
+
+1. **Integrated Stat Change Display**
+   - Stat changes appear in gray text directly within the story text box
+   - Players must click to acknowledge stat changes before continuing to the next story node
+   - Creates a more cohesive storytelling experience by embedding character development in the narrative
+
+2. **OnSelect Return Pattern**
+   - All `onSelect` callback functions now return a string with formatted stat change text
+   - This string is displayed in the story text box after the player makes a choice
+   - Format: `"You chose [choice]. [reason/outcome]<br><br>[stat] +/-[value]<br>[stat] +/-[value]"`
+
+3. **Event Handling System**
+   - Global flag `isDisplayingStatChanges` prevents conflicts between multiple click handlers
+   - Custom click handler management using `_clickHandler` property for clean tracking and removal
+   - Small delay (300ms) before registering click handler prevents accidental immediate clicks
+
+4. **Display Flow Control**
+   - The `displayStatChangeText` function manages the display and continuation flow
+   - Story won't advance until player explicitly clicks after seeing stat changes
+   - Clean event handler management prevents race conditions and handler conflicts
+
+### Implementation Best Practices:
+
+1. **Return Strings from onSelect**: Always have `onSelect` functions return a formatted string with stat changes rather than calling `displayStatChange` directly.
+
+2. **Descriptive Messages**: Include a brief narrative explanation of why stats changed, not just the raw numbers.
+
+3. **Consistent Formatting**: Use HTML breaks (`<br>`) for formatting the stat change text with proper spacing.
+
+4. **Flag Management**: The `isDisplayingStatChanges` flag must be properly set and cleared to ensure proper event handling.
+
+5. **Event Handler Cleanup**: Always remove event listeners when they're no longer needed to prevent memory leaks.
+
+This stat change display system improves narrative immersion by integrating character development directly into the story flow, making player choices feel more impactful and meaningful.

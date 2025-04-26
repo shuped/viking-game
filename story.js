@@ -11,9 +11,59 @@ import {
 } from './story/story-manager.js';
 
 let currentNodeId = 0;
+// Flag to track when stat changes are being displayed
+let isDisplayingStatChanges = false;
+
 const textBox = document.getElementById('cinematic-text-box');
 const textContent = document.getElementById('cinematic-text-content');
 const choiceBox = document.getElementById('cinematic-button-box');
+
+// Display player state changes in the UI
+function displayStatChange(attribute, value) {
+    // Create a floating notification
+    const notif = document.createElement('div');
+    notif.className = 'stat-change-notification';
+    
+    // Set the text content based on the attribute and value
+    let symbol = value >= 0 ? '+' : '';
+    let text = `${attribute}: ${symbol}${value}`;
+    
+    // Apply some styling to the notification
+    notif.textContent = text;
+    notif.style.position = 'absolute';
+    notif.style.top = '20%';
+    notif.style.left = '50%';
+    notif.style.transform = 'translate(-50%, -50%)';
+    notif.style.backgroundColor = 'rgba(25, 21, 44, 0.8)';
+    notif.style.border = '2px solid #4a90e2';
+    notif.style.color = value >= 0 ? '#4ade80' : '#f87171';
+    notif.style.padding = '8px 16px';
+    notif.style.borderRadius = '5px';
+    notif.style.zIndex = '1000';
+    notif.style.animation = 'fadeOutUp 2s forwards';
+    
+    // Add animation keyframes to the document if not already present
+    if (!document.getElementById('stat-change-animation')) {
+        const style = document.createElement('style');
+        style.id = 'stat-change-animation';
+        style.textContent = `
+            @keyframes fadeOutUp {
+                0% { opacity: 1; transform: translate(-50%, -50%); }
+                80% { opacity: 1; transform: translate(-50%, -80%); }
+                100% { opacity: 0; transform: translate(-50%, -100%); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    // Add to the document
+    document.body.appendChild(notif);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        notif.remove();
+    }, 2000);
+}
 
 // Display story text for the current node
 async function displayStoryText(nodeId) {
@@ -29,6 +79,11 @@ async function displayStoryText(nodeId) {
     
     // Mark this node as visited in our story state
     storyState.visitNode(nodeId);
+    
+    // Execute the onEnter function if it exists
+    if (currentNode.onEnter) {
+        currentNode.onEnter();
+    }
     
     // Clear any existing choices
     choiceBox.innerHTML = '';
@@ -67,9 +122,125 @@ async function displayStoryText(nodeId) {
     }
 }
 
+// Display stat change text in the story box and wait for player to continue
+async function displayStatChangeText(statChangeText, nextNodeId) {
+    // Set flag to prevent global click handler from interfering
+    isDisplayingStatChanges = true;
+    
+    // Clear any existing choices
+    choiceBox.innerHTML = '';
+    
+    // Create a container for the stat changes
+    const statChangeContainer = document.createElement('div');
+    statChangeContainer.style.color = '#a0a0a0'; // Grey text for stat changes
+    statChangeContainer.style.marginTop = '15px';
+    statChangeContainer.style.fontSize = '0.9em';
+    
+    // Add the stat change information
+    statChangeContainer.innerHTML = statChangeText;
+    
+    // Add to the text content
+    textContent.appendChild(statChangeContainer);
+    
+    // Return a promise that resolves when the user clicks to continue
+    return new Promise(resolve => {
+        // First, remove any existing click handlers on the cinematic frame
+        const frame = document.getElementById('cinematic-frame');
+        const oldClickHandler = frame._clickHandler;
+        if (oldClickHandler) {
+            frame.removeEventListener('click', oldClickHandler);
+        }
+        
+        // Create our one-time click handler
+        const onStatChangeClick = (event) => {
+            // Remove this handler to prevent multiple calls
+            frame.removeEventListener('click', onStatChangeClick);
+            
+            // Reset the flag before proceeding
+            isDisplayingStatChanges = false;
+            
+            // Save a reference to this handler in case we need to clean it up later
+            frame._clickHandler = null;
+            
+            // Continue to the next node
+            displayStoryText(nextNodeId);
+            resolve();
+        };
+        
+        // Save a reference to this handler
+        frame._clickHandler = onStatChangeClick;
+        
+        // Add the click handler with a slight delay to prevent accidental clicks
+        setTimeout(() => {
+            frame.addEventListener('click', onStatChangeClick);
+        }, 300);
+    });
+}
+
+// Handle the player's choice selection
+function handleChoiceSelection(nextNodeId, choice) {
+    // Process stat check if present
+    if (choice.statCheck) {
+        const { stat, threshold, success, failure } = choice.statCheck;
+        const playerStatValue = playerState[stat] || 0;
+        const passed = playerStatValue >= threshold;
+        
+        console.log(`Stat check: ${stat}(${playerStatValue}) vs threshold(${threshold}) - ${passed ? 'PASS' : 'FAIL'}`);
+        
+        // Handle success path
+        if (passed) {
+            // Apply success effects
+            if (success && success.onSelect) {
+                const statChangeText = success.onSelect(true);
+                if (statChangeText) {
+                    // Display the stat change text first before continuing to the next node
+                    displayStatChangeText(statChangeText, success.nextNode || nextNodeId);
+                    return;
+                }
+            }
+            
+            // Navigate to success node if specified
+            if (success && success.nextNode) {
+                displayStoryText(success.nextNode);
+                return;
+            }
+        } 
+        // Handle failure path
+        else {
+            // Apply failure effects
+            if (failure && failure.onSelect) {
+                const statChangeText = failure.onSelect(false);
+                if (statChangeText) {
+                    // Display the stat change text first before continuing to the next node
+                    displayStatChangeText(statChangeText, failure.nextNode || nextNodeId);
+                    return;
+                }
+            }
+            
+            // Navigate to failure node if specified
+            if (failure && failure.nextNode) {
+                displayStoryText(failure.nextNode);
+                return;
+            }
+        }
+    }
+    
+    // Apply regular choice effects
+    if (choice.onSelect) {
+        const statChangeText = choice.onSelect(true); // Pass true as default for non-stat check choices
+        if (statChangeText) {
+            // Display the stat change text first before continuing to the next node
+            displayStatChangeText(statChangeText, nextNodeId);
+            return;
+        }
+    }
+    
+    // Continue with normal story progression
+    displayStoryText(nextNodeId);
+}
+
 // Display choices for the current node
 function displayChoices(choices) {
-    // Existing code remains the same
     choiceBox.innerHTML = '';
     
     // Create a styled container for the choices that resembles the text box
@@ -139,7 +310,7 @@ function displayChoices(choices) {
             // Find the original index of this choice in the unfiltered list
             const originalIndex = choices.findIndex(c => c.text === choice.text);
             storyState.completeChoice(currentNodeId, originalIndex);            
-            handleChoiceSelection(choice.nextNode);
+            handleChoiceSelection(choice.nextNode, choice);
         });
         
         choiceList.appendChild(choiceItem);
@@ -149,19 +320,14 @@ function displayChoices(choices) {
     choiceBox.appendChild(choiceContainer);
 }
 
-// Handle the player's choice selection
-function handleChoiceSelection(nextNodeId) {
-    displayStoryText(nextNodeId);
-}
-
 // Setup story navigation listeners
 function setupStoryListeners(screens) {
     document.getElementById('cinematic-frame').addEventListener('click', async () => {
         const storyNodes = getCurrentStoryNodes();
         const currentNode = storyNodes[currentNodeId];
         
-        // Only allow advancing if we're not showing choices
-        if (!currentNode.choices) {
+        // Only allow advancing if we're not showing choices and not displaying stat changes
+        if (!currentNode.choices && !isDisplayingStatChanges) {
             // Check if this node has a transition property
             if (currentNode.transitionTo) {
                 // Handle different screen transitions based on transitionTo property
@@ -201,4 +367,4 @@ function setupStoryListeners(screens) {
     });
 }
 
-export { displayStoryText, setupStoryListeners, currentNodeId, storyState };
+export { displayStoryText, setupStoryListeners, currentNodeId, storyState, displayStatChange };

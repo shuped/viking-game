@@ -1,4 +1,7 @@
 // Prologue story nodes
+import { updatePlayerAttribute, addInventoryItem } from '../player.js';
+import { displayStatChange } from '../story.js';
+
 export const storyNodes = {
     // INTRO SECTION
     0: {
@@ -8,17 +11,102 @@ export const storyNodes = {
     1: {
         text: "You are...",
         choices: [
-            { text: "Bjorn, a mighty warrior", nextNode: 2 },
-            { text: "Leif, a clever explorer", nextNode: 2 },
-            { text: "Freya, a fierce shieldmaiden", nextNode: 2 }
+            { 
+                text: "Bjorn, a mighty warrior", 
+                nextNode: 2,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('strength', 2);
+                    updatePlayerAttribute('agility', 1);
+                    updatePlayerAttribute('intelligence', -1);
+                    
+                    // Return a string describing the stat changes
+                    return "You chose Bjorn, a mighty warrior.<br><br>" +
+                           "Strength +2<br>" +
+                           "Agility +1<br>" +
+                           "Intelligence -1";
+                }
+            },
+            { 
+                text: "Leif, a clever explorer", 
+                nextNode: 2,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('intelligence', 2);
+                    updatePlayerAttribute('agility', 1);
+                    updatePlayerAttribute('charisma', -1);
+                    
+                    // Return a string describing the stat changes
+                    return "You chose Leif, a clever explorer.<br><br>" +
+                           "Intelligence +2<br>" +
+                           "Agility +1<br>" +
+                           "Charisma -1";
+                }
+            },
+            { 
+                text: "Freya, a fierce shieldmaiden", 
+                nextNode: 2,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('strength', 1);
+                    updatePlayerAttribute('agility', 2);
+                    updatePlayerAttribute('charisma', -1);
+                    
+                    // Return a string describing the stat changes
+                    return "You chose Freya, a fierce shieldmaiden.<br><br>" +
+                           "Strength +1<br>" +
+                           "Agility +2<br>" +
+                           "Charisma -1";
+                }
+            }
         ]
     },
     2: {
         text: "Tonight is the eve of your eighteenth birthday... As you close your eyes and drift to sleep you find yourself reflecting on your life until now... You wonder why the gods saw fit you should be born into a family of...",
         choices: [
-            { text: "Poor farmers", nextNode: 3 },
-            { text: "Modest Fisherfolk", nextNode: 3 },
-            { text: "Comfortable Craftsmen", nextNode: 3 }
+            { 
+                text: "Poor farmers", 
+                nextNode: 3,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('strength', 2);
+                    updatePlayerAttribute('intelligence', -1);
+                    updatePlayerAttribute('charisma', -1);
+                    updatePlayerAttribute('fatigue', -5);
+                    
+                    return "You chose a family of poor farmers.<br><br>" +
+                           "Strength +2<br>" +
+                           "Intelligence -1<br>" +
+                           "Charisma -1<br>" +
+                           "Fatigue -5";
+                }
+            },
+            { 
+                text: "Modest Fisherfolk", 
+                nextNode: 3,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('strength', 1);
+                    updatePlayerAttribute('agility', 2);
+                    updatePlayerAttribute('charisma', -1);
+                    
+                    return "You chose a family of modest fisherfolk.<br><br>" +
+                           "Strength +1<br>" +
+                           "Agility +2<br>" +
+                           "Charisma -1";
+                }
+            },
+            { 
+                text: "Comfortable Craftsmen", 
+                nextNode: 3,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('strength', -1);
+                    updatePlayerAttribute('intelligence', 2);
+                    updatePlayerAttribute('charisma', 1);
+                    updatePlayerAttribute('gold', 5);
+                    
+                    return "You chose a family of comfortable craftsmen.<br><br>" +
+                           "Strength -1<br>" +
+                           "Intelligence +2<br>" +
+                           "Charisma +1<br>" +
+                           "Gold +5";
+                }
+            }
         ]
     },
     3: {
@@ -32,8 +120,38 @@ export const storyNodes = {
     5: {
         text: "Mirroring the left path and the right path hang two desiccated tree branches... On the left sits a White Raven, reposed in serene disinterest, its gaze fixed towards the left hand path... On the right, a Raven Black as jet is staring at you, it caws pleadingly before dropping another chestnut on the ground... an offering?",
         choices: [
-            { text: "Choose the Left White Raven path", nextNode: 6 },
-            { text: "Choose the Right Black Raven path", nextNode: 6 }
+            { 
+                text: "Choose the Left White Raven path", 
+                nextNode: 6,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('whiteRaven', 5);
+                    updatePlayerAttribute('reputation', 2);
+                    updatePlayerAttribute('intelligence', 1);
+                    updatePlayerAttribute('charisma', 1);
+                    
+                    return "You chose the White Raven's path.<br><br>" +
+                           "White Raven +5<br>" +
+                           "Reputation +2<br>" +
+                           "Intelligence +1<br>" +
+                           "Charisma +1";
+                }
+            },
+            { 
+                text: "Choose the Right Black Raven path", 
+                nextNode: 6,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('blackRaven', 5);
+                    updatePlayerAttribute('strength', 1);
+                    updatePlayerAttribute('agility', 1);
+                    updatePlayerAttribute('reputation', 1);
+                    
+                    return "You chose the Black Raven's path.<br><br>" +
+                           "Black Raven +5<br>" +
+                           "Strength +1<br>" +
+                           "Agility +1<br>" +
+                           "Reputation +1";
+                }
+            }
         ]
     },
     6: {
@@ -81,8 +199,32 @@ export const storyNodes = {
     17: {
         text: "Erik: *As you walk away Erik pauses, and in a slow, conspiratorial voice he says* \"Listen, I don't know about you, but I'm gonna need to think of a 'creative' way to acquire some gear... what do you say?\"",
         choices: [
-            { text: "Agree to help Erik 'acquire' the needed gear", nextNode: 18 },
-            { text: "Disagree and find an honest way to get gear", nextNode: 19 }
+            { 
+                text: "Agree to help Erik 'acquire' the needed gear", 
+                nextNode: 18,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('blackRaven', 3);
+                    updatePlayerAttribute('reputation', -1);
+                    
+                    return "You chose to help Erik with his scheme.<br><br>" +
+                           "Black Raven +3<br>" +
+                           "Reputation -1";
+                }
+            },
+            { 
+                text: "Disagree and find an honest way to get gear", 
+                nextNode: 19,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('whiteRaven', 3);
+                    updatePlayerAttribute('reputation', 1);
+                    updatePlayerAttribute('gold', -5);
+                    
+                    return "You chose the honest path.<br><br>" +
+                           "White Raven +3<br>" +
+                           "Reputation +1<br>" +
+                           "Gold -5";
+                }
+            }
         ]
     },
     
@@ -118,44 +260,208 @@ export const storyNodes = {
     24: {
         text: "You approach the warriors and they watch you with curiosity, pausing their exercises begrudgingly and sizing you up...",
         choices: [
-            { text: "Challenge their strongest warrior to a duel", nextNode: 25 },
-            { text: "Regale them with a gripping story", nextNode: 26 },
-            { text: "Insult their mothers... and prepare to run for your life", nextNode: 27 }
+            { 
+                text: "Challenge their strongest warrior to a duel", 
+                nextNode: 25,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('reputation', 2);
+                    updatePlayerAttribute('fatigue', 5);
+                    
+                    return "You challenge their strongest warrior to a duel.<br><br>" +
+                           "Reputation +2<br>" +
+                           "Fatigue +5";
+                },
+                statCheck: {
+                    stat: "strength",
+                    threshold: 7,
+                    success: {
+                        onSelect: () => {
+                            updatePlayerAttribute('reputation', 3);
+                            updatePlayerAttribute('strength', 1);
+                            
+                            return "Your impressive strength wins the duel!<br><br>" +
+                                   "Reputation +3<br>" +
+                                   "Strength +1";
+                        }
+                    },
+                    failure: {
+                        onSelect: () => {
+                            updatePlayerAttribute('reputation', -1);
+                            updatePlayerAttribute('health', -10);
+                            
+                            return "You lose the duel and take a beating.<br><br>" +
+                                   "Reputation -1<br>" +
+                                   "Health -10";
+                        }
+                    }
+                }
+            },
+            { 
+                text: "Regale them with a gripping story", 
+                nextNode: 26,
+                statCheck: {
+                    stat: "charisma",
+                    threshold: 5,
+                    success: {
+                        onSelect: () => {
+                            updatePlayerAttribute('reputation', 2);
+                            updatePlayerAttribute('charisma', 1);
+                            
+                            return "Your story captivates the warriors!<br><br>" +
+                                   "Reputation +2<br>" +
+                                   "Charisma +1";
+                        }
+                    },
+                    failure: {
+                        onSelect: () => {
+                            updatePlayerAttribute('reputation', -2);
+                            
+                            return "Your story falls flat and the warriors mock you.<br><br>" +
+                                   "Reputation -2";
+                        }
+                    }
+                }
+            },
+            { 
+                text: "Insult their mothers... and prepare to run for your life", 
+                nextNode: 27,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('reputation', -2);
+                    updatePlayerAttribute('blackRaven', 1);
+                    updatePlayerAttribute('energy', -10);
+                    
+                    return "You insult their mothers and create quite a scene!<br><br>" +
+                           "Reputation -2<br>" +
+                           "Black Raven +1<br>" +
+                           "Energy -10";
+                }
+            }
         ]
     },
     
-    // DUEL PATH
+    // DUEL COMBAT
     25: {
         text: "Puffing out your chest and squaring your shoulders you look from man to man, \"Who among you is the strongest?\" A tall Viking with an elaborately braided red beard steps towards you with a hearty chuckle... moments later the stage is set for a proper duel, wooden swords and old shields will be used.",
         next: 28
     },
-    
-    // STORYTELLING PATH
-    26: {
-        text: "The Vikings gather around you, mesmerized by your vivid recounting of one of Vikstad local legends. While you hold their attention, you notice Erik slipping quietly around the edges of the group, up to something in the background.",
-        next: 29
-    },
-    
-    // INSULT PATH
-    27: {
-        text: "The Vikings waste no time, chasing you with murderous intent across the field and into the woods... It seems for a moment like you might be done for, but you run like the wind... They at last give up the chase... you just hope you won't run into them again before you set sail tomorrow...",
-        next: 29
-    },
-    
-    // DUEL COMBAT
     28: {
         text: "DUEL (Choose your approach):",
         choices: [
-            { text: "STR - Rely on your strength to overpower the Red Beard", nextNode: 29 },
-            { text: "AGI - Focus on dexterity and quick attacks to overwhelm your foe", nextNode: 29 },
-            { text: "END - Exhaust your opponent, focusing on dodging and defense", nextNode: 29 }
+            { 
+                text: "STR - Rely on your strength to overpower the Red Beard", 
+                nextNode: 29,
+                statCheck: {
+                    stat: "strength",
+                    threshold: 8,
+                    success: {
+                        onSelect: () => {
+                            updatePlayerAttribute('strength', 1);
+                            updatePlayerAttribute('reputation', 3);
+                            updatePlayerAttribute('health', -5);
+                            
+                            return "You overpower the Red Beard with your impressive strength!<br><br>" +
+                                   "Strength +1<br>" +
+                                   "Reputation +3<br>" +
+                                   "Health -5";
+                        }
+                    },
+                    failure: {
+                        onSelect: () => {
+                            updatePlayerAttribute('health', -20);
+                            updatePlayerAttribute('energy', -15);
+                            updatePlayerAttribute('reputation', -2);
+                            
+                            return "The Red Beard proves too strong for you.<br><br>" +
+                                   "Health -20<br>" +
+                                   "Energy -15<br>" +
+                                   "Reputation -2";
+                        }
+                    }
+                }
+            },
+            { 
+                text: "AGI - Focus on dexterity and quick attacks to overwhelm your foe", 
+                nextNode: 29,
+                statCheck: {
+                    stat: "agility",
+                    threshold: 7,
+                    success: {
+                        onSelect: () => {
+                            updatePlayerAttribute('agility', 1);
+                            updatePlayerAttribute('reputation', 2);
+                            updatePlayerAttribute('energy', -10);
+                            
+                            return "Your quick movements and attacks leave the Red Beard struggling to keep up!<br><br>" +
+                                   "Agility +1<br>" +
+                                   "Reputation +2<br>" +
+                                   "Energy -10";
+                        }
+                    },
+                    failure: {
+                        onSelect: () => {
+                            updatePlayerAttribute('health', -15);
+                            updatePlayerAttribute('energy', -20);
+                            
+                            return "Your agility isn't enough - the Red Beard anticipates your movements.<br><br>" +
+                                   "Health -15<br>" +
+                                   "Energy -20";
+                        }
+                    }
+                }
+            },
+            { 
+                text: "END - Exhaust your opponent, focusing on dodging and defense", 
+                nextNode: 29,
+                onSelect: (success = true) => {
+                    updatePlayerAttribute('energy', -15);
+                    
+                    return "You focus on defensive maneuvers, trying to exhaust your opponent.<br><br>" +
+                           "Energy -15";
+                },
+                statCheck: {
+                    stat: "agility",
+                    threshold: 6,
+                    success: {
+                        onSelect: () => {
+                            updatePlayerAttribute('energy', -5);
+                            updatePlayerAttribute('reputation', 1);
+                            updatePlayerAttribute('agility', 1);
+                            
+                            return "Your endurance strategy works! The Red Beard tires out before you do.<br><br>" +
+                                   "Energy -5<br>" +
+                                   "Reputation +1<br>" +
+                                   "Agility +1";
+                        }
+                    },
+                    failure: {
+                        onSelect: () => {
+                            updatePlayerAttribute('health', -10);
+                            updatePlayerAttribute('energy', -10);
+                            
+                            return "Your endurance fails you. The Red Beard outlasts your defensive efforts.<br><br>" +
+                                   "Health -10<br>" +
+                                   "Energy -10";
+                        }
+                    }
+                }
+            }
         ]
     },
-
-    // SUCCESS OUTCOME (ALL PATHS LEAD HERE)
+    
+    // At node 29, give the player a weapon for completing Erik's quest
     29: {
         text: "You walk back to the tavern with your head held high. You find Erik in his room...\n\nErik: \"If it isn't the champion of Vikstad himself!\"\nYou: \"...I just hope it was all worth it, did you get the loot?\"\nErik: *Shrugging and flashing you his characteristic scoundrel's half smile* \"Have I ever let you down before!?\"\nYou: \"...\" \"...\" \"...\"\nErik: \"All right, all right! Here, your share of the loot.\"",
-        next: 30
+        next: 30,
+        onEnter: () => {
+            // Add a weapon to player inventory
+            addInventoryItem({
+                name: "Rusty Seax",
+                description: "A short, single-edged blade. It's seen better days, but it's better than nothing.",
+                type: "weapon",
+                damage: 3,
+                icon: "🗡️"
+            });
+        }
     },
     
     // CAMP UI SECTION

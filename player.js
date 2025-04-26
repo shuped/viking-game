@@ -22,6 +22,7 @@ function updatePlayerAttribute(attribute, value) {
         playerState[attribute] += value;
         return true;
     }
+    console.error(`Attribute ${attribute} does not exist on playerState`);
     return false;
 }
 
