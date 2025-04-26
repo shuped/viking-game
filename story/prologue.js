@@ -1,6 +1,6 @@
 // Prologue story nodes
 import { updatePlayerAttribute, addInventoryItem } from '../player.js';
-import { displayStatChange } from '../story.js';
+import { displayStatChange, storyState } from '../story.js';
 
 export const storyNodes = {
     // INTRO SECTION
@@ -262,14 +262,9 @@ export const storyNodes = {
         choices: [
             { 
                 text: "Challenge their strongest warrior to a duel", 
-                nextNode: 25,
-                onSelect: (success = true) => {
-                    updatePlayerAttribute('reputation', 2);
-                    updatePlayerAttribute('fatigue', 5);
-                    
-                    return "You challenge their strongest warrior to a duel.<br><br>" +
-                           "Reputation +2<br>" +
-                           "Fatigue +5";
+                condition: () => !storyState.hasCompletedChoice(24, 0),
+                onSelect: (success = true) => {                    
+                    return "You challenge their strongest warrior to a duel.<br><br>"
                 },
                 statCheck: {
                     stat: "strength",
@@ -282,23 +277,23 @@ export const storyNodes = {
                             return "Your impressive strength wins the duel!<br><br>" +
                                    "Reputation +3<br>" +
                                    "Strength +1";
-                        }
+                        },
+                        nextNode: 25,
                     },
                     failure: {
-                        onSelect: () => {
-                            updatePlayerAttribute('reputation', -1);
-                            updatePlayerAttribute('health', -10);
-                            
-                            return "You lose the duel and take a beating.<br><br>" +
-                                   "Reputation -1<br>" +
-                                   "Health -10";
-                        }
+                        onSelect: () => {     
+                            updatePlayerAttribute('reputation', -10);                       
+                            return "The warriors look you up and down before howling with laughter, and returning to their activities.. at least you made an impression... You'll have to try something else...<br><br>" +
+                                   "Reputation -10";
+                        },
+                        nextNode: 24,
                     }
                 }
             },
             { 
                 text: "Regale them with a gripping story", 
                 nextNode: 26,
+                condition: () => !storyState.hasCompletedChoice(24, 1),
                 statCheck: {
                     stat: "charisma",
                     threshold: 5,
@@ -310,7 +305,8 @@ export const storyNodes = {
                             return "Your story captivates the warriors!<br><br>" +
                                    "Reputation +2<br>" +
                                    "Charisma +1";
-                        }
+                        },
+                        nextNode: 50,
                     },
                     failure: {
                         onSelect: () => {
@@ -318,7 +314,8 @@ export const storyNodes = {
                             
                             return "Your story falls flat and the warriors mock you.<br><br>" +
                                    "Reputation -2";
-                        }
+                        },
+                        nextNode: 24,
                     }
                 }
             },
@@ -464,6 +461,28 @@ export const storyNodes = {
         }
     },
     
+    // Success branch for storytelling path
+    50: {
+        text: "You walk back to the tavern with your head held high, and your reputation improved. You handled yourself like an expert storyteller. You find Erik in his room...",
+        next: 51
+    },
+    // Roughly same as 29
+    51: {
+        text: "You walk back to the tavern with your head held high. You find Erik in his room...\n\nErik: \"If it isn't the champion of Vikstad himself!\"\nYou: \"...I just hope it was all worth it, did you get the loot?\"\nErik: *Shrugging and flashing you his characteristic scoundrel's half smile* \"Have I ever let you down before!?\"\nYou: \"...\" \"...\" \"...\"\nErik: \"All right, all right! Here, your share of the loot.\"",
+        next: 30,
+        onEnter: () => {
+            // Add a weapon to player inventory
+            addInventoryItem({
+                name: "Rusty Seax",
+                description: "A short, single-edged blade. It's seen better days, but it's better than nothing.",
+                type: "weapon",
+                damage: 3,
+                icon: "🗡️"
+            });
+        }
+    },
+    
+    // Original nodes continue here
     // CAMP UI SECTION
     30: {
         text: "Weapon and armor aquired. Erik's trust gained.",
