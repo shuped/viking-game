@@ -58,7 +58,8 @@ Story nodes can have these key properties:
 - `end` - Boolean indicating if this is a chapter end
 - `nextChapter` - The next chapter to transition to
 - `transitionTo` - Type of screen transition ('camp', 'battle', etc.)
-# Agent Instructions
+
+## Agent Instructions
 
 ## Travel System Implementation - April 26, 2025
 
@@ -172,6 +173,50 @@ We've implemented a character management screen that allows players to view thei
 5. **Consistent Styling**: Follow the established visual language with border images, color schemes, and layout patterns.
 
 The character management system provides players with clear feedback on their character's development throughout the game, making progression more tangible and rewarding.
+
+## Typewriter Effect & Story Presentation - April 30, 2025
+
+We've implemented an improved typewriter effect for displaying narrative text that creates a more engaging, interactive storytelling experience.
+
+### Key Components:
+
+1. **Interactive Typewriter Effect**
+   - Text appears character-by-character for a dynamic reading experience
+   - Players can click during typing to instantly display all remaining text
+   - "Click to continue" indicator only appears after text is fully displayed
+   - Choices only appear after text has been fully written to the text box
+
+2. **Robust Promise-Based Implementation**
+   - Typewriter effect uses async/await patterns for reliable sequencing
+   - Promise-based flow control ensures proper timing of UI updates
+   - Cancellation and completion mechanisms properly handle user interactions
+   - Prevents race conditions even during rapid transitions between story nodes
+
+3. **State Management**
+   - The `typewriterActive` flag tracks when text is being typed
+   - Click handlers check this flag to determine appropriate behavior
+   - Completion mechanism preserves text content while skipping animation
+   - Safeguards prevent choices from displaying prematurely
+
+4. **User Experience Improvements**
+   - More natural reading flow with properly timed UI elements
+   - Consistent behavior across all story nodes and transitions
+   - Players have control over pacing without missing story content
+   - Seamless integration with choice selection and stat display systems
+
+### Implementation Best Practices:
+
+1. **Async Flow Control**: Use `await` with the typewriter effect to ensure subsequent UI updates occur in the correct sequence.
+
+2. **Proper Flag Checking**: Always check the `typewriterActive` flag before displaying UI elements that should appear after text is fully written.
+
+3. **Promise Management**: When working with the typewriter system, ensure all promises resolve appropriately even in edge cases.
+
+4. **Cancellation Handling**: If you need to cancel an active typewriter effect, use the `await cancelTypewriter()` function to ensure proper cleanup.
+
+5. **Completion vs. Cancellation**: Use `completeTypewriter()` when you want to show all text immediately, and `cancelTypewriter()` when you want to stop the effect entirely.
+
+The improved typewriter effect system creates a more polished narrative experience that balances player control with storytelling pacing, ensuring players can enjoy the story at their preferred reading speed without missing content.
 
 ## Stat Change Display System - April 27, 2025
 
