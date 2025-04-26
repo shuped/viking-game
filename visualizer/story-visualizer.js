@@ -1,5 +1,65 @@
 // Story visualizer that loads the story nodes dynamically
-import { storyNodes } from '../story/prologue.js';
+import { storyState } from '../story/story-state.js';
+
+// Store for available chapters and their story nodes
+const storyChapters = {};
+
+// Current active chapter
+let currentChapter = 'prologue';
+let storyNodes = null;
+
+// Function to dynamically import a chapter
+async function importChapter(chapterName) {
+    try {
+        const module = await import(`../story/${chapterName}.js`);
+        storyChapters[chapterName] = module.storyNodes;
+        console.log(`Successfully loaded chapter: ${chapterName}`);
+        return true;
+    } catch (error) {
+        console.error(`Failed to load chapter: ${chapterName}`, error);
+        return false;
+    }
+}
+
+// Function to discover and load all chapters
+async function discoverChapters() {
+    // Known chapters from story-manager.js
+    const knownChapters = ['prologue', 'chapter-one'];
+    
+    // Load each chapter
+    for (const chapter of knownChapters) {
+        await importChapter(chapter);
+    }
+    
+    // Update chapter selector in UI
+    updateChapterSelector();
+    
+    // Load initial chapter
+    await loadChapter(currentChapter);
+}
+
+// Function to update the chapter selector dropdown
+function updateChapterSelector() {
+    const selector = document.getElementById('chapter');
+    selector.innerHTML = ''; // Clear existing options
+    
+    Object.keys(storyChapters).forEach(chapterName => {
+        const option = document.createElement('option');
+        option.value = chapterName;
+        option.textContent = formatChapterName(chapterName);
+        selector.appendChild(option);
+    });
+    
+    // Set current chapter as selected
+    selector.value = currentChapter;
+}
+
+// Format chapter name for display (e.g., "chapter-one" -> "Chapter One")
+function formatChapterName(chapterName) {
+    return chapterName.split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
 
 // Function to prepare the data for D3
 function prepareGraphData(storyNodes) {
@@ -44,8 +104,25 @@ function prepareGraphData(storyNodes) {
     return { nodes, links };
 }
 
-// Once the DOM is loaded, create the visualization
-document.addEventListener('DOMContentLoaded', () => {
+// Function to load a specific chapter
+async function loadChapter(chapterName) {
+    // If chapter isn't loaded yet, try to load it
+    if (!storyChapters[chapterName]) {
+        const success = await importChapter(chapterName);
+        if (!success) return false;
+    }
+    
+    currentChapter = chapterName;
+    storyNodes = storyChapters[chapterName];
+    renderVisualization();
+    return true;
+}
+
+// Function to render the visualization
+function renderVisualization() {
+    // Clear existing visualization
+    d3.select("#chart svg").remove();
+    
     // Prepare the data
     const graphData = prepareGraphData(storyNodes);
     
@@ -191,51 +268,40 @@ document.addEventListener('DOMContentLoaded', () => {
         d.fx = null;
         d.fy = null;
     }
+}
+
+// Once the DOM is loaded, create the visualization
+document.addEventListener('DOMContentLoaded', async () => {
+    // Set up chapter selector
+    const chapterSelector = document.getElementById('chapter');
+    chapterSelector.addEventListener('change', function() {
+        loadChapter(this.value);
+    });
+    
+    // Discover and load all chapters
+    await discoverChapters();
     
     // Zoom controls
     document.getElementById('zoomIn').addEventListener('click', function() {
-        const currentTransform = d3.zoomTransform(svg.node());
+        const currentTransform = d3.zoomTransform(d3.select("#chart svg").node());
         const newScale = currentTransform.k * 1.3;
-        svg.call(d3.zoom().transform, d3.zoomIdentity.translate(currentTransform.x, currentTransform.y).scale(newScale));
+        d3.select("#chart svg").call(d3.zoom().transform, d3.zoomIdentity.translate(currentTransform.x, currentTransform.y).scale(newScale));
     });
     
     document.getElementById('zoomOut').addEventListener('click', function() {
-        const currentTransform = d3.zoomTransform(svg.node());
+        const currentTransform = d3.zoomTransform(d3.select("#chart svg").node());
         const newScale = currentTransform.k / 1.3;
-        svg.call(d3.zoom().transform, d3.zoomIdentity.translate(currentTransform.x, currentTransform.y).scale(newScale));
+        d3.select("#chart svg").call(d3.zoom().transform, d3.zoomIdentity.translate(currentTransform.x, currentTransform.y).scale(newScale));
     });
     
     document.getElementById('resetView').addEventListener('click', function() {
-        svg.call(d3.zoom().transform, d3.zoomIdentity);
+        d3.select("#chart svg").call(d3.zoom().transform, d3.zoomIdentity);
     });
     
-    // Legend
-    const legend = svg.append("g")
-        .attr("class", "legend")
-        .attr("transform", "translate(20, 20)");
-    
-    const legendData = [
-        { color: "#ff6347", label: "Start Node" },
-        { color: "#ffa500", label: "Choice Node" },
-        { color: "#4a90e2", label: "Regular Node" },
-        { color: "#32cd32", label: "End Node" }
-    ];
-    
-    const legendItems = legend.selectAll(".legend-item")
-        .data(legendData)
-        .enter().append("g")
-        .attr("class", "legend-item")
-        .attr("transform", (d, i) => `translate(0, ${i * 25})`);
-    
-    legendItems.append("circle")
-        .attr("r", 8)
-        .attr("fill", d => d.color);
-    
-    legendItems.append("text")
-        .attr("x", 15)
-        .attr("y", 5)
-        .text(d => d.label)
-        .style("fill", "#e0e0e0");
+    // Export SVG
+    document.getElementById('exportSVG').addEventListener('click', function() {
+        exportSVG();
+    });
 });
 
 // Function to export the current view as an SVG file
@@ -245,7 +311,7 @@ window.exportSVG = function() {
     const svgUrl = URL.createObjectURL(svgBlob);
     const downloadLink = document.createElement("a");
     downloadLink.href = svgUrl;
-    downloadLink.download = "viking-story-map.svg";
+    downloadLink.download = `viking-story-map-${currentChapter}.svg`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);

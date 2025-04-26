@@ -2,6 +2,20 @@
 
 This Viking game is a narrative-driven game with RPG elements. Here's a breakdown of the key components:
 
+### Design Patterns:
+
+1. **Story State Management**
+   - Story progress is tracked through visited nodes and completed choices
+   - Story chapters are dynamically loaded when needed
+
+2. **Dynamic UI Elements**
+   - UI elements change based on game state and player progress
+   - Travel map shows available locations based on story progress
+
+3. **Time as a Resource**
+   - Camp activities consume time units (default: 5 units per camp visit)
+   - Players must manage time effectively for optimal character development
+
 ### Core Systems:
 
 1. **Story System**
@@ -44,54 +58,74 @@ Story nodes can have these key properties:
 - `end` - Boolean indicating if this is a chapter end
 - `nextChapter` - The next chapter to transition to
 - `transitionTo` - Type of screen transition ('camp', 'battle', etc.)
-- `battleType` - For battle transitions, the type of battle to initialize
-- `requiredNode` - For travel locations, the story node that must be visited to unlock
+# Agent Instructions
 
-### Travel Location Structure:
+## Travel System Implementation - April 26, 2025
 
-Travel destinations are organized by chapter with properties:
-```
+We've replaced the "Events" camp option with a dynamic travel system that enables players to explore story locations based on their choices and progress.
+
+### Key Components:
+
+1. **Dynamic Travel Locations**
+   - Locations appear/disappear based on story progress and player choices
+   - `isAvailable()` functions determine when locations are accessible
+   - Each location connects to a specific story node when selected
+
+2. **Story Integration**
+   - Travel locations can start quest lines that return to camp when completed
+   - Story nodes can have a `transitionTo: 'camp'` property to return to camp UI
+   - Story nodes can have a `travelReturn: true` flag to indicate travel-based storylines
+
+3. **State Management**
+   - Using `storyState.hasVisited(nodeId)` to check if a story node has been visited
+   - Using `storyState.hasCompletedChoice(nodeId, choiceIndex)` to check player choices
+   - Combining conditions for complex availability logic (e.g., available after a choice but unavailable after visiting)
+
+### Implementation Examples:
+
+#### 1. Basic Location with Simple Condition:
+```javascript
 {
-    id: 'locationId',
-    name: 'Location Name',
-    description: 'Description of the location.',
-    requiredNode: 5, // Story node that must be visited to unlock
-    storyNode: 25,   // Target story node when selected
-    position: { x: 30, y: 20 } // % position on map
+    id: 'town-square',
+    name: 'Víkstad Town Square',
+    description: 'The bustling center of Víkstad where warriors gather.',
+    isAvailable: () => storyState.hasVisited(12), // Available after visiting node 12
+    storyNode: 13,
+    position: { x: 40, y: 60 }
 }
 ```
 
-### Design Patterns:
+#### 2. Location with Complex Conditions:
+```javascript
+{
+    id: 'training-grounds',
+    name: 'Training Grounds',
+    description: 'Where warriors practice their combat skills.',
+    // Only available if player chose to help Erik AND hasn't visited yet
+    isAvailable: () => storyState.hasCompletedChoice(17, 0) && !storyState.hasVisited(20),
+    storyNode: 20,
+    position: { x: 20, y: 80 }
+}
+```
 
-1. **Story State Management**
-   - Story progress is tracked through visited nodes and completed choices
-   - Story chapters are dynamically loaded when needed
+#### 3. Story Node Setup for Travel:
+```javascript
+18: {
+    text: "Erik's eyes gleam with approval. \"Meet me at the training grounds later.\"",
+    transitionTo: 'camp' // Returns to camp after this node
+}
+```
 
-2. **Dynamic UI Elements**
-   - UI elements change based on game state and player progress
-   - Travel map shows available locations based on story progress
+### Best Practices:
 
-3. **Time as a Resource**
-   - Camp activities consume time units (default: 5 units per camp visit)
-   - Players must manage time effectively for optimal character development
+1. **Use isAvailable Functions**: Always use `isAvailable` functions for determining location availability rather than hardcoded rules.
 
-### Recent Implementation: Travel System
+2. **One-Time Locations**: For quest locations that should only be visited once, include `!storyState.hasVisited(nodeId)` in the availability check.
 
-The events camp option was replaced with a travel system that:
-- Shows a map with clickable locations
-- Dynamically displays available destinations based on story progress
-- Transitions to appropriate story nodes when locations are selected
-- Provides a tooltip with location details on hover
-- Creates a framework for adding new locations as the story progresses
+3. **Choice-Based Locations**: Use `storyState.hasCompletedChoice(nodeId, choiceIndex)` to unlock locations based on player choices.
 
-This travel system enables a more open-world feeling while still maintaining the narrative structure of the game.
+4. **Camp Transitions**: Add `transitionTo: 'camp'` to story nodes that should return to the camp UI.
 
-Added new properties to story nodes in chapter-one.js:
-- Added `transitionTo: 'battle'` and `battleType: 'first'` to node 10
-- Added `transitionTo: 'camp'` to node 18
-- Added `transitionTo: 'battle'` and `battleType: 'second'` to node 21
+5. **Debugging**: The storyState object is exposed as window.storystate for debugging in the browser console.
 
-Updated story.js to use the new properties:
-- Modified `setupStoryListeners` function to check for the `transitionTo` property
-- Used the `transitionTo` value to determine which screen to transition to
-- For battle transitions, used the `battleType` property to determine which battle to initialize
+This travel system creates a more dynamic and immersive game experience by allowing players to make meaningful choices about where to go, when to pursue storylines, and enabling non-linear progression through the game's narrative.
