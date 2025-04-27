@@ -4,7 +4,8 @@ const screens = {
     cinematicUI: document.getElementById('cinematic-ui'),
     camp: document.getElementById('camp-ui'),
     battle: document.getElementById('battle-ui'),
-    character: document.getElementById('character-screen')
+    character: document.getElementById('character-screen'),
+    gameOver: document.getElementById('game-over-ui')
 };
 
 // Import all necessary modules
@@ -13,6 +14,7 @@ import { displayStoryText, setupStoryListeners } from './story.js';
 import { initCamp } from './camp.js';
 import { initBattle } from './battle.js';
 import { initCharacter } from './character.js';
+import { initGameOver } from './gameOver.js';
 
 // Initialize the game
 function initGame() {
@@ -25,14 +27,16 @@ function initGame() {
         });
     });
     
-    // Set up story navigation listeners
-    setupStoryListeners(screens);
-    
-    // Initialize all game subsystems
+    // Initialize all game subsystems first
     initCamp();
     initBattle();
     initCharacter();
+    initGameOver(); // Explicitly initialize gameOver
+    
+    // Setup story navigation listeners AFTER all systems are initialized
+    setupStoryListeners(screens);
 }
+
 window.goToNode = function(node) {
     transitionToScreen(screens.start, screens.cinematicUI, () => {
         displayStoryText(node);
@@ -41,6 +45,3 @@ window.goToNode = function(node) {
 
 // Export what other modules will need
 export { screens, initGame };
-
-// Start the game when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', initGame);

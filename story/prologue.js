@@ -1,5 +1,5 @@
 // Prologue story nodes
-import { updatePlayerAttribute, addInventoryItem } from '../player.js';
+import { updatePlayerAttribute, addInventoryItem, initializePlayerStats, setPlayerAttribute, setPlayerFlag } from '../player.js';
 import { displayStatChange, storyState } from '../story.js';
 
 export const storyNodes = {
@@ -15,45 +15,51 @@ export const storyNodes = {
                 text: "Bjorn, a mighty warrior", 
                 nextNode: 2,
                 onSelect: (success = true) => {
-                    updatePlayerAttribute('strength', 2);
-                    updatePlayerAttribute('agility', 1);
-                    updatePlayerAttribute('intelligence', -1);
+                    // Initialize with warrior stats
+                    initializePlayerStats('WARRIOR');
+                    setPlayerAttribute('name', 'Bjorn');
+                    setPlayerFlag('characterSelected', true);
                     
-                    // Return a string describing the stat changes
+                    // Return a string describing character selection
                     return "You chose Bjorn, a mighty warrior.<br><br>" +
-                           "Strength +2<br>" +
-                           "Agility +1<br>" +
-                           "Intelligence -1";
+                           "Strength: 8<br>" +
+                           "Agility: 6<br>" +
+                           "Intelligence: 3<br>" +
+                           "Charisma: 4";
                 }
             },
             { 
                 text: "Leif, a clever explorer", 
                 nextNode: 2,
                 onSelect: (success = true) => {
-                    updatePlayerAttribute('intelligence', 2);
-                    updatePlayerAttribute('agility', 1);
-                    updatePlayerAttribute('charisma', -1);
+                    // Initialize with explorer stats
+                    initializePlayerStats('EXPLORER');
+                    setPlayerAttribute('name', 'Leif');
+                    setPlayerFlag('characterSelected', true);
                     
-                    // Return a string describing the stat changes
+                    // Return a string describing character selection
                     return "You chose Leif, a clever explorer.<br><br>" +
-                           "Intelligence +2<br>" +
-                           "Agility +1<br>" +
-                           "Charisma -1";
+                           "Strength: 4<br>" +
+                           "Agility: 7<br>" +
+                           "Intelligence: 7<br>" +
+                           "Charisma: 3";
                 }
             },
             { 
                 text: "Freya, a fierce shieldmaiden", 
                 nextNode: 2,
                 onSelect: (success = true) => {
-                    updatePlayerAttribute('strength', 1);
-                    updatePlayerAttribute('agility', 2);
-                    updatePlayerAttribute('charisma', -1);
+                    // Initialize with shieldmaiden stats
+                    initializePlayerStats('SHIELDMAIDEN');
+                    setPlayerAttribute('name', 'Freya');
+                    setPlayerFlag('characterSelected', true);
                     
-                    // Return a string describing the stat changes
+                    // Return a string describing character selection
                     return "You chose Freya, a fierce shieldmaiden.<br><br>" +
-                           "Strength +1<br>" +
-                           "Agility +2<br>" +
-                           "Charisma -1";
+                           "Strength: 6<br>" +
+                           "Agility: 8<br>" +
+                           "Intelligence: 4<br>" +
+                           "Charisma: 3";
                 }
             }
         ]
@@ -69,6 +75,7 @@ export const storyNodes = {
                     updatePlayerAttribute('intelligence', -1);
                     updatePlayerAttribute('charisma', -1);
                     updatePlayerAttribute('fatigue', -5);
+                    setPlayerAttribute('background', 'farmer');
                     
                     return "You chose a family of poor farmers.<br><br>" +
                            "Strength +2<br>" +
@@ -84,6 +91,7 @@ export const storyNodes = {
                     updatePlayerAttribute('strength', 1);
                     updatePlayerAttribute('agility', 2);
                     updatePlayerAttribute('charisma', -1);
+                    setPlayerAttribute('background', 'fisher');
                     
                     return "You chose a family of modest fisherfolk.<br><br>" +
                            "Strength +1<br>" +
@@ -99,6 +107,7 @@ export const storyNodes = {
                     updatePlayerAttribute('intelligence', 2);
                     updatePlayerAttribute('charisma', 1);
                     updatePlayerAttribute('gold', 5);
+                    setPlayerAttribute('background', 'craftsman');
                     
                     return "You chose a family of comfortable craftsmen.<br><br>" +
                            "Strength -1<br>" +
@@ -278,6 +287,7 @@ export const storyNodes = {
                     failure: {
                         onSelect: () => {     
                             updatePlayerAttribute('reputation', -10);                       
+
                             return "The warriors look you up and down before howling with laughter, and returning to their activities.. at least you made an impression... You'll have to try something else...<br><br>" +
                                    "Reputation -10";
                         },
@@ -353,9 +363,7 @@ export const storyNodes = {
                 onSelect: () => {
                     updatePlayerAttribute('health', -500);
                     
-                    return "The Vikings waste no time, chasing you with murderous intent across the field and into the woods... It seems for a moment like you might outpace them... but your foot catches a gnarled root and you tumble to the ground... You begin to stand up, not daring to look behind you... *The world goes black*<br><br>" +
-                           "Health -500<br>" +
-                           "GAME OVER";
+                    return "The Vikings waste no time, chasing you with murderous intent across the field and into the woods... It seems for a moment like you might outpace them... but your foot catches a gnarled root and you tumble to the ground... You begin to stand up, not daring to look behind you... *The world goes black*";
                 },
                 nextNode: 666, // Changed from 40 to 666 (game over node)
             }
@@ -693,7 +701,7 @@ export const storyNodes = {
                             updatePlayerAttribute('reputation', -3);
                             updatePlayerAttribute('health', -20);
                             
-                            return "Your attempt at a flashy finish backfires as Red Beard anticipates your movement. He catches your arm mid-swing and throws you painfully to the ground...<br><br>" +
+                            return "Your attempt at a flashy finish backfires as Red Beard anticipates your movement. He trips you, sending you sprawling into the dirt to the laughter of the onlookers...<br><br>" +
                                    "Reputation -3<br>" +
                                    "Health -20";
                         },
@@ -800,7 +808,9 @@ export const storyNodes = {
         }
     },
     666: {
-        text: "You have died. Game Over.",
+        text: "Your vision fades to black as the angry Vikings catch up to you...",
+        transitionTo: 'gameOver',
+        deathCause: "Killed by angry Viking warriors after insulting their mothers",
         end: true
     }
 };

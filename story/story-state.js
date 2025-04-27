@@ -41,6 +41,12 @@ export const storyState = {
     // Get state for a specific chapter
     getChapterState(chapterName) {
         return this.chapterStates[chapterName] || { visitedNodes: new Set(), completedChoices: new Set() };
+    },
+    
+    // Reset the entire story state
+    reset() {
+        this.chapterStates = {};
+        this.currentChapter = null;
     }
 };
 window.storystate = storyState; // For debugging purposes

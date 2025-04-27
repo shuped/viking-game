@@ -924,3 +924,109 @@ h3 {
     color: #999;
     font-style: italic;
 }
+
+/* Game Over Screen */
+#game-over-ui {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/prologue_screen.png');
+    background-size: cover;
+    background-position: center;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-over-container {
+    width: 80%;
+    max-width: 800px;
+    background-color: rgba(25, 21, 44, 0.9);
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    border: 9px solid transparent;
+    border-image-source: url('assets/Text_Box.png');
+    border-image-slice: 9;
+    border-image-width: 1;
+    border-image-outset: 0.4;
+    border-image-repeat: stretch;
+}
+
+#game-over-title {
+    color: crimson;
+    font-size: 3rem;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+#death-cause {
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+    font-style: italic;
+}
+
+#game-over-stats {
+    margin: 20px 0;
+    text-align: left;
+}
+
+#game-over-achievements {
+    margin: 20px 0;
+}
+
+#achievements-list {
+    padding-left: 20px;
+    margin: 10px 0;
+    list-style-type: none;
+}
+
+#achievements-list li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+#achievements-list li:before {
+    content: "⚔️";
+    margin-right: 10px;
+}
+
+#final-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.final-stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
+#death-time {
+    margin-top: 20px;
+    font-style: italic;
+    color: #aaa;
+}
+
+#game-over-buttons {
+    margin-top: 30px;
+}
+
+#new-game {
+    background-color: crimson;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#new-game:hover {
+    background-color: darkred;
+}

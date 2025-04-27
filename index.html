@@ -219,6 +219,56 @@
         </div>
     </div>
     
+    <!-- Game Over Screen -->
+    <div id="game-over-ui" class="screen">
+        <div id="game-over-container">
+            <h1 id="game-over-title">You Have Fallen</h1>
+            <div id="death-cause"></div>
+            
+            <div id="game-over-stats">
+                <h2>Your Saga Ends Here</h2>
+                <div id="game-over-achievements">
+                    <h3>Accomplishments</h3>
+                    <ul id="achievements-list"></ul>
+                </div>
+                <div id="final-stats">
+                    <h3>Final Stats</h3>
+                    <div id="final-stats-grid">
+                        <div class="final-stat">
+                            <div class="final-stat-label">Strength:</div>
+                            <div class="final-stat-value" id="final-str">0</div>
+                        </div>
+                        <div class="final-stat">
+                            <div class="final-stat-label">Agility:</div>
+                            <div class="final-stat-value" id="final-agi">0</div>
+                        </div>
+                        <div class="final-stat">
+                            <div class="final-stat-label">Intelligence:</div>
+                            <div class="final-stat-value" id="final-int">0</div>
+                        </div>
+                        <div class="final-stat">
+                            <div class="final-stat-label">Charisma:</div>
+                            <div class="final-stat-value" id="final-cha">0</div>
+                        </div>
+                        <div class="final-stat">
+                            <div class="final-stat-label">Reputation:</div>
+                            <div class="final-stat-value" id="final-rep">0</div>
+                        </div>
+                        <div class="final-stat">
+                            <div class="final-stat-label">Alignment:</div>
+                            <div class="final-stat-value" id="final-alignment">Neutral</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="death-time"></div>
+            </div>
+            
+            <div id="game-over-buttons">
+                <button id="new-game" class="btn">Begin A New Saga</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Character Management Screen -->
     <div id="character-screen" class="screen">
         <div id="character-container">

@@ -2,6 +2,7 @@ import { typewriterEffect, cancelTypewriter, completeTypewriter, typewriterActiv
 import { transitionToScreen } from './transitions.js';
 import { initCamp } from './camp.js';
 import { initBattle } from './battle.js';
+import { initGameOver } from './gameOver.js';
 import { playerState } from './player.js';
 import { storyState } from './story/story-state.js';
 import { 
@@ -155,6 +156,13 @@ async function displayStoryText(nodeId) {
 function setupStoryListeners(screens) {
     document.getElementById('cinematic-frame').addEventListener('click', async () => {
         const storyNodes = getCurrentStoryNodes();
+        
+        // Guard against null/undefined storyNodes or invalid currentNodeId
+        if (!storyNodes || currentNodeId === undefined || !(currentNodeId in storyNodes)) {
+            console.error(`Invalid story node: ${currentNodeId}`);
+            return;
+        }
+        
         const currentNode = storyNodes[currentNodeId];
         
         // If typewriter is active, complete it instead of advancing
@@ -177,6 +185,11 @@ function setupStoryListeners(screens) {
                     transitionToScreen(screens.cinematicUI, screens.battle, () => {
                         // Use the battleType property to determine which battle to initialize
                         initBattle(currentNode.battleType || 'first');
+                    });
+                }
+                else if (currentNode.transitionTo === 'gameOver') {
+                    transitionToScreen(screens.cinematicUI, screens.gameOver, () => {
+                        initGameOver(currentNode.deathCause);
                     });
                 }
             } 
