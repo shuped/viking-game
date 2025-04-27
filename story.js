@@ -11,13 +11,68 @@ import {
     transitionToChapter 
 } from './story/story-manager.js';
 
+// State variables
 let currentNodeId = 0;
-// Flag to track when stat changes are being displayed
 let isDisplayingStatChanges = false;
 
+// DOM elements
 const textBox = document.getElementById('cinematic-text-box');
 const textContent = document.getElementById('cinematic-text-content');
 const choiceBox = document.getElementById('cinematic-button-box');
+
+// Common UI Rendering Functions
+function clearUI() {
+    choiceBox.innerHTML = '';
+    const existingIndicator = document.querySelector('.click-indicator');
+    if (existingIndicator) {
+        existingIndicator.remove();
+    }
+}
+
+async function renderTextBox(text) {
+    textBox.style.opacity = '0';
+    textBox.classList.add('visible');
+    textContent.innerHTML = '';
+    
+    await fadeInTextBox();
+    await typewriterEffect(textContent, text);
+}
+
+function fadeInTextBox() {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            textBox.style.transition = 'opacity 0.5s ease-in';
+            textBox.style.opacity = '1';
+            setTimeout(resolve, 500);
+        }, 100);
+    });
+}
+
+// Core Logic Functions
+function processStatCheck(statCheck) {
+    const { stat, threshold, success, failure } = statCheck;
+    const playerStatValue = playerState[stat] || 0;
+    const passed = playerStatValue >= threshold;
+    
+    console.log(`Stat check: ${stat}(${playerStatValue}) vs threshold(${threshold}) - ${passed ? 'PASS' : 'FAIL'}`);
+    
+    return {
+        passed,
+        handler: passed ? success : failure
+    };
+}
+
+async function handleStatChangeText(handler, nextNodeId) {
+    if (!handler || !handler.onSelect) return nextNodeId;
+    
+    const statChangeText = handler.onSelect(handler.passed !== false);
+    if (statChangeText) {
+        await displayStatChangeText(statChangeText, handler.nextNode || nextNodeId);
+        return null; // Already handled transition
+    }
+    
+    return handler.nextNode || nextNodeId;
+}
 
 // Display story text for the current node
 async function displayStoryText(nodeId) {
@@ -36,119 +91,28 @@ async function displayStoryText(nodeId) {
         currentNode.onEnter();
     }
     
-    // Clear any existing choices
-    choiceBox.innerHTML = '';
+    // Clear UI elements
+    clearUI();
     
-    // Remove any existing click indicators
-    const existingIndicator = document.querySelector('.click-indicator');
-    if (existingIndicator) {
-        existingIndicator.remove();
-    }
-    
-    // Handle node-level stat checks before displaying text
+    // Handle node-level stat checks
     if (currentNode.statCheck) {
-        const { stat, threshold, success, failure } = currentNode.statCheck;
-        const playerStatValue = playerState[stat] || 0;
-        const passed = playerStatValue >= threshold;
+        await renderTextBox(currentNode.text);
         
-        console.log(`Node-level stat check: ${stat}(${playerStatValue}) vs threshold(${threshold}) - ${passed ? 'PASS' : 'FAIL'}`);
+        const { handler } = processStatCheck(currentNode.statCheck);
+        const nextNodeId = await handleStatChangeText(handler, currentNode.next);
         
-        // Prepare text box but keep it invisible
-        textBox.style.opacity = '0';
-        textBox.classList.add('visible');
-        
-        // Clear text content before starting new typewriter effect
-        textContent.innerHTML = '';
-        
-        // Fade in text box with animation
-        await new Promise(resolve => {
-            setTimeout(() => {
-                // Start fade-in animation
-                textBox.style.transition = 'opacity 0.5s ease-in';
-                textBox.style.opacity = '1';
-                
-                // Wait for fade-in to complete before continuing
-                setTimeout(resolve, 500);
-            }, 100);
-        });
-        
-        // Use typewriter effect to display the node text
-        await typewriterEffect(textContent, currentNode.text);
-        
-        // After text is displayed, handle stat check success/failure
-        if (passed) {
-            // Apply success effects
-            if (success && success.onSelect) {
-                const statChangeText = success.onSelect(true);
-                if (statChangeText) {
-                    // Display the stat change text and then proceed to the next node
-                    await displayStatChangeText(statChangeText, success.nextNode || currentNode.next);
-                    return;
-                }
-            }
-            
-            // Navigate to success node if specified
-            if (success && success.nextNode) {
-                await displayStoryText(success.nextNode);
-                return;
-            }
-        } 
-        // Handle failure path
-        else {
-            // Apply failure effects
-            if (failure && failure.onSelect) {
-                const statChangeText = failure.onSelect(false);
-                if (statChangeText) {
-                    // Display the stat change text and then proceed to the next node
-                    await displayStatChangeText(statChangeText, failure.nextNode || currentNode.next);
-                    return;
-                }
-            }
-            
-            // Navigate to failure node if specified
-            if (failure && failure.nextNode) {
-                await displayStoryText(failure.nextNode);
-                return;
-            }
-        }
-        
-        // If no specific next node is defined, use the default next node
-        if (currentNode.next) {
-            await displayStoryText(currentNode.next);
+        if (nextNodeId) {
+            await displayStoryText(nextNodeId);
         }
         return;
     }
     
-    // Standard node display logic (without stat check)
-    // Prepare text box but keep it invisible
-    textBox.style.opacity = '0';
-    textBox.classList.add('visible');
+    // Standard node display logic
+    await renderTextBox(currentNode.text);
     
-    // Clear text content before starting new typewriter effect
-    textContent.innerHTML = '';
-    
-    // Fade in text box with animation
-    await new Promise(resolve => {
-        setTimeout(() => {
-            // Start fade-in animation
-            textBox.style.transition = 'opacity 0.5s ease-in';
-            textBox.style.opacity = '1';
-            
-            // Wait for fade-in to complete before continuing
-            setTimeout(resolve, 500);
-        }, 100); // Small delay to ensure CSS transition works properly
-    });
-    
-    try {
-        // Display the text with typewriter effect
-        await typewriterEffect(textContent, currentNode.text);
-        
-        // Only display choices after typewriter has fully completed
-        if (currentNode.choices) {
-            displayChoices(currentNode.choices);
-        }
-    } catch (error) {
-        console.error('Error during typewriter effect:', error);
+    // Only display choices after typewriter has fully completed
+    if (currentNode.choices) {
+        displayChoices(currentNode.choices);
     }
 }
 
@@ -173,48 +137,60 @@ function setupStoryListeners(screens) {
         
         // Only allow advancing if we're not showing choices and not displaying stat changes
         if (!currentNode.choices && !isDisplayingStatChanges) {
-            // Check if this node has a transition property
-            if (currentNode.transitionTo) {
-                // Handle different screen transitions based on transitionTo property
-                if (currentNode.transitionTo === 'camp') {
-                    transitionToScreen(screens.cinematicUI, screens.camp, () => {
-                        initCamp();
-                    });
-                }
-                else if (currentNode.transitionTo === 'battle') {
-                    transitionToScreen(screens.cinematicUI, screens.battle, () => {
-                        // Use the battleType property to determine which battle to initialize
-                        initBattle(currentNode.battleType || 'first');
-                    });
-                }
-                else if (currentNode.transitionTo === 'gameOver') {
-                    transitionToScreen(screens.cinematicUI, screens.gameOver, () => {
-                        initGameOver(currentNode.deathCause);
-                    });
-                }
-            } 
-            else {
-                // Normal progression to next story node
-                displayStoryText(currentNode.next);
+            // Try screen transitions first
+            if (handleScreenTransition(currentNode, screens)) {
+                return;
             }
-            if (currentNode.end) {
-                // Check if there's a next chapter to transition to
-                if (currentNode.nextChapter) {
-                    console.log(`Transitioning to chapter: ${currentNode.nextChapter}`);
-                    const success = await transitionToChapter(currentNode.nextChapter);
-                    if (success) {
-                        // Start at the beginning of the new chapter (node 0)
-                        displayStoryText(0);
-                    } else {
-                        console.error("Failed to load next chapter");
-                    }
-                } else {
-                    console.log("End of story reached"); 
-                    // Here you could add code to end the game or show credits
-                }
+            
+            // Try chapter transitions next
+            if (await handleChapterTransition(currentNode)) {
+                return;
+            }
+            
+            // Normal progression to next story node
+            if (currentNode.next) {
+                displayStoryText(currentNode.next);
             }
         }
     });
+}
+
+// Handle screen transitions
+function handleScreenTransition(currentNode, screens) {
+    if (currentNode.transitionTo) {
+        const transitions = {
+            'camp': () => transitionToScreen(screens.cinematicUI, screens.camp, initCamp),
+            'battle': () => transitionToScreen(screens.cinematicUI, screens.battle, 
+                      () => initBattle(currentNode.battleType || 'first')),
+            'gameOver': () => transitionToScreen(screens.cinematicUI, screens.gameOver, 
+                      () => initGameOver(currentNode.deathCause))
+        };
+        
+        if (transitions[currentNode.transitionTo]) {
+            transitions[currentNode.transitionTo]();
+            return true;
+        }
+    }
+    return false;
+}
+
+// Handle chapter transitions
+async function handleChapterTransition(currentNode) {
+    if (currentNode.end && currentNode.nextChapter) {
+        console.log(`Transitioning to chapter: ${currentNode.nextChapter}`);
+        const success = await transitionToChapter(currentNode.nextChapter);
+        if (success) {
+            // Start at the beginning of the new chapter (node 0)
+            displayStoryText(0);
+            return true;
+        } else {
+            console.error("Failed to load next chapter");
+        }
+    } else if (currentNode.end) {
+        console.log("End of story reached");
+        // Here you could add code to end the game or show credits
+    }
+    return false;
 }
 
 // Display player state changes in the UI
@@ -251,53 +227,18 @@ function displayStatChange(attribute, value) {
 async function handleChoiceSelection(nextNodeId, choice) {
     // Process stat check if present
     if (choice.statCheck) {
-        const { stat, threshold, success, failure } = choice.statCheck;
-        const playerStatValue = playerState[stat] || 0;
-        const passed = playerStatValue >= threshold;
+        const { passed, handler } = processStatCheck(choice.statCheck);
+        const nextNode = await handleStatChangeText(handler, nextNodeId);
         
-        console.log(`Stat check: ${stat}(${playerStatValue}) vs threshold(${threshold}) - ${passed ? 'PASS' : 'FAIL'}`);
-        
-        // Handle success path
-        if (passed) {
-            // Apply success effects
-            if (success && success.onSelect) {
-                const statChangeText = success.onSelect(true);
-                if (statChangeText) {
-                    // Display the stat change text first before continuing to the next node
-                    await displayStatChangeText(statChangeText, success.nextNode || nextNodeId);
-                    return;
-                }
-            }
-            
-            // Navigate to success node if specified
-            if (success && success.nextNode) {
-                await displayStoryText(success.nextNode);
-                return;
-            }
-        } 
-        // Handle failure path
-        else {
-            // Apply failure effects
-            if (failure && failure.onSelect) {
-                const statChangeText = failure.onSelect(false);
-                if (statChangeText) {
-                    // Display the stat change text first before continuing to the next node
-                    await displayStatChangeText(statChangeText, failure.nextNode || nextNodeId);
-                    return;
-                }
-            }
-            
-            // Navigate to failure node if specified
-            if (failure && failure.nextNode) {
-                await displayStoryText(failure.nextNode);
-                return;
-            }
+        if (nextNode) {
+            await displayStoryText(nextNode);
         }
+        return;
     }
     
     // Apply regular choice effects
     if (choice.onSelect) {
-        const statChangeText = choice.onSelect(true); // Pass true as default for non-stat check choices
+        const statChangeText = choice.onSelect(true);
         if (statChangeText) {
             // Display the stat change text first before continuing to the next node
             await displayStatChangeText(statChangeText, nextNodeId);
