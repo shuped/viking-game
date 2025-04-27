@@ -13,7 +13,7 @@ const travelDestinations = {
             id: 'town-square',
             name: 'Víkstad Town Square',
             description: 'The bustling center of Víkstad where warriors gather. Your friend Erik might be there.',
-            isAvailable: () => storyState.hasVisited(12), // Available after initial camp transition
+            isAvailable: () => storyState.hasVisited(12) && !storyState.hasVisited(20), // Available after initial camp transition
             storyNode: 13, // Takes you to Erik conversation
             position: { x: 40, y: 60 }
         },
