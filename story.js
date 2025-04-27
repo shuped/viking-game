@@ -44,6 +44,81 @@ async function displayStoryText(nodeId) {
         existingIndicator.remove();
     }
     
+    // Handle node-level stat checks before displaying text
+    if (currentNode.statCheck) {
+        const { stat, threshold, success, failure } = currentNode.statCheck;
+        const playerStatValue = playerState[stat] || 0;
+        const passed = playerStatValue >= threshold;
+        
+        console.log(`Node-level stat check: ${stat}(${playerStatValue}) vs threshold(${threshold}) - ${passed ? 'PASS' : 'FAIL'}`);
+        
+        // Prepare text box but keep it invisible
+        textBox.style.opacity = '0';
+        textBox.classList.add('visible');
+        
+        // Clear text content before starting new typewriter effect
+        textContent.innerHTML = '';
+        
+        // Fade in text box with animation
+        await new Promise(resolve => {
+            setTimeout(() => {
+                // Start fade-in animation
+                textBox.style.transition = 'opacity 0.5s ease-in';
+                textBox.style.opacity = '1';
+                
+                // Wait for fade-in to complete before continuing
+                setTimeout(resolve, 500);
+            }, 100);
+        });
+        
+        // Use typewriter effect to display the node text
+        await typewriterEffect(textContent, currentNode.text);
+        
+        // After text is displayed, handle stat check success/failure
+        if (passed) {
+            // Apply success effects
+            if (success && success.onSelect) {
+                const statChangeText = success.onSelect(true);
+                if (statChangeText) {
+                    // Display the stat change text and then proceed to the next node
+                    await displayStatChangeText(statChangeText, success.nextNode || currentNode.next);
+                    return;
+                }
+            }
+            
+            // Navigate to success node if specified
+            if (success && success.nextNode) {
+                await displayStoryText(success.nextNode);
+                return;
+            }
+        } 
+        // Handle failure path
+        else {
+            // Apply failure effects
+            if (failure && failure.onSelect) {
+                const statChangeText = failure.onSelect(false);
+                if (statChangeText) {
+                    // Display the stat change text and then proceed to the next node
+                    await displayStatChangeText(statChangeText, failure.nextNode || currentNode.next);
+                    return;
+                }
+            }
+            
+            // Navigate to failure node if specified
+            if (failure && failure.nextNode) {
+                await displayStoryText(failure.nextNode);
+                return;
+            }
+        }
+        
+        // If no specific next node is defined, use the default next node
+        if (currentNode.next) {
+            await displayStoryText(currentNode.next);
+        }
+        return;
+    }
+    
+    // Standard node display logic (without stat check)
     // Prepare text box but keep it invisible
     textBox.style.opacity = '0';
     textBox.classList.add('visible');

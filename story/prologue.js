@@ -271,12 +271,7 @@ export const storyNodes = {
                     threshold: 7,
                     success: {
                         onSelect: () => {
-                            updatePlayerAttribute('reputation', 3);
-                            updatePlayerAttribute('strength', 1);
-                            
-                            return "Your impressive strength wins the duel!<br><br>" +
-                                   "Reputation +3<br>" +
-                                   "Strength +1";
+                            return "Your appearance is enough to challenge the masculinity of the experienced warriors"
                         },
                         nextNode: 25,
                     },
@@ -336,118 +331,42 @@ export const storyNodes = {
         ]
     },
     
-    // DUEL COMBAT
-    25: {
-        text: "Puffing out your chest and squaring your shoulders you look from man to man, \"Who among you is the strongest?\" A tall Viking with an elaborately braided red beard steps towards you with a hearty chuckle... moments later the stage is set for a proper duel, wooden swords and old shields will be used.",
-        next: 28
-    },
-    28: {
-        text: "DUEL (Choose your approach):",
-        choices: [
-            { 
-                text: "STR - Rely on your strength to overpower the Red Beard", 
-                nextNode: 29,
-                statCheck: {
-                    stat: "strength",
-                    threshold: 8,
-                    success: {
-                        onSelect: () => {
-                            updatePlayerAttribute('strength', 1);
-                            updatePlayerAttribute('reputation', 3);
-                            updatePlayerAttribute('health', -5);
-                            
-                            return "You overpower the Red Beard with your impressive strength!<br><br>" +
-                                   "Strength +1<br>" +
-                                   "Reputation +3<br>" +
-                                   "Health -5";
-                        }
-                    },
-                    failure: {
-                        onSelect: () => {
-                            updatePlayerAttribute('health', -20);
-                            updatePlayerAttribute('energy', -15);
-                            updatePlayerAttribute('reputation', -2);
-                            
-                            return "The Red Beard proves too strong for you.<br><br>" +
-                                   "Health -20<br>" +
-                                   "Energy -15<br>" +
-                                   "Reputation -2";
-                        }
-                    }
-                }
-            },
-            { 
-                text: "AGI - Focus on dexterity and quick attacks to overwhelm your foe", 
-                nextNode: 29,
-                statCheck: {
-                    stat: "agility",
-                    threshold: 7,
-                    success: {
-                        onSelect: () => {
-                            updatePlayerAttribute('agility', 1);
-                            updatePlayerAttribute('reputation', 2);
-                            updatePlayerAttribute('energy', -10);
-                            
-                            return "Your quick movements and attacks leave the Red Beard struggling to keep up!<br><br>" +
-                                   "Agility +1<br>" +
-                                   "Reputation +2<br>" +
-                                   "Energy -10";
-                        }
-                    },
-                    failure: {
-                        onSelect: () => {
-                            updatePlayerAttribute('health', -15);
-                            updatePlayerAttribute('energy', -20);
-                            
-                            return "Your agility isn't enough - the Red Beard anticipates your movements.<br><br>" +
-                                   "Health -15<br>" +
-                                   "Energy -20";
-                        }
-                    }
-                }
-            },
-            { 
-                text: "END - Exhaust your opponent, focusing on dodging and defense", 
-                nextNode: 29,
-                onSelect: (success = true) => {
+    // INSULT MOTHERS PATH
+    27: {
+        text: "You take a deep breath, steel your resolve, and loudly proclaim that their mothers were so ugly they must have been fathered by trolls... For a moment there is absolute silence as the warriors process what you just said...",
+        next: 31,
+        statCheck: {
+            stat: "agility",
+            threshold: 6,
+            success: {
+                onSelect: () => {
+                    updatePlayerAttribute('agility', 1);
                     updatePlayerAttribute('energy', -15);
                     
-                    return "You focus on defensive maneuvers, trying to exhaust your opponent.<br><br>" +
+                    return "The Vikings waste no time, chasing you with murderous intent across the field and into the woods... It seems for a moment like you might be done for, but you run like the wind... They at last give up the chase... you just hope you won't run into them again before you set sail tomorrow...<br><br>" +
+                           "Agility +1<br>" +
                            "Energy -15";
                 },
-                statCheck: {
-                    stat: "agility",
-                    threshold: 6,
-                    success: {
-                        onSelect: () => {
-                            updatePlayerAttribute('energy', -5);
-                            updatePlayerAttribute('reputation', 1);
-                            updatePlayerAttribute('agility', 1);
-                            
-                            return "Your endurance strategy works! The Red Beard tires out before you do.<br><br>" +
-                                   "Energy -5<br>" +
-                                   "Reputation +1<br>" +
-                                   "Agility +1";
-                        }
-                    },
-                    failure: {
-                        onSelect: () => {
-                            updatePlayerAttribute('health', -10);
-                            updatePlayerAttribute('energy', -10);
-                            
-                            return "Your endurance fails you. The Red Beard outlasts your defensive efforts.<br><br>" +
-                                   "Health -10<br>" +
-                                   "Energy -10";
-                        }
-                    }
-                }
+                nextNode: 32,
+            },
+            failure: {
+                onSelect: () => {
+                    updatePlayerAttribute('health', -500);
+                    
+                    return "The Vikings waste no time, chasing you with murderous intent across the field and into the woods... It seems for a moment like you might outpace them... but your foot catches a gnarled root and you tumble to the ground... You begin to stand up, not daring to look behind you... *The world goes black*<br><br>" +
+                           "Health -500<br>" +
+                           "GAME OVER";
+                },
+                nextNode: 666, // Changed from 40 to 666 (game over node)
             }
-        ]
+        }
     },
-    
-    // At node 29, give the player a weapon for completing Erik's quest
-    29: {
-        text: "You walk back to the tavern with your head held high. You find Erik in his room...\n\nErik: \"If it isn't the champion of Vikstad himself!\"\nYou: \"...I just hope it was all worth it, did you get the loot?\"\nErik: *Shrugging and flashing you his characteristic scoundrel's half smile* \"Have I ever let you down before!?\"\nYou: \"...\" \"...\" \"...\"\nErik: \"All right, all right! Here, your share of the loot.\"",
+    31: {
+        text: "The warriors look at each other, and then at you, their faces contorting with rage. One of them gives a howl like a wolf and they all start towards you. You take off running as fast as your legs will carry you!",
+        next: 32
+    },
+    32: {
+        text: "You've escaped the warriors and made it back to the tavern. You find Erik in his room...\n\nErik: \"You're alive! I was starting to worry when I heard those Danes were on a rampage!\"\nYou: \"...I just hope it was all worth it, did you get the loot?\"\nErik: *Shrugging and flashing you his characteristic scoundrel's half smile* \"Have I ever let you down before!?\"\nYou: \"...\" \"...\" \"...\"\nErik: \"All right, all right! Here, your share of the loot.\"",
         next: 30,
         onEnter: () => {
             // Add a weapon to player inventory
@@ -525,4 +444,363 @@ export const storyNodes = {
         end: true,
         nextChapter: "chapter-one"  // This tells the story system to load chapter-one next
     },
+
+    // DUEL PATH - Expanded duel system with multiple rounds
+    25: {
+        text: "A tall Viking with an elaborately braided red beard steps towards you with a hearty chuckle... moments later the stage is set for a proper duel, wooden swords and old shields will be used.",
+        next: 28
+    },
+    28: {
+        text: "DUEL: Round 1\n\nYou face off against the red-bearded warrior as the others gather around to watch. Choose your approach:",
+        choices: [
+            { 
+                text: "STR - Rely on your strength to overpower Red Beard", 
+                statCheck: {
+                    stat: "strength",
+                    threshold: 7,
+                    success: {
+                        onSelect: () => {
+                            // Track successful round instead of immediately granting stats
+                            storyState.duelRound1Success = true;
+                            
+                            return "The crowd watches in rapt silence as you batter your foe with a series of enraged heavy attacks... he stumbles and falls, but swiftly returns to his feet... his face is battered and bleeding as he howls with rage... it's not over yet...";
+                        },
+                        nextNode: 28.1, // Next round
+                    },
+                    failure: {
+                        onSelect: () => {
+                            storyState.duelRound1Success = false;
+                            updatePlayerAttribute('health', -10);
+                            
+                            return "Your strength is pitiful when tested against the red bearded brute... He overpowers you easily, unleashing a devastating series of blows to your face and body... you're bleeding... All present watch with keen interest...<br><br>" +
+                                   "Health -10";
+                        },
+                        nextNode: 28.1, // Next round
+                    }
+                }
+            },
+            { 
+                text: "AGI - Focus on dexterity and quick attacks", 
+                statCheck: {
+                    stat: "agility",
+                    threshold: 6,
+                    success: {
+                        onSelect: () => {
+                            // Track successful round instead of immediately granting stats
+                            storyState.duelRound1Success = true;
+                            
+                            return "You dash in a lightning blitz, rattling off blow after blow and covering your foe with a series of painful bruises... he staggers back, panting. The look of uncertainty on his face emboldens you, and you seize the moment slicing him in the neck with a brutal finisher. He falls to the ground... silence...";
+                        },
+                        nextNode: 28.1, // Next round
+                    },
+                    failure: {
+                        onSelect: () => {
+                            storyState.duelRound1Success = false;
+                            updatePlayerAttribute('health', -10);
+                            
+                            return "You're clumsy and untrained blows fail to overwhelm the brute, with a strained grunt, he smashes you in the face with his shield... sending you reeling to the ground... for a moment the world goes dark...<br><br>" +
+                                   "Health -10";
+                        },
+                        nextNode: 28.1, // Next round
+                    }
+                }
+            },
+            { 
+                text: "END - Focus on defense and striking at opportune moments", 
+                statCheck: {
+                    stat: "endurance",
+                    threshold: 6,
+                    success: {
+                        onSelect: () => {
+                            // Track successful round instead of immediately granting stats
+                            storyState.duelRound1Success = true;
+                            
+                            return "You keep your distance, humiliating and angering your opponent with each successful dodge, block and parry... he's frustrated and exhausted now, you seize an opening and smash his shield out of his hand, finishing with a flourish, your practice sword against his throat. The rapt silence of the onlookers breaks as they grumble their annoyances at your cheeky fighting style.";
+                        },
+                        nextNode: 28.1, // Next round
+                    },
+                    failure: {
+                        onSelect: () => {
+                            storyState.duelRound1Success = false;
+                            updatePlayerAttribute('health', -10);
+                            updatePlayerAttribute('energy', -15);
+                            
+                            return "You overestimated your abilities, as your stamina runs low, the red bearded brute carries on fighting. He still seems fresh, blocking, dodging and parrying blows until you're so exhausted that you can't lift your shield anymore... you fall to your knees... and take a swift and hard kick to the face... the world goes dark...<br><br>" +
+                                   "Health -10<br>" +
+                                   "Energy -15";
+                        },
+                        nextNode: 28.1, // Next round
+                    }
+                }
+            }
+        ]
+    },
+    28.1: {
+        text: "DUEL: Round 2\n\nRed Beard adjusts his stance, clearly taking you more seriously now. Choose your approach for the second round:",
+        choices: [
+            { 
+                text: "STR - Rely on your strength to overpower Red Beard", 
+                statCheck: {
+                    stat: "strength",
+                    threshold: 8, // Harder check
+                    success: {
+                        onSelect: () => {
+                            // Track successful round instead of immediately granting stats
+                            storyState.duelRound2Success = true;
+                            
+                            return "With renewed determination, you unleash a devastating series of powerful blows. Red Beard attempts to block but your raw strength breaks through his defenses...";
+                        },
+                        nextNode: 28.2, // Final round
+                    },
+                    failure: {
+                        onSelect: () => {
+                            storyState.duelRound2Success = false;
+                            updatePlayerAttribute('health', -15);
+                            
+                            return "Red Beard anticipates your straightforward approach and counters effortlessly, landing several painful blows that leave you staggering...<br><br>" +
+                                   "Health -15";
+                        },
+                        nextNode: 28.2, // Final round
+                    }
+                }
+            },
+            { 
+                text: "AGI - Focus on dexterity and quick attacks", 
+                statCheck: {
+                    stat: "agility",
+                    threshold: 7, // Harder check
+                    success: {
+                        onSelect: () => {
+                            // Track successful round instead of immediately granting stats
+                            storyState.duelRound2Success = true;
+                            
+                            return "You dance around Red Beard, your speed making you nearly impossible to hit. You land several quick strikes that leave him frustrated and off-balance...";
+                        },
+                        nextNode: 28.2, // Final round
+                    },
+                    failure: {
+                        onSelect: () => {
+                            storyState.duelRound2Success = false;
+                            updatePlayerAttribute('health', -15);
+                            
+                            return "Your fancy footwork fails you as Red Beard predicts your movements. He trips you, sending you sprawling into the dirt to the laughter of the onlookers...<br><br>" +
+                                   "Health -15";
+                        },
+                        nextNode: 28.2, // Final round
+                    }
+                }
+            },
+            { 
+                text: "END - Focus on defense and striking at opportune moments", 
+                statCheck: {
+                    stat: "endurance",
+                    threshold: 7, // Harder check
+                    success: {
+                        onSelect: () => {
+                            // Track successful round instead of immediately granting stats
+                            storyState.duelRound2Success = true;
+                            
+                            return "You weather Red Beard's assault, conserving your energy while he tires himself out. The crowd begins to cheer as they recognize your tactical approach...";
+                        },
+                        nextNode: 28.2, // Final round
+                    },
+                    failure: {
+                        onSelect: () => {
+                            storyState.duelRound2Success = false;
+                            updatePlayerAttribute('health', -15);
+                            updatePlayerAttribute('energy', -15);
+                            
+                            return "Your defensive strategy falters as Red Beard overwhelms you with relentless attacks. Your arms grow weary from blocking his powerful blows...<br><br>" +
+                                   "Health -15<br>" +
+                                   "Energy -15";
+                        },
+                        nextNode: 28.2, // Final round
+                    }
+                }
+            }
+        ]
+    },
+    28.2: {
+        text: "DUEL: Final Round\n\nThe crowd is fully engaged now, cheering and placing bets. This is the decisive moment - choose your final approach:",
+        choices: [
+            { 
+                text: "STR - End this with overwhelming power", 
+                statCheck: {
+                    stat: "strength",
+                    threshold: 9, // Hardest check
+                    success: {
+                        onSelect: () => {
+                            // Track successful round instead of immediately granting stats
+                            storyState.duelRound3Success = true;
+                            
+                            // Check if all three rounds were successful
+                            const allRoundsSuccess = storyState.duelRound1Success && 
+                                                    storyState.duelRound2Success && 
+                                                    storyState.duelRound3Success;
+                            
+                            // Only grant reputation for complete victory
+                            if (allRoundsSuccess) {
+                                updatePlayerAttribute('reputation', 5);
+                                return "With a mighty roar, you charge forward and deliver a devastating blow that shatters Red Beard's shield and sends him crashing to the ground. The crowd erupts in cheers at your display of raw power!<br><br>" +
+                                       "Reputation +5";
+                            } else {
+                                return "With a mighty roar, you charge forward and deliver a devastating blow that shatters Red Beard's shield and sends him crashing to the ground. The crowd erupts in cheers at your display of raw power!";
+                            }
+                        },
+                        nextNode: 29, // Victory path
+                    },
+                    failure: {
+                        onSelect: () => {
+                            updatePlayerAttribute('reputation', -3);
+                            updatePlayerAttribute('health', -20);
+                            
+                            return "Your final desperate attack leaves you exposed. Red Beard sidesteps and delivers a crushing counter that sends you sprawling to the ground in defeat...<br><br>" +
+                                   "Reputation -3<br>" +
+                                   "Health -20";
+                        },
+                        nextNode: 52, // Defeat path
+                    }
+                }
+            },
+            { 
+                text: "AGI - Win with speed and precision", 
+                statCheck: {
+                    stat: "agility",
+                    threshold: 8, // Hardest check
+                    success: {
+                        onSelect: () => {
+                            // Track successful round instead of immediately granting stats
+                            storyState.duelRound3Success = true;
+                            
+                            // Check if all three rounds were successful
+                            const allRoundsSuccess = storyState.duelRound1Success && 
+                                                    storyState.duelRound2Success && 
+                                                    storyState.duelRound3Success;
+                            
+                            // Only grant reputation for complete victory
+                            if (allRoundsSuccess) {
+                                updatePlayerAttribute('reputation', 5);
+                                return "You become a blur of motion, striking from impossible angles. Before Red Beard can even react, you've disarmed him and placed your practice sword at his throat. The crowd roars their approval!<br><br>" +
+                                       "Reputation +5";
+                            } else {
+                                return "You become a blur of motion, striking from impossible angles. Before Red Beard can even react, you've disarmed him and placed your practice sword at his throat. The crowd roars their approval!";
+                            }
+                        },
+                        nextNode: 29, // Victory path
+                    },
+                    failure: {
+                        onSelect: () => {
+                            updatePlayerAttribute('reputation', -3);
+                            updatePlayerAttribute('health', -20);
+                            
+                            return "Your attempt at a flashy finish backfires as Red Beard anticipates your movement. He catches your arm mid-swing and throws you painfully to the ground...<br><br>" +
+                                   "Reputation -3<br>" +
+                                   "Health -20";
+                        },
+                        nextNode: 52, // Defeat path
+                    }
+                }
+            },
+            { 
+                text: "END - Outlast and outsmart your opponent", 
+                statCheck: {
+                    stat: "endurance",
+                    threshold: 8, // Hardest check
+                    success: {
+                        onSelect: () => {
+                            // Track successful round instead of immediately granting stats
+                            storyState.duelRound3Success = true;
+                            
+                            // Check if all three rounds were successful
+                            const allRoundsSuccess = storyState.duelRound1Success && 
+                                                    storyState.duelRound2Success && 
+                                                    storyState.duelRound3Success;
+                            
+                            // Only grant reputation for complete victory
+                            if (allRoundsSuccess) {
+                                updatePlayerAttribute('reputation', 5);
+                                return "You maintain your defensive stance, letting Red Beard wear himself out completely. When he can barely lift his shield, you strike with precision, ending the match cleanly. Even the most skeptical warriors nod in respect at your tactical victory.<br><br>" +
+                                       "Reputation +5";
+                            } else {
+                                return "You maintain your defensive stance, letting Red Beard wear himself out completely. When he can barely lift his shield, you strike with precision, ending the match cleanly. Even the most skeptical warriors nod in respect at your tactical victory.";
+                            }
+                        },
+                        nextNode: 29, // Victory path
+                    },
+                    failure: {
+                        onSelect: () => {
+                            updatePlayerAttribute('reputation', -3);
+                            updatePlayerAttribute('health', -20);
+                            updatePlayerAttribute('energy', -20);
+                            
+                            return "Your endurance finally gives out. As you struggle to catch your breath, Red Beard seizes the opportunity and delivers a finishing blow that sends you crashing to defeat...<br><br>" +
+                                   "Reputation -3<br>" +
+                                   "Health -20<br>" +
+                                   "Energy -20";
+                        },
+                        nextNode: 52, // Defeat path
+                    }
+                }
+            }
+        ]
+    },
+    // Victory path after duel
+    29: {
+        text: "You walk back to the tavern with your head held high, and your reputation improved. You handled yourself like a true warrior. You find Erik in his room...",
+        next: 53
+    },
+    53: {
+        text: "Erik: \"If it isn't the champion of Vikstad himself!\"\n\nYou: \"...I just hope it was all worth it, did you get the loot?\"\n\nErik: *Shrugging and flashing you his characteristic scoundrel's half smile* \"Have I ever let you down before!?\"\n\nYou: \"...\" \"...\" \"...\"\n\nErik: \"All right, all right! Here, your share of the loot.\"",
+        next: 30,
+        onEnter: () => {
+            // Add equipment to player inventory after successful duel
+            addInventoryItem({
+                name: "Sturdy Wooden Shield",
+                description: "A well-made wooden shield reinforced with iron. It has seen some combat.",
+                type: "armor",
+                defense: 4,
+                icon: "🛡️"
+            });
+            
+            addInventoryItem({
+                name: "Viking Seax",
+                description: "A fine single-edged blade. Perfect for close combat.",
+                type: "weapon",
+                damage: 5,
+                icon: "🗡️"
+            });
+        }
+    },
+    
+    // Defeat path after duel
+    52: {
+        text: "You've made a proper fool of yourself, and have never been beaten so badly in your life... you limp back to the tavern, a bloodied mess... You find Erik in his room...",
+        next: 54
+    },
+    54: {
+        text: "Erik: \"...Odin's flaming eye... what happened to you back there!?\"\n\n*He tries to help you but you brush him off in anger*\n\nYou: \"...drop it Erik... just tell me you made out with the equipment.\"\n\nErik: \"...yea, about that...\"\n\nYou: \"...you have to be kidding me...\"\n\nErik: *with a strained laugh* \"Of course I am! Here, your share of the spoils!\"",
+        next: 30,
+        onEnter: () => {
+            // Add basic equipment to player inventory after failed duel
+            addInventoryItem({
+                name: "Cracked Shield",
+                description: "A shield that has seen better days, but still offers some protection.",
+                type: "armor",
+                defense: 2,
+                icon: "🛡️"
+            });
+            
+            addInventoryItem({
+                name: "Rusty Seax",
+                description: "A short, single-edged blade. It's seen better days, but it's better than nothing.",
+                type: "weapon",
+                damage: 3,
+                icon: "🗡️"
+            });
+        }
+    },
+    666: {
+        text: "You have died. Game Over.",
+        end: true
+    }
 };
