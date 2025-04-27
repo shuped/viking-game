@@ -374,18 +374,8 @@ export const storyNodes = {
         next: 32
     },
     32: {
-        text: "You've escaped the warriors and made it back to the tavern. You find Erik in his room...\n\nErik: \"You're alive! I was starting to worry when I heard those Danes were on a rampage!\"\nYou: \"...I just hope it was all worth it, did you get the loot?\"\nErik: *Shrugging and flashing you his characteristic scoundrel's half smile* \"Have I ever let you down before!?\"\nYou: \"...\" \"...\" \"...\"\nErik: \"All right, all right! Here, your share of the loot.\"",
-        next: 30,
-        onEnter: () => {
-            // Add a weapon to player inventory
-            addInventoryItem({
-                name: "Rusty Seax",
-                description: "A short, single-edged blade. It's seen better days, but it's better than nothing.",
-                type: "weapon",
-                damage: 3,
-                icon: "🗡️"
-            });
-        }
+        text: "You've escaped the warriors and made it back to the tavern. You find Erik in his room...\n\nErik: \"You're alive! I was starting to worry when I heard those Danes were on a rampage!\"\nYou: \"...I just hope it was all worth it, did you get the loot?\"\nErik: *Shrugging and flashing you his characteristic scoundrel's half smile* \"Have I ever let you down before!?",
+        next: 51.1,
     },
     
     // Success branch for storytelling path
@@ -393,9 +383,12 @@ export const storyNodes = {
         text: "You walk back to the tavern with your head held high, and your reputation improved. You handled yourself like an expert storyteller. You find Erik in his room...",
         next: 51
     },
-    // Roughly same as 29
     51: {
-        text: "You walk back to the tavern with your head held high. You find Erik in his room...\n\nErik: \"If it isn't the champion of Vikstad himself!\"\nYou: \"...I just hope it was all worth it, did you get the loot?\"\nErik: *Shrugging and flashing you his characteristic scoundrel's half smile* \"Have I ever let you down before!?\"\nYou: \"...\" \"...\" \"...\"\nErik: \"All right, all right! Here, your share of the loot.\"",
+        text: `You walk back to the tavern with your head held high, and your reputation improved. You handled yourself like an expert storyteller. You find Erik in his room...\nErik: "If it isn't the venerable lore keeper of Vikstad himself!"\nYou: "...I just hope it was all worth it, did you get the loot?\nErik *Shrugging and flashing you his characteristic scoundrels half smile* "Have I ever let you down before!?"`,
+        next: 51.1,
+    },
+    51.1: {
+        text: `You: "..." "..." "..."\nErik== "all right all right! Here, your share of the loot."`,
         next: 30,
         onEnter: () => {
             // Add a weapon to player inventory
