@@ -2,6 +2,8 @@
 export const storyState = {
     chapterStates: {},
     currentChapter: null,
+    // Track the next node IDs for different scene types
+    nextNodeAfterTransition: {},
 
     // Initialize state for a new chapter
     initChapter(chapterName) {
@@ -43,10 +45,21 @@ export const storyState = {
         return this.chapterStates[chapterName] || { visitedNodes: new Set(), completedChoices: new Set() };
     },
     
+    // Store the next node ID to visit after a scene transition
+    setNextNodeAfterTransition(sceneType, nodeId) {
+        this.nextNodeAfterTransition[sceneType] = nodeId;
+    },
+    
+    // Get the next node ID for a specific scene type
+    getNextNodeAfterTransition(sceneType) {
+        return this.nextNodeAfterTransition[sceneType];
+    },
+    
     // Reset the entire story state
     reset() {
         this.chapterStates = {};
         this.currentChapter = null;
+        this.nextNodeAfterTransition = {};
     }
 };
 window.storystate = storyState; // For debugging purposes

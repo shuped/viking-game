@@ -158,6 +158,18 @@ function setupStoryListeners(screens) {
 // Handle screen transitions
 function handleScreenTransition(currentNode, screens) {
     if (currentNode.transitionTo) {
+        // Handle the new transition object format
+        const transitionData = typeof currentNode.transitionTo === 'string' 
+            ? { scene: currentNode.transitionTo } 
+            : currentNode.transitionTo;
+            
+        const { scene, next } = transitionData;
+        
+        // Store the next node to return to after this transition
+        if (next !== undefined) {
+            storyState.setNextNodeAfterTransition(scene, next);
+        }
+        
         const transitions = {
             'camp': () => transitionToScreen(screens.cinematicUI, screens.camp, initCamp),
             'battle': () => transitionToScreen(screens.cinematicUI, screens.battle, 
@@ -166,10 +178,25 @@ function handleScreenTransition(currentNode, screens) {
                       () => initGameOver(currentNode.deathCause))
         };
         
-        if (transitions[currentNode.transitionTo]) {
-            transitions[currentNode.transitionTo]();
+        if (transitions[scene]) {
+            transitions[scene]();
             return true;
         }
+    }
+    return false;
+}
+
+// Allow external systems to resume the story from a saved node
+function proceedWithNextMainNode(sceneType, screens) {
+    const nextNodeId = storyState.getNextNodeAfterTransition(sceneType);
+    
+    if (nextNodeId !== undefined) {
+        // Transition back to cinematic screen first
+        transitionToScreen(screens[sceneType], screens.cinematicUI, () => {
+            // Then display the next story node
+            displayStoryText(nextNodeId);
+        });
+        return true;
     }
     return false;
 }
@@ -395,4 +422,4 @@ function displayChoices(choices) {
     choiceBox.appendChild(choiceContainer);
 }
 
-export { displayStoryText, setupStoryListeners, currentNodeId, storyState, displayStatChange };
+export { displayStoryText, setupStoryListeners, currentNodeId, storyState, displayStatChange, proceedWithNextMainNode };

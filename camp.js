@@ -1,6 +1,6 @@
 import { playerState } from './player.js';
 import { transitionToScreen } from './transitions.js';
-import { displayStoryText } from './story.js';
+import { displayStoryText, proceedWithNextMainNode } from './story.js';
 import { screens } from './main.js';
 import { getCurrentChapter } from './story/story-manager.js';
 import { storyState } from './story/story-state.js';
@@ -43,10 +43,7 @@ function setupCampEventListeners() {
     
     // Continue journey button
     document.getElementById('continue-journey').addEventListener('click', () => {
-        // Return to story at node 20
-        transitionToScreen(screens.camp, screens.cinematicUI, () => {
-            displayStoryText(20);
-        });
+        proceedWithNextMainNode('camp', screens);
     });
     
     // Training modal options

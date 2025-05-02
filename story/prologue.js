@@ -189,7 +189,7 @@ export const storyNodes = {
     },
     12: {
         text: "The Hersir accepts the strangers' bid to join the warband in the name of Jarl Oddr and dismisses them for now. A pact is struck... A warband is formed... A call goes out for volunteers... Bondi warriors... Men like you.",
-        transitionTo: 'camp'
+        transitionTo: { scene: 'camp', next: 38 },
     },
 
     // JOIN UP QUEST SECTION - Accessible via Travel Menu
