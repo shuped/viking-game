@@ -124,7 +124,8 @@ function handleTraining(option) {
         case 'solo':
             if (roll + playerState.strength > 15) {
                 playerState.strength += 1;
-                result = '<p>You push yourself hard in training, focusing on your form. Your strength has increased!</p>';
+                playerState.endurance += 1;
+                result = '<p>You push yourself hard in training, focusing on your form. Your strength and endurance have increased!</p>';
             } else {
                 playerState.fatigue += 5;
                 result = '<p>You train hard but make little progress. You feel more fatigued.</p>';
@@ -134,8 +135,9 @@ function handleTraining(option) {
         case 'tier1':
             if (roll + playerState.reputation > 12) {
                 playerState.strength += 1;
+                playerState.coordination += 1;
                 playerState.reputation += 1;
-                result = '<p>You train with your crewmates, showing your skills. Both your strength and reputation have improved!</p>';
+                result = '<p>You train with your crewmates, showing your skills. Your strength, coordination, and reputation have improved!</p>';
             } else {
                 result = '<p>The training session is awkward. Your crewmates don\'t seem impressed.</p>';
             }
@@ -143,9 +145,10 @@ function handleTraining(option) {
             
         case 'tier2':
             if (roll + playerState.reputation > 15) {
-                playerState.strength += 2;
+                playerState.strength += 1;
                 playerState.agility += 1;
-                result = '<p>The veterans share valuable techniques with you. Your strength and agility have improved significantly!</p>';
+                playerState.weaponSkill += 1;
+                result = '<p>The veterans share valuable techniques with you. Your strength, agility, and weapon skill have improved significantly!</p>';
             } else {
                 result = '<p>The veterans find you lacking. They spend little time showing you their techniques.</p>';
                 playerState.reputation -= 1;
@@ -154,8 +157,9 @@ function handleTraining(option) {
             
         case 'tier3':
             if (roll + playerState.reputation > 18) {
-                playerState.strength += 2;
+                playerState.strength += 1;
                 playerState.agility += 1;
+                playerState.weaponSkill += 2;
                 playerState.reputation += 2;
                 result = '<p>Hersir Olaf personally instructs you. His guidance greatly improves your skills and standing in the warband!</p>';
             } else {
@@ -180,14 +184,19 @@ function handleRest(option) {
     switch (option) {
         case 'sleep':
             playerState.fatigue = Math.max(0, playerState.fatigue - 10);
-            result = '<p>You find a quiet spot and get some much-needed rest. Your fatigue is reduced.</p>';
+            playerState.vitality += 1;
+            result = '<p>You find a quiet spot and get some much-needed rest. Your fatigue is reduced and vitality improved.</p>';
             break;
             
         case 'drink':
             if (roll > 15) {
                 playerState.fatigue = Math.max(0, playerState.fatigue - 5);
                 playerState.reputation += 1;
+                playerState.coordination += (roll > 18) ? 1 : 0; // Small chance to improve coordination
                 result = '<p>You share mead with your crewmates, telling boastful stories of your exploits. Your reputation increases!</p>';
+                if (roll > 18) {
+                    result += '<p>The experience improves your social coordination with the crew.</p>';
+                }
             } else {
                 playerState.fatigue += 5;
                 result = '<p>You drink too much and make a fool of yourself. You wake up with a headache.</p>';
@@ -197,10 +206,18 @@ function handleRest(option) {
         case 'pray':
             if (playerState.blackRaven > playerState.whiteRaven) {
                 playerState.blackRaven += 1;
+                playerState.weaponSkill += (roll > 17) ? 1 : 0; // Small chance to improve weapon skill through Odin's blessing
                 result = '<p>You offer prayers to Odin for victory in battle. You feel the Black Raven\'s gaze upon you.</p>';
+                if (roll > 17) {
+                    result += '<p>Your prayers are answered with clarity of mind regarding combat techniques.</p>';
+                }
             } else {
                 playerState.whiteRaven += 1;
+                playerState.endurance += (roll > 17) ? 1 : 0; // Small chance to improve endurance through meditation
                 result = '<p>You contemplate the nature of fate and your place in it. The White Raven\'s wisdom fills your thoughts.</p>';
+                if (roll > 17) {
+                    result += '<p>Your meditation provides insights into preserving your stamina in challenging situations.</p>';
+                }
             }
             playerState.fatigue = Math.max(0, playerState.fatigue - 5);
             break;
@@ -276,15 +293,23 @@ function handleScavenge() {
     updateTimeDisplay();
     
     const roll = rollD20();
+    const coordinationBonus = Math.floor(playerState.coordination / 3); // Coordination helps with finding items
+    const effectiveRoll = roll + coordinationBonus;
     let result = '';
     
-    if (roll > 15) {
+    if (effectiveRoll > 17) {
+        playerState.gold += 5;
+        result = `<p>Your keen eye and steady hands help you find a well-hidden cache of Saxon valuables! You gain 5 gold.</p>`;
+        if (coordinationBonus > 0) {
+            result += `<p>Your coordination skills were crucial in uncovering this hiding spot.</p>`;
+        }
+    } else if (effectiveRoll > 14) {
         playerState.gold += 3;
-        result = '<p>You find a small cache of Saxon valuables hidden nearby! You gain 3 gold.</p>';
-    } else if (roll > 10) {
+        result = '<p>You find some valuable items that can be traded for 3 gold.</p>';
+    } else if (effectiveRoll > 10) {
         playerState.inventory.push('Herbs');
         result = '<p>You gather some useful medicinal herbs from the forest edge.</p>';
-    } else if (roll > 5) {
+    } else if (effectiveRoll > 5) {
         playerState.inventory.push('Wood');
         result = '<p>You collect some good firewood and materials that could be useful for crafting.</p>';
     } else {
@@ -301,8 +326,20 @@ function handleCrafting() {
     campTimeRemaining -= 1;
     updateTimeDisplay();
     
-    // Simple crafting for now
-    campResultContent.innerHTML = '<p>You spend time maintaining your equipment, sharpening your blade and repairing your armor. Your gear is in better condition now.</p>';
+    const roll = rollD20();
+    const weaponSkillBonus = Math.floor(playerState.weaponSkill / 4);
+    const effectiveRoll = roll + weaponSkillBonus;
+    
+    if (effectiveRoll > 15) {
+        playerState.weaponSkill += 1;
+        let result = '<p>You spend time maintaining your equipment with expert precision. Your blade has never been sharper, and your armor fits perfectly. The process improves your weapon skill.</p>';
+        if (weaponSkillBonus > 0) {
+            result += '<p>Your existing weapon knowledge helps you make even better improvements.</p>';
+        }
+        campResultContent.innerHTML = result;
+    } else {
+        campResultContent.innerHTML = '<p>You spend time maintaining your equipment, sharpening your blade and repairing your armor. Your gear is in better condition now.</p>';
+    }
 }
 
 // Handle medic activities
@@ -311,9 +348,24 @@ function handleMedic() {
     campTimeRemaining -= 1;
     updateTimeDisplay();
     
-    if (playerState.health < 100) {
-        playerState.health = Math.min(100, playerState.health + 10);
-        campResultContent.innerHTML = '<p>You tend to your wounds, cleaning and bandaging them properly. Your health improves.</p>';
+    const vitalityBonus = Math.floor(playerState.vitality / 4);
+    
+    if (playerState.health < playerState.maxHealth) {
+        // Vitality improves healing effectiveness
+        const healAmount = 10 + vitalityBonus;
+        playerState.health = Math.min(playerState.maxHealth, playerState.health + healAmount);
+        
+        let result = `<p>You tend to your wounds, cleaning and bandaging them properly. Your health improves by ${healAmount} points.</p>`;
+        if (vitalityBonus > 0) {
+            result += `<p>Your vitality helps you recover more effectively.</p>`;
+        }
+        campResultContent.innerHTML = result;
+        
+        // Small chance to improve vitality from the experience
+        if (Math.random() > 0.8) {
+            playerState.vitality += 1;
+            campResultContent.innerHTML += `<p>The experience of treating your own wounds has increased your vitality.</p>`;
+        }
     } else {
         campResultContent.innerHTML = '<p>You have no wounds that need tending. You help others in the camp with their injuries instead.</p>';
         playerState.reputation += 1;

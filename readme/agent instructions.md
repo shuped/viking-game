@@ -31,7 +31,7 @@ This Viking game is a narrative-driven game with RPG elements. Here's a breakdow
    - `player.js` - Manages character attributes, inventory, and reputation
    - Encapsulated design with private state and public getters/setters
    - Character types with stat bundles: WARRIOR, EXPLORER, SHIELDMAIDEN, DEFAULT
-   - Core stats: strength, agility, intelligence, charisma, health, energy, fatigue
+   - Core stats: strength, agility, endurance, coordination, weapon skill, health, energy, fatigue
    - Special stats: reputation, blackRaven/whiteRaven (moral alignment system)
    - Flag system for tracking gameplay choices and character backgrounds
 

@@ -24,8 +24,7 @@ export const storyNodes = {
                     return "You chose Bjorn, a mighty warrior.<br><br>" +
                            "Strength: 8<br>" +
                            "Agility: 6<br>" +
-                           "Intelligence: 3<br>" +
-                           "Charisma: 4";
+                           "coordination: 4";
                 }
             },
             { 
@@ -41,8 +40,7 @@ export const storyNodes = {
                     return "You chose Leif, a clever explorer.<br><br>" +
                            "Strength: 4<br>" +
                            "Agility: 7<br>" +
-                           "Intelligence: 7<br>" +
-                           "Charisma: 3";
+                           "coordination: 3";
                 }
             },
             { 
@@ -58,8 +56,7 @@ export const storyNodes = {
                     return "You chose Freya, a fierce shieldmaiden.<br><br>" +
                            "Strength: 6<br>" +
                            "Agility: 8<br>" +
-                           "Intelligence: 4<br>" +
-                           "Charisma: 3";
+                           "coordination: 3";
                 }
             }
         ]
@@ -72,16 +69,14 @@ export const storyNodes = {
                 nextNode: 3,
                 onSelect: (success = true) => {
                     updatePlayerAttribute('strength', 2);
-                    updatePlayerAttribute('intelligence', -1);
-                    updatePlayerAttribute('charisma', -1);
-                    updatePlayerAttribute('fatigue', -5);
+                    updatePlayerAttribute('coordination', -1);
+                    updatePlayerAttribute('agility', -5);
                     setPlayerAttribute('background', 'farmer');
                     
                     return "You chose a family of poor farmers.<br><br>" +
                            "Strength +2<br>" +
-                           "Intelligence -1<br>" +
-                           "Charisma -1<br>" +
-                           "Fatigue -5";
+                           "coordination -1<br>" +
+                           "Agility -5";
                 }
             },
             { 
@@ -90,13 +85,13 @@ export const storyNodes = {
                 onSelect: (success = true) => {
                     updatePlayerAttribute('strength', 1);
                     updatePlayerAttribute('agility', 2);
-                    updatePlayerAttribute('charisma', -1);
+                    updatePlayerAttribute('coordination', -1);
                     setPlayerAttribute('background', 'fisher');
                     
                     return "You chose a family of modest fisherfolk.<br><br>" +
                            "Strength +1<br>" +
                            "Agility +2<br>" +
-                           "Charisma -1";
+                           "coordination -1";
                 }
             },
             { 
@@ -104,15 +99,13 @@ export const storyNodes = {
                 nextNode: 3,
                 onSelect: (success = true) => {
                     updatePlayerAttribute('strength', -1);
-                    updatePlayerAttribute('intelligence', 2);
-                    updatePlayerAttribute('charisma', 1);
+                    updatePlayerAttribute('coordination', 1);
                     updatePlayerAttribute('gold', 5);
                     setPlayerAttribute('background', 'craftsman');
                     
                     return "You chose a family of comfortable craftsmen.<br><br>" +
                            "Strength -1<br>" +
-                           "Intelligence +2<br>" +
-                           "Charisma +1<br>" +
+                           "coordination +1<br>" +
                            "Gold +5";
                 }
             }
@@ -135,14 +128,12 @@ export const storyNodes = {
                 onSelect: (success = true) => {
                     updatePlayerAttribute('whiteRaven', 5);
                     updatePlayerAttribute('reputation', 2);
-                    updatePlayerAttribute('intelligence', 1);
-                    updatePlayerAttribute('charisma', 1);
+                    updatePlayerAttribute('coordination', 1);
                     
                     return "You chose the White Raven's path.<br><br>" +
                            "White Raven +5<br>" +
                            "Reputation +2<br>" +
-                           "Intelligence +1<br>" +
-                           "Charisma +1";
+                           "coordination +1";
                 }
             },
             { 
@@ -300,16 +291,16 @@ export const storyNodes = {
                 nextNode: 26,
                 condition: () => !storyState.hasCompletedChoice(24, 1),
                 statCheck: {
-                    stat: "charisma",
+                    stat: "coordination",
                     threshold: 5,
                     success: {
                         onSelect: () => {
                             updatePlayerAttribute('reputation', 2);
-                            updatePlayerAttribute('charisma', 1);
+                            updatePlayerAttribute('coordination', 1);
                             
                             return "Your story captivates the warriors!<br><br>" +
                                    "Reputation +2<br>" +
-                                   "Charisma +1";
+                                   "coordination +1";
                         },
                         nextNode: 50,
                     },

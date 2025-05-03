@@ -86,8 +86,10 @@ function updateCharacterUI() {
         // Update stats
         updateStatBar('strength', playerState.strength, 20);
         updateStatBar('agility', playerState.agility, 20);
-        updateStatBar('intelligence', playerState.intelligence, 20);
-        updateStatBar('charisma', playerState.charisma, 20);
+        updateStatBar('endurance', playerState.endurance, 20);
+        updateStatBar('coordination', playerState.coordination, 20);
+        updateStatBar('vitality', playerState.vitality, 20);
+        updateStatBar('weaponSkill', playerState.weaponSkill, 20);
         
         // Update health and energy
         updateResourceBar('health', playerState.health, playerState.maxHealth);

@@ -789,15 +789,19 @@ h3 {
     background-color: #2ecc71; /* Green */
 }
 
-.intelligence-fill {
+.coordination-fill {
     background-color: #3498db; /* Blue */
 }
 
-.charisma-fill {
+.endurance-fill {
     background-color: #f39c12; /* Orange */
 }
 
-.health-fill {
+.weaponSkill-fill {
+    background-color: #9b59b6; /* Purple */
+}
+
+.health-fill, .vitality-fill {
     background-color: #e74c3c; /* Red */
 }
 
