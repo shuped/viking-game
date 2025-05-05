@@ -20,6 +20,9 @@
             <button class="btn" id="start-game">
                 <img src="assets/start_button.png" alt="Start Game">
             </button>
+            <button class="btn" id="battle-simulator">
+                <span class="simulator-button">Battle Simulator</span>
+            </button>
         </div>
     </div>
 
@@ -273,6 +276,131 @@
             
             <div id="game-over-buttons">
                 <button id="new-game" class="btn">Begin A New Saga</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Battle Simulator Screen -->
+    <div id="simulator-screen" class="screen">
+        <div id="simulator-container">
+            <div id="simulator-header">
+                <h2>Battle Simulator</h2>
+                <button id="close-simulator" class="close-button">×</button>
+            </div>
+            
+            <div id="simulator-template-container">
+                <div class="template-heading">Character Template:</div>
+                <div class="template-buttons">
+                    <button class="template-btn" data-template="DEFAULT">Default</button>
+                    <button class="template-btn" data-template="WARRIOR">Warrior</button>
+                    <button class="template-btn" data-template="EXPLORER">Explorer</button>
+                    <button class="template-btn" data-template="SHIELDMAIDEN">Shieldmaiden</button>
+                </div>
+            </div>
+            
+            <div id="simulator-content">
+                <div class="simulator-section">
+                    <h3>Character Stats</h3>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Strength:</span>
+                            <span id="strength-value">5</span>
+                        </div>
+                        <input type="range" min="1" max="20" value="5" class="stat-slider" id="strength-slider">
+                    </div>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Agility:</span>
+                            <span id="agility-value">5</span>
+                        </div>
+                        <input type="range" min="1" max="20" value="5" class="stat-slider" id="agility-slider">
+                    </div>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Endurance:</span>
+                            <span id="endurance-value">5</span>
+                        </div>
+                        <input type="range" min="1" max="20" value="5" class="stat-slider" id="endurance-slider">
+                    </div>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Coordination:</span>
+                            <span id="coordination-value">5</span>
+                        </div>
+                        <input type="range" min="1" max="20" value="5" class="stat-slider" id="coordination-slider">
+                    </div>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Vitality:</span>
+                            <span id="vitality-value">5</span>
+                        </div>
+                        <input type="range" min="1" max="20" value="5" class="stat-slider" id="vitality-slider">
+                    </div>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Weapon Skill:</span>
+                            <span id="weaponSkill-value">5</span>
+                        </div>
+                        <input type="range" min="1" max="20" value="5" class="stat-slider" id="weaponSkill-slider">
+                    </div>
+                </div>
+                
+                <div class="simulator-section">
+                    <h3>Health & Energy</h3>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Health:</span>
+                            <span id="health-value">100</span>
+                        </div>
+                        <input type="range" min="10" max="300" value="100" class="stat-slider" id="health-slider">
+                    </div>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Max Health:</span>
+                            <span id="maxHealth-value">100</span>
+                        </div>
+                        <input type="range" min="10" max="300" value="100" class="stat-slider" id="maxHealth-slider">
+                    </div>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Energy:</span>
+                            <span id="energy-value">65</span>
+                        </div>
+                        <input type="range" min="10" max="200" value="65" class="stat-slider" id="energy-slider">
+                    </div>
+                    
+                    <div class="stat-slider-container">
+                        <div class="stat-slider-label">
+                            <span>Max Energy:</span>
+                            <span id="maxEnergy-value">65</span>
+                        </div>
+                        <input type="range" min="10" max="200" value="65" class="stat-slider" id="maxEnergy-slider">
+                    </div>
+                    
+                    <div class="battle-type-selection">
+                        <div class="battle-type-option selected" data-battle-type="first">
+                            <h4>Saxon Scout</h4>
+                            <p>A quick scout with high agility</p>
+                        </div>
+                        <div class="battle-type-option" data-battle-type="second">
+                            <h4>Saxon Defender</h4>
+                            <p>A strong defender with high endurance</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="simulator-actions">
+                    <button id="start-battle-btn">Start Battle</button>
+                </div>
             </div>
         </div>
     </div>

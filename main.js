@@ -5,7 +5,8 @@ const screens = {
     camp: document.getElementById('camp-ui'),
     battle: document.getElementById('battle-ui'),
     character: document.getElementById('character-screen'),
-    gameOver: document.getElementById('game-over-ui')
+    gameOver: document.getElementById('game-over-ui'),
+    simulator: document.getElementById('simulator-screen')
 };
 
 // Import all necessary modules
@@ -15,6 +16,7 @@ import { initCamp } from './camp.js';
 import { initBattle } from './battle.js';
 import { initCharacter } from './character.js';
 import { initGameOver } from './gameOver.js';
+import { initBattleSimulator } from './battle-simulator.js';
 
 // Initialize the game
 function initGame() {
@@ -31,7 +33,7 @@ function initGame() {
     initCamp();
     initBattle();
     initCharacter();
-    initGameOver(); // Explicitly initialize gameOver
+    initGameOver();
     
     // Setup story navigation listeners AFTER all systems are initialized
     setupStoryListeners(screens);
@@ -42,6 +44,19 @@ window.goToNode = function(node) {
         displayStoryText(node);
     });
 };
+
+// Initialize the game when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded');
+    
+    // Setup Start Screen event listener
+    document.getElementById('start-game').addEventListener('click', () => {
+        initGame();
+    });
+    
+    // Initialize Battle Simulator separately from main game flow
+    initBattleSimulator();
+});
 
 // Export what other modules will need
 export { screens, initGame };

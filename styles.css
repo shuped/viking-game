@@ -1115,3 +1115,192 @@ h3 {
     background-color: #455a64 !important;
     width: 100%;
 }
+
+/* Battle Simulator Button */
+.simulator-button {
+    background-color: #a83232;
+    color: white;
+    border: 2px solid #6d1919;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.simulator-button:hover {
+    background-color: #c04141;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Battle Simulator Screen */
+#simulator-screen {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/prologue_screen.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#simulator-container {
+    width: 90%;
+    max-width: 900px;
+    background-color: rgba(25, 21, 44, 0.9);
+    border: 9px solid transparent;
+    border-image-source: url('assets/Text_Box.png');
+    border-image-slice: 9;
+    border-image-width: 1;
+    border-image-outset: 0.4;
+    border-image-repeat: stretch;
+    padding: 25px;
+    color: white;
+}
+
+#simulator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #4a90e2;
+    padding-bottom: 10px;
+}
+
+#simulator-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.simulator-section {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.simulator-section h3 {
+    color: #4a90e2;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(74, 144, 226, 0.3);
+    padding-bottom: 5px;
+}
+
+.stat-slider-container {
+    margin-bottom: 12px;
+}
+
+.stat-slider-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.stat-slider {
+    width: 100%;
+    appearance: none;
+    height: 8px;
+    background: #333;
+    border-radius: 4px;
+    outline: none;
+}
+
+.stat-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #4a90e2;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.battle-type-selection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.battle-type-option {
+    background-color: #2c3e50;
+    border: 2px solid #4a5d70;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.battle-type-option:hover {
+    background-color: #3d5a75;
+    transform: translateY(-2px);
+}
+
+.battle-type-option.selected {
+    background-color: #2980b9;
+    border-color: #5dade2;
+}
+
+.battle-type-option h4 {
+    margin: 0 0 10px 0;
+}
+
+#simulator-actions {
+    grid-column: 1 / span 2;
+    margin-top: 20px;
+    text-align: center;
+}
+
+#start-battle-btn {
+    background-color: #c0392b;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+#start-battle-btn:hover {
+    background-color: #e74c3c;
+    transform: scale(1.05);
+}
+
+#simulator-template-container {
+    margin-bottom: 20px;
+}
+
+.template-heading {
+    margin-bottom: 10px;
+    color: #f7d794;
+}
+
+.template-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.template-btn {
+    background-color: #34495e;
+    border: none;
+    color: white;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.template-btn:hover {
+    background-color: #4a6583;
+}
+
+.template-btn.selected {
+    background-color: #2980b9;
+    font-weight: bold;
+}
