@@ -1,4 +1,4 @@
-## Project Structure Overview - May 2, 2025
+## Project Structure Overview - May 5, 2025
 
 This Viking game is a narrative-driven game with RPG elements. Here's a breakdown of the key components:
 
@@ -42,7 +42,7 @@ This Viking game is a narrative-driven game with RPG elements. Here's a breakdow
    - Game over screen tracks achievements based on story progress
 
 4. **Game Screens**
-   - Multiple UI screens: cinematic, camp, battle, game over
+   - Multiple UI screens: cinematic, camp, battle, game over, simulator
    - `transitions.js` - Handles transitions between screens
    - `typewriter.js` - For narrative text effects
 
@@ -62,6 +62,30 @@ This Viking game is a narrative-driven game with RPG elements. Here's a breakdow
    - `battle.js` - Handles combat encounters
    - Different battle types can be triggered from story nodes
    - Can resume story nodes after completing battles
+   - Dynamic hit chance calculation based on:
+     - Attacker's weapon skill vs defender's agility
+     - Defender's energy level (scaled by endurance)
+     - Feint ability uses attacker's agility vs defender's coordination
+   - Weapon-based attack system with different abilities
+   - Battle UI displays hit percentages and ability details
+
+8. **Weapon System**
+   - `weapons.js` - Defines weapons and their abilities
+   - Modular weapon ability architecture:
+     - Abilities have energy costs, damage multipliers, and hit chance modifiers
+     - Weapons have base damage that's used by abilities
+     - Custom damage formulas can incorporate different player stats
+     - Interactive UI with tooltips showing damage calculations
+
+9. **Battle Simulator**
+   - `battle-simulator.js` - Testing environment for battle mechanics
+   - Accessible from the start menu
+   - Features for testing:
+     - Character template selection (DEFAULT, WARRIOR, EXPLORER, SHIELDMAIDEN)
+     - Individual stat adjustment via sliders
+     - Health and energy level customization
+     - Enemy type selection
+     - Direct access to battles with custom stats
 
 ### Story Node Structure:
 
@@ -90,3 +114,30 @@ The game supports a resumable transition system that allows story nodes to conti
    - `handleScreenTransition()` stores this node ID before transitioning to the scene
    - Special scenes (camp, battle) can call `proceedWithNextMainNode('camp', screens)` to resume
    - System returns to story mode and continues from the specified node
+
+### Combat System Details:
+
+1. **Hit Chance Calculation**
+   - Base hit chance affected by attacker's weapon skill and defender's agility
+   - Energy levels impact dodge chance: lower energy = easier to hit
+   - Endurance amplifies energy's effect on dodge chance
+   - Various actions modify hit chance (defending reduces chance to be hit by 30%)
+
+2. **Weapon Abilities**
+   - Each weapon provides unique combat abilities
+   - Abilities have different energy costs, damage calculations, and hit modifiers
+   - Current abilities for rusty sword:
+     - Thrust: Low energy (6), modest damage, +5% hit chance
+     - Swing: Medium energy (9), agility-based damage bonus, -5% hit chance
+   
+3. **Feint System**
+   - Success based on attacker's agility vs defender's coordination
+   - Energy cost: 5 if successful, 10 if failed
+   - Successful feint reduces enemy energy by 15
+   - UI displays success chance percentage
+
+4. **Combat UI**
+   - Dynamic tooltips for ability details
+   - Shows hit chances and damage calculations
+   - Energy costs displayed with abilities
+   - Weapon abilities appear when selecting "Attack"
