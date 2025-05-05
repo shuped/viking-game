@@ -2,6 +2,7 @@ import { playerState } from './player.js';
 import { transitionToScreen } from './transitions.js';
 import { displayStoryText } from './story.js';
 import { screens } from './main.js';
+import { getEquippedWeapon } from './weapons.js';
 
 // Battle System
 const battleState = {
@@ -11,12 +12,20 @@ const battleState = {
     playerMaxEnergy: 65,
     enemyHealth: 100,
     enemyMaxHealth: 100,
+    enemyEnergy: 60,     // New: track enemy energy
+    enemyMaxEnergy: 60,  // New: track enemy max energy
+    enemyAgility: 5,     // New: enemy agility stat
+    enemyEndurance: 5,   // New: enemy endurance stat
+    enemyWeaponSkill: 5, // New: enemy weapon skill
+    enemyCoordination: 5, // New: enemy coordination stat for feint defense
     enemyName: 'Saxon Warrior',
     turnCount: 0,
     battlePhase: 'player', // 'player', 'enemy', 'end'
     battleType: 'first', // 'first', 'second'
     battleLog: [],
-    isActive: false
+    isActive: false,
+    showingWeaponAbilities: false, // New flag to track if weapon ability selection is shown
+    equippedWeapon: null, // Will store the player's equipped weapon
 };
 
 window.battleState = battleState; // For debugging purposes
@@ -32,12 +41,20 @@ function initBattle(battleType) {
     battleState.battleType = battleType;
     battleState.battleLog = [];
     battleState.isActive = true;
+    battleState.showingWeaponAbilities = false;
+    battleState.equippedWeapon = getEquippedWeapon(); // Set player's equipped weapon
     
     // Set enemy stats based on battle type
     if (battleType === 'first') {
         battleState.enemyName = 'Saxon Scout';
         battleState.enemyHealth = 80;
         battleState.enemyMaxHealth = 80;
+        battleState.enemyEnergy = 70;
+        battleState.enemyMaxEnergy = 70;
+        battleState.enemyAgility = 6;
+        battleState.enemyEndurance = 4;
+        battleState.enemyWeaponSkill = 5;
+        battleState.enemyCoordination = 4; // A scout has decent coordination but not exceptional
         
         // Set initial battle message
         updateBattleText("A Saxon scout charges at you, wielding a short sword. The clash of steel rings through the air as your warband engages the enemy.");
@@ -45,6 +62,12 @@ function initBattle(battleType) {
         battleState.enemyName = 'Saxon Defender';
         battleState.enemyHealth = 120;
         battleState.enemyMaxHealth = 120;
+        battleState.enemyEnergy = 60;
+        battleState.enemyMaxEnergy = 60;
+        battleState.enemyAgility = 4;
+        battleState.enemyEndurance = 7;
+        battleState.enemyWeaponSkill = 6;
+        battleState.enemyCoordination = 6; // A defender has better coordination due to combat experience
         
         // Set initial battle message
         updateBattleText("A battle-hardened Saxon defender blocks your path to the village. His chainmail glints in the sunlight as he raises his axe, ready to defend his home.");
@@ -55,6 +78,32 @@ function initBattle(battleType) {
     
     // Add event listeners to battle actions
     setupBattleEventListeners();
+}
+
+// New function: Calculate hit chance based on attacker's weapon skill and defender's stats
+function calculateHitChance(attackerWeaponSkill, defenderAgility, defenderEnergy, defenderMaxEnergy, defenderEndurance) {
+    const baseHitChance = 0.60; // 60% base chance to hit
+    const weaponSkillBonus = attackerWeaponSkill * 0.04; // Each point of weapon skill adds 4%
+    const agilityPenalty = defenderAgility * 0.05; // Each point of agility reduces chance by 5%
+    
+    // Energy factor: as energy decreases, dodge chance decreases (easier to hit)
+    const energyProportion = Math.max(0, defenderEnergy / defenderMaxEnergy);
+    const energyFactor = (1 - energyProportion) * defenderEndurance * 0.03;
+    
+    // Calculate final hit chance (capped between 0.1 and 0.95)
+    let hitChance = baseHitChance + weaponSkillBonus - (agilityPenalty * energyProportion) + energyFactor;
+    hitChance = Math.min(0.95, Math.max(0.1, hitChance)); // Cap between 10% and 95% chance
+    console.log(`Hit chance: ${hitChance.toFixed(2)}`);
+    return hitChance;
+}
+
+// New function: Calculate feint success chance based on attacker's agility and defender's coordination
+function calculateFeintChance(attackerAgility, defenderCoordination) {
+    // Calculate base success chance
+    let successChance = 0.5 + ((attackerAgility - defenderCoordination) * 0.05);
+    successChance = Math.min(0.9, Math.max(0.2, successChance)); // Cap between 20% and 90%
+    
+    return successChance;
 }
 
 function setupBattleEventListeners() {
@@ -96,18 +145,40 @@ function updateBattleUI() {
     // Update player name
     document.querySelector('.status-name').textContent = 'Viking Warrior';
     
+    // Calculate feint success chance for button text
+    const feintChance = calculateFeintChance(playerState.agility, battleState.enemyCoordination);
+    const feintSuccessPercent = Math.round(feintChance * 100);
+    
     // Update action buttons based on available energy
     document.querySelectorAll('.battle-action').forEach(button => {
         const action = button.dataset.action;
         let energyCost = 0;
         
         switch (action) {
-            case 'attack': energyCost = 10; break;
-            case 'feint': energyCost = 15; break;
-            case 'throw': energyCost = 20; break;
-            case 'defend': energyCost = 5; break;
-            case 'recover': energyCost = 0; break;
-            case 'evade': energyCost = 10; break;
+            case 'attack': 
+                energyCost = 10; 
+                button.textContent = 'Attack';
+                break;
+            case 'feint': 
+                energyCost = 5;
+                button.textContent = `Feint (${feintSuccessPercent}%)`;
+                break;
+            case 'throw': 
+                energyCost = 20; 
+                button.textContent = 'Throw';
+                break;
+            case 'defend': 
+                energyCost = 5; 
+                button.textContent = 'Defend';
+                break;
+            case 'recover': 
+                energyCost = 0; 
+                button.textContent = 'Recover';
+                break;
+            case 'evade': 
+                energyCost = 10; 
+                button.textContent = 'Evade';
+                break;
         }
         
         if (energyCost > battleState.playerEnergy) {
@@ -134,39 +205,41 @@ function handlePlayerAction(action) {
         return;
     }
     
-    let damage = 0;
+    // Special case for Attack - show weapon abilities instead of attacking directly
+    if (action === 'attack') {
+        showWeaponAbilitySelection();
+        return;
+    }
+    
+    let potentialDamage = 0;
     let energyCost = 0;
     let actionText = '';
     
-    // Calculate damage and energy cost based on action
-    switch (action) {
-        case 'attack':
-            damage = Math.floor(5 + Math.random() * 10) + Math.floor(playerState.strength / 2);
-            energyCost = 10;
-            actionText = `You swing your weapon at the ${battleState.enemyName}, dealing ${damage} damage!`;
-            break;
-            
+    // Calculate potential damage and energy cost based on action
+    switch (action) {           
         case 'feint':
-            damage = Math.floor(8 + Math.random() * 15) + Math.floor(playerState.agility / 2);
-            energyCost = 15;
-            actionText = `You fake a move and catch the ${battleState.enemyName} off guard, striking for ${damage} damage!`;
+            // Feint has no direct damage but can drain enemy energy if successful
+            potentialDamage = 0;
+            // Initial cost is 5, but will be updated to 10 if the feint misses
+            energyCost = 5;
+            actionText = `You feint an attack, trying to tire out the ${battleState.enemyName}`;
             break;
             
         case 'throw':
-            damage = Math.floor(12 + Math.random() * 20);
+            potentialDamage = Math.floor(12 + Math.random() * 20);
             energyCost = 20;
-            actionText = `You throw your weapon with precision, striking the ${battleState.enemyName} for ${damage} damage!`;
+            actionText = `You throw your weapon with precision at the ${battleState.enemyName}`;
             break;
             
         case 'defend':
-            damage = 0;
+            potentialDamage = 0;
             energyCost = 5;
             battleState.playerDefending = true;
             actionText = `You raise your shield, preparing to block the next attack.`;
             break;
             
         case 'recover':
-            damage = 0;
+            potentialDamage = 0;
             energyCost = 0;
             const energyRecovered = Math.floor(10 + Math.random() * 10);
             battleState.playerEnergy = Math.min(battleState.playerMaxEnergy, battleState.playerEnergy + energyRecovered);
@@ -174,7 +247,7 @@ function handlePlayerAction(action) {
             break;
             
         case 'evade':
-            damage = 0;
+            potentialDamage = 0;
             energyCost = 10;
             battleState.playerEvading = true;
             actionText = `You prepare to dodge the next attack, making yourself harder to hit.`;
@@ -187,27 +260,80 @@ function handlePlayerAction(action) {
     // Update battle text
     updateBattleText(actionText);
     
-    // Apply damage to enemy
-    if (damage > 0) {
+    // Apply damage to enemy if applicable
+    if (potentialDamage > 0) {
+        // Calculate hit chance based on player's weapon skill and enemy's stats
+        const hitChance = calculateHitChance(
+            playerState.weaponSkill,
+            battleState.enemyAgility,
+            battleState.enemyEnergy,
+            battleState.enemyMaxEnergy,
+            battleState.enemyEndurance
+        );
+        
         // Play attack animation
         const playerCharacter = document.querySelector('.character-placeholder.viking');
         playerCharacter.classList.add('attack-animation');
+        
         setTimeout(() => {
             playerCharacter.classList.remove('attack-animation');
             
-            // Play enemy hurt animation
-            const enemyCharacter = document.querySelector('.character-placeholder.saxon');
-            enemyCharacter.classList.add('hurt-animation');
+            // Determine if attack hits
+            const roll = Math.random();
+            if (roll <= hitChance) {
+                // Attack hits!
+                // Play enemy hurt animation
+                const enemyCharacter = document.querySelector('.character-placeholder.saxon');
+                enemyCharacter.classList.add('hurt-animation');
+                setTimeout(() => {
+                    enemyCharacter.classList.remove('hurt-animation');
+                }, 500);
+                
+                // Apply damage and reduce enemy energy
+                battleState.enemyHealth = Math.max(0, battleState.enemyHealth - potentialDamage);
+                battleState.enemyEnergy = Math.max(0, battleState.enemyEnergy - Math.floor(potentialDamage * 0.3));
+                appendBattleText(`, dealing ${potentialDamage} damage!`);
+                
+                // Check if enemy is defeated
+                if (battleState.enemyHealth <= 0) {
+                    handleEnemyDefeated();
+                    return;
+                }
+            } else {
+                // Attack misses!
+                appendBattleText(`, but the ${battleState.enemyName} dodges your attack!`);
+            }
+            
+            // Enemy turn after a short delay
             setTimeout(() => {
-                enemyCharacter.classList.remove('hurt-animation');
-            }, 500);
+                handleEnemyTurn();
+            }, 1000);
+        }, 500);
+    } else if (action === 'feint') {
+        // For feint, calculate success chance using the new function
+        const playerAgility = playerState.agility;
+        const enemyCoordination = battleState.enemyCoordination || 5; // Default to 5 if not defined
+        
+        const successChance = calculateFeintChance(playerAgility, enemyCoordination);
+        
+        // Play feint animation
+        const playerCharacter = document.querySelector('.character-placeholder.viking');
+        playerCharacter.classList.add('attack-animation');
+        
+        setTimeout(() => {
+            playerCharacter.classList.remove('attack-animation');
             
-            battleState.enemyHealth = Math.max(0, battleState.enemyHealth - damage);
-            
-            // Check if enemy is defeated
-            if (battleState.enemyHealth <= 0) {
-                handleEnemyDefeated();
-                return;
+            // Determine if feint is successful
+            const roll = Math.random();
+            if (roll <= successChance) {
+                // Feint succeeds - reduce enemy energy by 15
+                const energyReduction = 15;
+                battleState.enemyEnergy = Math.max(0, battleState.enemyEnergy - energyReduction);
+                appendBattleText(`, successfully tiring out your opponent and draining ${energyReduction} energy!`);
+            } else {
+                // Feint fails - costs additional energy (10 total instead of 5)
+                battleState.playerEnergy = Math.max(0, battleState.playerEnergy - 5); // Additional 5 energy cost
+                appendBattleText(`, but the ${battleState.enemyName} doesn't fall for it!`);
             }
             
             // Enemy turn after a short delay
@@ -237,45 +363,77 @@ function handleEnemyTurn() {
     
     // Enemy AI - simple random choice
     const enemyActions = ['attack', 'heavy_attack', 'special'];
+    
+    // If enemy is low on energy, they might recover
+    if (battleState.enemyEnergy < battleState.enemyMaxEnergy * 0.3 && Math.random() > 0.5) {
+        const energyRecovered = Math.floor(8 + Math.random() * 7);
+        battleState.enemyEnergy = Math.min(battleState.enemyMaxEnergy, battleState.enemyEnergy + energyRecovered);
+        updateBattleText(`The ${battleState.enemyName} takes a moment to recover, regaining ${energyRecovered} energy.`);
+        
+        // Return to player turn
+        setTimeout(() => {
+            battleState.battlePhase = 'player';
+            battleState.turnCount++;
+            updateBattleUI();
+            appendBattleText(" What will you do?");
+        }, 1000);
+        
+        return;
+    }
+    
     const enemyAction = enemyActions[Math.floor(Math.random() * enemyActions.length)];
     
-    let damage = 0;
+    let potentialDamage = 0;
+    let energyCost = 0;
     let actionText = '';
     
-    // Calculate enemy damage based on action
+    // Calculate enemy potential damage based on action
     switch (enemyAction) {
         case 'attack':
-            damage = Math.floor(5 + Math.random() * 8);
+            potentialDamage = Math.floor(5 + Math.random() * 8);
+            energyCost = 8;
             actionText = `The ${battleState.enemyName} swings their weapon at you`;
             break;
             
         case 'heavy_attack':
-            damage = Math.floor(10 + Math.random() * 5);
+            potentialDamage = Math.floor(10 + Math.random() * 5);
+            energyCost = 15;
             actionText = `The ${battleState.enemyName} delivers a powerful blow`;
             break;
             
         case 'special':
             if (battleState.battleType === 'first') {
-                damage = Math.floor(8 + Math.random() * 7);
+                potentialDamage = Math.floor(8 + Math.random() * 7);
+                energyCost = 12;
                 actionText = `The ${battleState.enemyName} attempts a quick thrust with their sword`;
             } else {
-                damage = Math.floor(12 + Math.random() * 8);
+                potentialDamage = Math.floor(12 + Math.random() * 8);
+                energyCost = 18;
                 actionText = `The ${battleState.enemyName} swings their axe in a wide arc`;
             }
             break;
     }
     
+    // Reduce enemy energy
+    battleState.enemyEnergy = Math.max(0, battleState.enemyEnergy - energyCost);
+    
+    // Calculate hit chance based on enemy's weapon skill and player's stats
+    const hitChance = calculateHitChance(
+        battleState.enemyWeaponSkill,
+        playerState.agility,
+        battleState.playerEnergy,
+        battleState.playerMaxEnergy,
+        playerState.endurance
+    );
+    
     // Apply defense or evasion effects
     if (wasDefending) {
-        damage = Math.floor(damage * 0.5);
-        actionText += `, but your shield absorbs much of the impact`;
+        potentialDamage = Math.floor(potentialDamage * 0.5);
+        hitChance * 0.7; // 30% less chance to hit when defending
+        actionText += `, targeting your shield`;
     } else if (wasEvading) {
-        if (Math.random() > 0.3) {
-            damage = 0;
-            actionText += `, but you successfully dodge out of the way`;
-        } else {
-            actionText += `, and despite your attempt to dodge, the attack connects`;
-        }
+        hitChance * 0.5; // 50% less chance to hit when evading
+        actionText += `, as you try to dodge`;
     }
     
     // Play enemy attack animation
@@ -285,7 +443,9 @@ function handleEnemyTurn() {
     setTimeout(() => {
         enemyCharacter.classList.remove('attack-animation');
         
-        if (damage > 0) {
+        // Determine if attack hits
+        const roll = Math.random();
+        if (roll <= hitChance) {
             // Play player hurt animation
             const playerCharacter = document.querySelector('.character-placeholder.viking');
             playerCharacter.classList.add('hurt-animation');
@@ -293,11 +453,23 @@ function handleEnemyTurn() {
                 playerCharacter.classList.remove('hurt-animation');
             }, 500);
             
-            // Apply damage to player
-            battleState.playerHealth = Math.max(0, battleState.playerHealth - damage);
-            actionText += `, dealing ${damage} damage!`;
+            // Apply damage to player and reduce energy
+            battleState.playerHealth = Math.max(0, battleState.playerHealth - potentialDamage);
+            battleState.playerEnergy = Math.max(0, battleState.playerEnergy - Math.floor(potentialDamage * 0.2));
+            
+            if (wasDefending) {
+                actionText += `, but your shield absorbs much of the impact, taking ${potentialDamage} damage!`;
+            } else if (wasEvading) {
+                actionText += `, and despite your attempt to dodge, the attack connects for ${potentialDamage} damage!`;
+            } else {
+                actionText += `, dealing ${potentialDamage} damage!`;
+            }
         } else {
-            actionText += `.`;
+            if (wasEvading) {
+                actionText += `, but you successfully dodge out of the way!`;
+            } else {
+                actionText += `, but misses as you narrowly avoid the strike!`;
+            }
         }
         
         // Update battle text
@@ -388,6 +560,226 @@ function returnToStory() {
     transitionToScreen(screens.battle, screens.cinematicUI, () => {
         displayStoryText(nextNodeId);
     });
+}
+
+// Helper function for creating ability buttons
+function createAbilityButton(ability, weapon) {
+    // Calculate hit chance for this ability
+    const baseHitChance = calculateHitChance(
+        playerState.weaponSkill,
+        battleState.enemyAgility,
+        battleState.enemyEnergy,
+        battleState.enemyMaxEnergy,
+        battleState.enemyEndurance
+    );
+    
+    // Apply the ability's hit chance modifier
+    let hitChance = baseHitChance + (ability.hitChanceModifier || 0);
+    hitChance = Math.min(0.95, Math.max(0.1, hitChance)); // Cap between 10% and 95%
+    
+    const hitChancePercent = Math.round(hitChance * 100);
+    
+    // Calculate damage for hover information
+    const calculatedDamage = ability.calculateDamage(weapon.baseDamage);
+    
+    // Create ability button
+    const abilityBtn = document.createElement('button');
+    abilityBtn.className = 'battle-action weapon-ability';
+    abilityBtn.dataset.abilityId = ability.id;
+    abilityBtn.textContent = `${ability.name} (${hitChancePercent}%)`;
+    
+    // Create hover text with detailed information
+    const hoverText = `${ability.description}\nDamage: ~${calculatedDamage}\nEnergy Cost: ${ability.energyCost}`;
+    abilityBtn.title = hoverText;
+    
+    // Disable if not enough energy
+    if (ability.energyCost > battleState.playerEnergy) {
+        abilityBtn.disabled = true;
+        abilityBtn.style.opacity = '0.5';
+    }
+    
+    // Add event listener
+    abilityBtn.addEventListener('click', () => handleWeaponAbility(ability));
+    
+    return abilityBtn;
+}
+
+// Function to show weapon ability selection UI
+function showWeaponAbilitySelection() {
+    // Set flag to indicate we're showing weapon abilities
+    battleState.showingWeaponAbilities = true;
+    
+    // Get the currently equipped weapon
+    const weapon = battleState.equippedWeapon;
+    
+    if (!weapon || !weapon.abilities || weapon.abilities.length === 0) {
+        console.error("No weapon equipped or weapon has no abilities!");
+        return;
+    }
+    
+    // Get the battle actions container
+    const actionsContainer = document.getElementById('battle-actions');
+    
+    // Store the original content to restore later
+    if (!battleState.originalActionsHTML) {
+        battleState.originalActionsHTML = actionsContainer.innerHTML;
+    }
+    
+    // Clear the container
+    actionsContainer.innerHTML = '';
+    
+    // Create a heading for the weapon abilities
+    const weaponHeader = document.createElement('div');
+    weaponHeader.className = 'weapon-abilities-header';
+    weaponHeader.textContent = `${weapon.name} Abilities:`;
+    actionsContainer.appendChild(weaponHeader);
+    
+    // Create ability buttons in rows of 3
+    const abilities = weapon.abilities;
+    const maxButtonsPerRow = 3;
+    
+    for (let i = 0; i < abilities.length; i += maxButtonsPerRow) {
+        // Create a new row
+        const abilityRow = document.createElement('div');
+        abilityRow.className = 'action-row';
+        
+        // Add up to 3 ability buttons to this row
+        const endIndex = Math.min(i + maxButtonsPerRow, abilities.length);
+        for (let j = i; j < endIndex; j++) {
+            const abilityBtn = createAbilityButton(abilities[j], weapon);
+            abilityRow.appendChild(abilityBtn);
+        }
+        
+        actionsContainer.appendChild(abilityRow);
+    }
+    
+    // Add ability descriptions
+    const descriptionContainer = document.createElement('div');
+    descriptionContainer.className = 'ability-descriptions';
+    
+    weapon.abilities.forEach(ability => {
+        const description = document.createElement('div');
+        description.className = 'ability-description';
+        description.textContent = `${ability.name}: ${ability.getDisplayDescription(weapon.baseDamage)}`;
+        descriptionContainer.appendChild(description);
+    });
+    
+    actionsContainer.appendChild(descriptionContainer);
+    
+    // Add back button
+    const backBtn = document.createElement('button');
+    backBtn.className = 'battle-action back-button';
+    backBtn.textContent = 'Back';
+    backBtn.addEventListener('click', hideWeaponAbilitySelection);
+    
+    const backRow = document.createElement('div');
+    backRow.className = 'action-row';
+    backRow.appendChild(backBtn);
+    
+    actionsContainer.appendChild(backRow);
+}
+
+// Function to hide weapon ability selection and restore normal UI
+function hideWeaponAbilitySelection() {
+    if (!battleState.showingWeaponAbilities) return;
+    
+    battleState.showingWeaponAbilities = false;
+    
+    // Restore original battle actions
+    if (battleState.originalActionsHTML) {
+        const actionsContainer = document.getElementById('battle-actions');
+        actionsContainer.innerHTML = battleState.originalActionsHTML;
+        
+        // Re-attach event listeners
+        setupBattleEventListeners();
+    }
+    
+    // Update the UI to refresh button states
+    updateBattleUI();
+}
+
+// Function to handle when a weapon ability is selected
+function handleWeaponAbility(ability) {
+    // Hide the weapon ability selection UI
+    hideWeaponAbilitySelection();
+    
+    // Check if player has enough energy
+    if (ability.energyCost > battleState.playerEnergy) {
+        updateBattleText("You don't have enough energy to use this ability!");
+        return;
+    }
+    
+    // Apply energy cost
+    battleState.playerEnergy = Math.max(0, battleState.playerEnergy - ability.energyCost);
+    
+    // Get the weapon's base damage and calculate ability damage
+    const weapon = battleState.equippedWeapon;
+    const potentialDamage = ability.calculateDamage(weapon.baseDamage);
+    
+    // Update battle text
+    updateBattleText(`You use ${ability.name} with your ${weapon.name}!`);
+    
+    // Calculate hit chance with this ability's modifier
+    let hitChance = calculateHitChance(
+        playerState.weaponSkill,
+        battleState.enemyAgility,
+        battleState.enemyEnergy,
+        battleState.enemyMaxEnergy,
+        battleState.enemyEndurance
+    );
+    
+    // Apply ability-specific hit chance modifier
+    hitChance += (ability.hitChanceModifier || 0);
+    hitChance = Math.min(0.95, Math.max(0.1, hitChance)); // Cap between 10% and 95%
+    
+    // Play attack animation
+    const playerCharacter = document.querySelector('.character-placeholder.viking');
+    playerCharacter.classList.add('attack-animation');
+    
+    setTimeout(() => {
+        playerCharacter.classList.remove('attack-animation');
+        
+        // Determine if attack hits
+        const roll = Math.random();
+        if (roll <= hitChance) {
+            // Attack hits!
+            // Play enemy hurt animation
+            const enemyCharacter = document.querySelector('.character-placeholder.saxon');
+            enemyCharacter.classList.add('hurt-animation');
+            setTimeout(() => {
+                enemyCharacter.classList.remove('hurt-animation');
+            }, 500);
+            
+            // Apply damage and reduce enemy energy
+            battleState.enemyHealth = Math.max(0, battleState.enemyHealth - potentialDamage);
+            battleState.enemyEnergy = Math.max(0, battleState.enemyEnergy - Math.floor(potentialDamage * 0.3));
+            
+            // Apply any special effects from the ability
+            const effectResult = ability.executeEffect(battleState);
+            if (effectResult) {
+                appendBattleText(`, ${effectResult}`);
+            } else {
+                appendBattleText(`, dealing ${potentialDamage} damage!`);
+            }
+            
+            // Check if enemy is defeated
+            if (battleState.enemyHealth <= 0) {
+                handleEnemyDefeated();
+                return;
+            }
+        } else {
+            // Attack misses!
+            appendBattleText(`, but the ${battleState.enemyName} dodges your attack!`);
+        }
+        
+        // Enemy turn after a short delay
+        setTimeout(() => {
+            handleEnemyTurn();
+        }, 1000);
+    }, 500);
+    
+    // Update UI
+    updateBattleUI();
 }
 
 export { initBattle, battleState };

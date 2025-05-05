@@ -1034,3 +1034,84 @@ h3 {
 #new-game:hover {
     background-color: darkred;
 }
+
+/* Battle UI specific styles */
+.skill-chance-display {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+    color: #f7d794;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #885a27;
+}
+
+#feint-success-chance {
+    font-weight: bold;
+    color: #f5cd79;
+}
+
+/* Weapon Abilities UI */
+.weapon-abilities-header {
+    color: #f7d794;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 8px;
+    font-size: 16px;
+    padding: 5px;
+    border-bottom: 1px solid #885a27;
+}
+
+.weapon-ability {
+    background-color: #795548 !important;
+    position: relative;
+}
+
+.weapon-ability:hover {
+    background-color: #5d4037 !important;
+}
+
+/* Custom tooltip styling */
+.weapon-ability:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(25, 21, 44, 0.95);
+    color: #f7d794;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #885a27;
+    font-size: 12px;
+    white-space: pre;
+    width: max-content;
+    max-width: 200px;
+    text-align: left;
+    z-index: 10;
+    text-wrap: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.ability-descriptions {
+    margin: 8px 0;
+    font-size: 12px;
+    color: #e0e0e0;
+    max-height: 60px;
+    overflow-y: auto;
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.ability-description {
+    margin-bottom: 4px;
+    padding: 2px 5px;
+    border-left: 2px solid #885a27;
+}
+
+.back-button {
+    background-color: #455a64 !important;
+    width: 100%;
+}
