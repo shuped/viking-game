@@ -754,6 +754,62 @@ h3 {
     padding-bottom: 5px;
 }
 
+/* Level and Experience Display */
+.level-section {
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+}
+
+.level-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+}
+
+.level-label {
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+    color: #d4af37; /* Gold color for level label */
+}
+
+.character-level {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 0 5px #d4af37; /* Gold glow */
+}
+
+.exp-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.exp-bar {
+    height: 15px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 7px;
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.exp-fill {
+    height: 100%;
+    background: linear-gradient(to right, #4a6fa5, #6e9eff);
+    width: 0%; /* Will be set dynamically */
+    transition: width 0.5s ease-in-out;
+}
+
+.exp-value {
+    font-size: 14px;
+    color: #ffffff;
+    text-align: center;
+}
+
 /* Character Stats */
 .stat-container, .resource-container {
     display: flex;
@@ -1303,4 +1359,30 @@ h3 {
 .template-btn.selected {
     background-color: #2980b9;
     font-weight: bold;
+}
+
+/* Skill Points Display */
+.skill-points-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 5px;
+    border: 1px solid #d4af37; /* Gold border */
+}
+
+.skill-points-label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+    color: #d4af37; /* Gold color to match level */
+}
+
+.skill-points-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow: 0 0 5px #d4af37; /* Gold glow */
 }

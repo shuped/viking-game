@@ -3,7 +3,7 @@ import { transitionToScreen } from './transitions.js';
 import { initCamp } from './camp.js';
 import { initBattle } from './battle.js';
 import { initGameOver } from './gameOver.js';
-import { playerState } from './player.js';
+import { playerState, addExperience } from './player.js';
 import { storyState } from './story/story-state.js';
 import { 
     getCurrentStoryNodes, 
@@ -74,6 +74,44 @@ async function handleStatChangeText(handler, nextNodeId) {
     return handler.nextNode || nextNodeId;
 }
 
+// Handle experience rewards from story nodes
+function handleExperienceReward(experienceAmount) {
+    if (!experienceAmount || experienceAmount <= 0) return;
+    
+    const leveledUp = addExperience(experienceAmount);
+    
+    // Show notification if there was a level up
+    if (leveledUp) {
+        showNotification(`You gained ${experienceAmount} XP and LEVELED UP to level ${playerState.level}!`, 'level-up');
+    } else {
+        showNotification(`You gained ${experienceAmount} XP!`, 'exp-gain');
+    }
+}
+
+// Display a notification message
+function showNotification(message, className = '') {
+    const notificationElement = document.createElement('div');
+    notificationElement.className = `story-notification ${className}`;
+    notificationElement.textContent = message;
+    
+    // Add to the cinematic UI
+    const cinematicUI = document.getElementById('cinematic-ui');
+    cinematicUI.appendChild(notificationElement);
+    
+    // Fade in
+    setTimeout(() => {
+        notificationElement.classList.add('visible');
+    }, 10);
+    
+    // Remove after animation
+    setTimeout(() => {
+        notificationElement.classList.remove('visible');
+        setTimeout(() => {
+            notificationElement.remove();
+        }, 1000);
+    }, 3000);
+}
+
 // Display story text for the current node
 async function displayStoryText(nodeId) {
     // Start by ensuring any previous typewriter effect is cancelled
@@ -89,6 +127,11 @@ async function displayStoryText(nodeId) {
     // Execute the onEnter function if it exists
     if (currentNode.onEnter) {
         currentNode.onEnter();
+    }
+    
+    // Award experience if specified in the node
+    if (currentNode.expReward && typeof currentNode.expReward === 'number') {
+        handleExperienceReward(currentNode.expReward);
     }
     
     // Clear UI elements

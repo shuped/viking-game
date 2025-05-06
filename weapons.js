@@ -53,12 +53,14 @@ class Weapon {
         name,
         description,
         baseDamage, // New: base damage is now a weapon property
+        weaponType, // New: weapon type (sword, mace, axe, polearm)
         abilities
     }) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.baseDamage = baseDamage; // Store the base damage value
+        this.weaponType = weaponType; // Store the weapon type
         this.abilities = abilities;
     }
     
@@ -100,6 +102,7 @@ const rustyShortSword = new Weapon({
     name: 'Rusty Short Sword',
     description: 'A weathered blade, though still sharp enough to be dangerous.',
     baseDamage: 10, // Example base damage value
+    weaponType: 'sword', // Example weapon type
     abilities: [thrust, swing]
 });
 

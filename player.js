@@ -18,7 +18,23 @@ const STAT_BUNDLES = {
         reputation: 0,
         blackRaven: 0,
         whiteRaven: 0,
-        gold: 10
+        gold: 10,
+        level: 1,
+        exp: 0,
+        skillPoints: 0,
+        // Weapon experience and levels
+        weaponExp: {
+            sword: 0,
+            mace: 0,
+            axe: 0,
+            polearm: 0
+        },
+        weaponLevel: {
+            sword: 1,
+            mace: 1,
+            axe: 1,
+            polearm: 1
+        }
     },
     WARRIOR: {
         strength: 8,
@@ -36,7 +52,23 @@ const STAT_BUNDLES = {
         reputation: 0,
         blackRaven: 0,
         whiteRaven: 0,
-        gold: 8
+        gold: 8,
+        level: 1,
+        exp: 0,
+        skillPoints: 0,
+        // Weapon experience and levels
+        weaponExp: {
+            sword: 0,
+            mace: 0,
+            axe: 0,
+            polearm: 0
+        },
+        weaponLevel: {
+            sword: 1,
+            mace: 1,
+            axe: 1,
+            polearm: 1
+        }
     },
     EXPLORER: {
         strength: 4,
@@ -54,7 +86,23 @@ const STAT_BUNDLES = {
         reputation: 0,
         blackRaven: 0,
         whiteRaven: 0,
-        gold: 12
+        gold: 12,
+        level: 1,
+        exp: 0,
+        skillPoints: 0,
+        // Weapon experience and levels
+        weaponExp: {
+            sword: 0,
+            mace: 0,
+            axe: 0,
+            polearm: 0
+        },
+        weaponLevel: {
+            sword: 1,
+            mace: 1,
+            axe: 1,
+            polearm: 1
+        }
     },
     SHIELDMAIDEN: {
         strength: 6,
@@ -72,7 +120,23 @@ const STAT_BUNDLES = {
         reputation: 0,
         blackRaven: 0,
         whiteRaven: 0,
-        gold: 10
+        gold: 10,
+        level: 1,
+        exp: 0,
+        skillPoints: 0,
+        // Weapon experience and levels
+        weaponExp: {
+            sword: 0,
+            mace: 0,
+            axe: 0,
+            polearm: 0
+        },
+        weaponLevel: {
+            sword: 1,
+            mace: 1,
+            axe: 1,
+            polearm: 1
+        }
     }
 };
 
@@ -125,6 +189,57 @@ function setPlayerAttribute(attribute, value) {
     return false;
 }
 
+// Experience and level functions
+function addExperience(amount) {
+    if (amount <= 0) return;
+    
+    _playerState.exp += amount;
+    console.log(`Added ${amount} experience. Total: ${_playerState.exp}`);
+    
+    // Check for level up
+    checkForLevelUp();
+    
+    // Return true if the player leveled up
+    return _playerState.exp >= _playerState.level * 100;
+}
+
+function checkForLevelUp() {
+    const expToLevel = _playerState.level * 100;
+    
+    if (_playerState.exp >= expToLevel) {
+        // Level up the player
+        _playerState.level += 1;
+        _playerState.exp -= expToLevel;
+        
+        // Add skill points instead of automatically increasing stats
+        _playerState.skillPoints += 3;
+        
+        // Increase max health and energy - these still increase automatically
+        _playerState.maxHealth += 10;
+        _playerState.health = _playerState.maxHealth;
+        _playerState.maxEnergy += 5;
+        _playerState.energy = _playerState.maxEnergy;
+        
+        console.log(`Level up! Player is now level ${_playerState.level} and gained 3 skill points (total: ${_playerState.skillPoints})`);
+        
+        // Check for additional level ups if we gained enough exp
+        checkForLevelUp();
+        
+        return true;
+    }
+    
+    return false;
+}
+
+function getCurrentLevelProgress() {
+    const expToLevel = _playerState.level * 100;
+    return {
+        currentExp: _playerState.exp,
+        requiredExp: expToLevel,
+        progress: (_playerState.exp / expToLevel) * 100
+    };
+}
+
 function addInventoryItem(item) {
     _playerState.inventory.push(item);
 }
@@ -168,6 +283,74 @@ function getPlayerFlag(flag) {
     return _playerState.flags[flag] || false;
 }
 
+// Weapon experience and level functions
+function addWeaponExperience(weaponType, amount) {
+    if (!weaponType || amount <= 0) return false;
+    
+    // Make sure the weapon type is valid
+    if (!_playerState.weaponExp.hasOwnProperty(weaponType)) {
+        console.error(`Weapon type ${weaponType} does not exist`);
+        return false;
+    }
+    
+    // Add experience to the weapon type
+    _playerState.weaponExp[weaponType] += amount;
+    console.log(`Added ${amount} experience to ${weaponType}. Total: ${_playerState.weaponExp[weaponType]}`);
+    
+    // Check for weapon level up
+    checkForWeaponLevelUp(weaponType);
+    
+    return true;
+}
+
+function checkForWeaponLevelUp(weaponType) {
+    if (!_playerState.weaponExp.hasOwnProperty(weaponType)) {
+        console.error(`Weapon type ${weaponType} does not exist`);
+        return false;
+    }
+    
+    const currentLevel = _playerState.weaponLevel[weaponType];
+    const expToLevel = currentLevel * 100;
+    
+    if (_playerState.weaponExp[weaponType] >= expToLevel) {
+        // Level up the weapon type
+        _playerState.weaponLevel[weaponType] += 1;
+        _playerState.weaponExp[weaponType] -= expToLevel;
+        
+        console.log(`${weaponType.charAt(0).toUpperCase() + weaponType.slice(1)} mastery increased to level ${_playerState.weaponLevel[weaponType]}!`);
+        
+        // Check for additional level ups if we gained enough exp
+        checkForWeaponLevelUp(weaponType);
+        
+        return true;
+    }
+    
+    return false;
+}
+
+function getWeaponTypeLevel(weaponType) {
+    if (!_playerState.weaponLevel.hasOwnProperty(weaponType)) {
+        return 0;
+    }
+    return _playerState.weaponLevel[weaponType];
+}
+
+function getWeaponTypeLevelProgress(weaponType) {
+    if (!_playerState.weaponExp.hasOwnProperty(weaponType)) {
+        return { currentExp: 0, requiredExp: 100, progress: 0 };
+    }
+    
+    const currentLevel = _playerState.weaponLevel[weaponType];
+    const expToLevel = currentLevel * 100;
+    const currentExp = _playerState.weaponExp[weaponType];
+    
+    return {
+        currentExp,
+        requiredExp: expToLevel,
+        progress: (currentExp / expToLevel) * 100
+    };
+}
+
 // For debugging purposes
 window.debugPlayerState = () => ({..._playerState});
 
@@ -175,11 +358,18 @@ export {
     playerState, 
     updatePlayerAttribute, 
     setPlayerAttribute,
+    addExperience,
+    checkForLevelUp,
+    getCurrentLevelProgress,
     addInventoryItem, 
     removeInventoryItem,
     getInventoryItems,
     initializePlayerStats,
     setPlayerFlag,
     getPlayerFlag,
+    addWeaponExperience,
+    checkForWeaponLevelUp,
+    getWeaponTypeLevel,
+    getWeaponTypeLevelProgress,
     STAT_BUNDLES
 };

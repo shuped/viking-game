@@ -83,6 +83,9 @@ function closeCharacterScreen() {
 // Update all UI elements based on player state
 function updateCharacterUI() {
     try {
+        // Update level and experience
+        updateLevelDisplay(playerState.level, playerState.exp);
+        
         // Update stats
         updateStatBar('strength', playerState.strength, 20);
         updateStatBar('agility', playerState.agility, 20);
@@ -185,6 +188,116 @@ function updateReputationBar(reputation, whiteRaven, blackRaven) {
     } catch (error) {
         console.error('Error updating reputation bar:', error);
     }
+}
+
+// Update level and experience display
+function updateLevelDisplay(level, exp) {
+    try {
+        const levelElement = document.querySelector('.character-level');
+        const expBarElement = document.querySelector('.exp-fill');
+        const expValueElement = document.querySelector('.exp-value');
+        const skillPointsElement = document.querySelector('.skill-points-value');
+        
+        if (!levelElement || !expBarElement || !expValueElement) {
+            console.warn('Level display elements not found, creating them');
+            createLevelDisplayElements();
+            return updateLevelDisplay(level, exp); // Try again after creating elements
+        }
+        
+        // Update level number
+        levelElement.textContent = level;
+        
+        // Calculate exp percentage and required exp to level
+        const expToLevel = level * 100;
+        const expPercentage = (exp / expToLevel) * 100;
+        
+        // Update exp bar and text
+        expBarElement.style.width = `${expPercentage}%`;
+        expValueElement.textContent = `${exp}/${expToLevel} XP`;
+        
+        // Update skill points if element exists
+        if (skillPointsElement) {
+            skillPointsElement.textContent = playerState.skillPoints || 0;
+        }
+    } catch (error) {
+        console.error('Error updating level display:', error);
+    }
+}
+
+// Create level display elements if they don't exist
+function createLevelDisplayElements() {
+    const characterScreen = document.getElementById('character-screen');
+    if (!characterScreen) return;
+    
+    // Check if a stats container already exists
+    let statsContainer = characterScreen.querySelector('.stats-container');
+    
+    if (!statsContainer) {
+        // Create stats container if it doesn't exist
+        statsContainer = document.createElement('div');
+        statsContainer.className = 'stats-container';
+        characterScreen.appendChild(statsContainer);
+    }
+    
+    // Create level display section
+    const levelSection = document.createElement('div');
+    levelSection.className = 'level-section';
+    
+    // Create level display
+    const levelDisplay = document.createElement('div');
+    levelDisplay.className = 'level-display';
+    
+    const levelLabel = document.createElement('div');
+    levelLabel.className = 'level-label';
+    levelLabel.textContent = 'Level:';
+    
+    const levelValue = document.createElement('div');
+    levelValue.className = 'character-level';
+    levelValue.textContent = '1';
+    
+    levelDisplay.appendChild(levelLabel);
+    levelDisplay.appendChild(levelValue);
+    
+    // Create exp bar
+    const expContainer = document.createElement('div');
+    expContainer.className = 'exp-container';
+    
+    const expBar = document.createElement('div');
+    expBar.className = 'exp-bar';
+    
+    const expFill = document.createElement('div');
+    expFill.className = 'exp-fill';
+    
+    const expValue = document.createElement('div');
+    expValue.className = 'exp-value';
+    expValue.textContent = '0/100 XP';
+    
+    expBar.appendChild(expFill);
+    expContainer.appendChild(expBar);
+    expContainer.appendChild(expValue);
+    
+    // Create skill points display
+    const skillPointsContainer = document.createElement('div');
+    skillPointsContainer.className = 'skill-points-container';
+    
+    const skillPointsLabel = document.createElement('div');
+    skillPointsLabel.className = 'skill-points-label';
+    skillPointsLabel.textContent = 'Skill Points:';
+    
+    const skillPointsValue = document.createElement('div');
+    skillPointsValue.className = 'skill-points-value';
+    skillPointsValue.textContent = '0';
+    
+    skillPointsContainer.appendChild(skillPointsLabel);
+    skillPointsContainer.appendChild(skillPointsValue);
+    
+    // Add everything to the level section
+    levelSection.appendChild(levelDisplay);
+    levelSection.appendChild(expContainer);
+    levelSection.appendChild(skillPointsContainer);
+    
+    // Insert at the top of the stats container
+    statsContainer.insertBefore(levelSection, statsContainer.firstChild);
 }
 
 // Update inventory items

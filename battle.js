@@ -1,8 +1,58 @@
-import { playerState } from './player.js';
+import { playerState, addExperience, addWeaponExperience, getWeaponTypeLevel, getWeaponTypeLevelProgress } from './player.js';
 import { transitionToScreen } from './transitions.js';
 import { displayStoryText } from './story.js';
 import { screens } from './main.js';
-import { getEquippedWeapon } from './weapons.js';
+import { getEquippedWeapon  } from './weapons.js';
+
+// Enemy types with their stats and experience rewards
+const ENEMY_TYPES = {
+    SAXON_SCOUT: {
+        name: 'Saxon Scout',
+        health: 80,
+        maxHealth: 80,
+        energy: 70,
+        maxEnergy: 70,
+        agility: 6,
+        endurance: 4,
+        weaponSkill: 5,
+        coordination: 4,
+        description: "A quick and agile Saxon scout equipped with a short sword.",
+        expReward: 50
+    },
+    SAXON_DEFENDER: {
+        name: 'Saxon Defender',
+        health: 120,
+        maxHealth: 120,
+        energy: 60,
+        maxEnergy: 60,
+        agility: 4,
+        endurance: 7,
+        weaponSkill: 6,
+        coordination: 6,
+        description: "A battle-hardened Saxon defender with chainmail and a heavy axe.",
+        expReward: 100
+    },
+    SAXON_BERSERKER: {
+        name: 'Saxon Berserker',
+        health: 150,
+        maxHealth: 150,
+        energy: 80,
+        maxEnergy: 80,
+        agility: 7,
+        endurance: 7,
+        weaponSkill: 8,
+        coordination: 5,
+        description: "A fearsome Saxon berserker who fights with reckless abandon.",
+        expReward: 150
+    }
+};
+
+// Battle state
+let enemy = null;
+let battleType = '';
+let battleActive = false;
+let playerDefending = false;
+let currentTurn = 'player';
 
 // Battle System
 const battleState = {
@@ -12,20 +62,21 @@ const battleState = {
     playerMaxEnergy: 65,
     enemyHealth: 100,
     enemyMaxHealth: 100,
-    enemyEnergy: 60,     // New: track enemy energy
-    enemyMaxEnergy: 60,  // New: track enemy max energy
-    enemyAgility: 5,     // New: enemy agility stat
-    enemyEndurance: 5,   // New: enemy endurance stat
-    enemyWeaponSkill: 5, // New: enemy weapon skill
-    enemyCoordination: 5, // New: enemy coordination stat for feint defense
+    enemyEnergy: 60,
+    enemyMaxEnergy: 60,
+    enemyAgility: 5,
+    enemyEndurance: 5,
+    enemyWeaponSkill: 5,
+    enemyCoordination: 5,
     enemyName: 'Saxon Warrior',
+    enemyType: null, // Reference to the enemy type
     turnCount: 0,
-    battlePhase: 'player', // 'player', 'enemy', 'end'
-    battleType: 'first', // 'first', 'second'
+    battlePhase: 'player',
+    battleType: 'first',
     battleLog: [],
     isActive: false,
-    showingWeaponAbilities: false, // New flag to track if weapon ability selection is shown
-    equippedWeapon: null, // Will store the player's equipped weapon
+    showingWeaponAbilities: false,
+    equippedWeapon: null,
 };
 
 window.battleState = battleState; // For debugging purposes
@@ -46,32 +97,24 @@ function initBattle(battleType) {
     
     // Set enemy stats based on battle type
     if (battleType === 'first') {
-        battleState.enemyName = 'Saxon Scout';
-        battleState.enemyHealth = 80;
-        battleState.enemyMaxHealth = 80;
-        battleState.enemyEnergy = 70;
-        battleState.enemyMaxEnergy = 70;
-        battleState.enemyAgility = 6;
-        battleState.enemyEndurance = 4;
-        battleState.enemyWeaponSkill = 5;
-        battleState.enemyCoordination = 4; // A scout has decent coordination but not exceptional
-        
-        // Set initial battle message
-        updateBattleText("A Saxon scout charges at you, wielding a short sword. The clash of steel rings through the air as your warband engages the enemy.");
+        battleState.enemyType = ENEMY_TYPES.SAXON_SCOUT;
     } else {
-        battleState.enemyName = 'Saxon Defender';
-        battleState.enemyHealth = 120;
-        battleState.enemyMaxHealth = 120;
-        battleState.enemyEnergy = 60;
-        battleState.enemyMaxEnergy = 60;
-        battleState.enemyAgility = 4;
-        battleState.enemyEndurance = 7;
-        battleState.enemyWeaponSkill = 6;
-        battleState.enemyCoordination = 6; // A defender has better coordination due to combat experience
-        
-        // Set initial battle message
-        updateBattleText("A battle-hardened Saxon defender blocks your path to the village. His chainmail glints in the sunlight as he raises his axe, ready to defend his home.");
+        battleState.enemyType = ENEMY_TYPES.SAXON_DEFENDER;
     }
+
+    const enemyType = battleState.enemyType;
+    battleState.enemyName = enemyType.name;
+    battleState.enemyHealth = enemyType.health;
+    battleState.enemyMaxHealth = enemyType.maxHealth;
+    battleState.enemyEnergy = enemyType.energy;
+    battleState.enemyMaxEnergy = enemyType.maxEnergy;
+    battleState.enemyAgility = enemyType.agility;
+    battleState.enemyEndurance = enemyType.endurance;
+    battleState.enemyWeaponSkill = enemyType.weaponSkill;
+    battleState.enemyCoordination = enemyType.coordination;
+
+    // Set initial battle message
+    updateBattleText(enemyType.description);
     
     // Update UI
     updateBattleUI();
@@ -519,8 +562,26 @@ function handleEnemyDefeated() {
     playerState.health = battleState.playerHealth;
     playerState.energy = battleState.playerEnergy;
     
-    // Show victory message
-    updateBattleText(`The ${battleState.enemyName} falls before your might! Victory is yours!`);
+    // Get currently equipped weapon
+    const equippedWeapon = battleState.equippedWeapon;
+    
+    // Get enemy experience reward
+    const experienceReward = battleState.enemyType.expReward;
+    
+    // Add weapon experience if we have a valid weapon and weapon type
+    if (equippedWeapon && equippedWeapon.weaponType) {
+        addWeaponExperience(equippedWeapon.weaponType, experienceReward);
+        
+        // Get updated weapon level for the message
+        const weaponLevel = getWeaponTypeLevel(equippedWeapon.weaponType);
+        const levelProgress = getWeaponTypeLevelProgress(equippedWeapon.weaponType);
+        
+        // Show victory message with weapon experience
+        updateBattleText(`The ${battleState.enemyName} falls before your might! Victory is yours! You gained ${experienceReward} ${equippedWeapon.weaponType} experience. (Level ${weaponLevel}: ${levelProgress.currentExp}/${levelProgress.requiredExp})`);
+    } else {
+        // Fallback if no weapon type is available
+        updateBattleText(`The ${battleState.enemyName} falls before your might! Victory is yours!`);
+    }
     
     // After a delay, return to story
     setTimeout(() => {
