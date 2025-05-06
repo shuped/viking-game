@@ -1128,26 +1128,27 @@ h3 {
     background-color: #5d4037 !important;
 }
 
-/* Custom tooltip styling */
+/* Enhanced tooltip styling */
 .weapon-ability:hover::after {
     content: attr(title);
     position: absolute;
-    bottom: 100%;
+    bottom: 120%;
     left: 50%;
     transform: translateX(-50%);
     background-color: rgba(25, 21, 44, 0.95);
     color: #f7d794;
-    padding: 8px;
+    padding: 12px;
     border-radius: 4px;
     border: 1px solid #885a27;
-    font-size: 12px;
+    font-size: 14px;
     white-space: pre;
     width: max-content;
-    max-width: 200px;
+    max-width: 250px;
     text-align: left;
     z-index: 10;
-    text-wrap: auto;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    line-height: 1.4;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.7);
+    pointer-events: none; /* Prevents tooltip from interfering with clicks */
 }
 
 .ability-descriptions {
@@ -1407,6 +1408,15 @@ h3 {
 .weapon-type-name {
     font-weight: bold;
     color: #e0e0e0;
+    flex: 1;
+}
+
+.weapon-type-bonus {
+    color: #4a90e2;
+    font-weight: bold;
+    margin-right: 10px;
+    min-width: 70px;
+    text-align: center;
 }
 
 .weapon-type-level {

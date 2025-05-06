@@ -154,7 +154,7 @@ const _playerState = {
 
 // Public player state object with getters - this is what we export
 const playerState = {};
-
+window.playerState = playerState;
 // Create getters for all properties in _playerState
 for (const key in _playerState) {
     if (key === 'inventory' || key === 'flags') {
@@ -351,6 +351,15 @@ function getWeaponTypeLevelProgress(weaponType) {
     };
 }
 
+// Get weapon type damage bonus based on mastery level
+function getWeaponTypeDamageBonus(weaponType) {
+    if (!_playerState.weaponLevel.hasOwnProperty(weaponType)) {
+        return 0;
+    }
+    // Each level adds 2 damage (starting from level 2)
+    return (_playerState.weaponLevel[weaponType] - 1) * 2;
+}
+
 // For debugging purposes
 window.debugPlayerState = () => ({..._playerState});
 
@@ -371,5 +380,6 @@ export {
     checkForWeaponLevelUp,
     getWeaponTypeLevel,
     getWeaponTypeLevelProgress,
+    getWeaponTypeDamageBonus,
     STAT_BUNDLES
 };

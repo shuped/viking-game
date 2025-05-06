@@ -1,8 +1,9 @@
-import { playerState, addExperience, addWeaponExperience, getWeaponTypeLevel, getWeaponTypeLevelProgress } from './player.js';
+import { playerState, addExperience, addWeaponExperience, getWeaponTypeLevel, getWeaponTypeLevelProgress, getWeaponTypeDamageBonus } from './player.js';
 import { transitionToScreen } from './transitions.js';
 import { displayStoryText } from './story.js';
 import { screens } from './main.js';
 import { getEquippedWeapon  } from './weapons.js';
+import { refreshCharacterUI } from './character.js';
 
 // Enemy types with their stats and experience rewards
 const ENEMY_TYPES = {
@@ -640,8 +641,11 @@ function createAbilityButton(ability, weapon) {
     
     const hitChancePercent = Math.round(hitChance * 100);
     
-    // Calculate damage for hover information
-    const calculatedDamage = ability.calculateDamage(weapon.baseDamage);
+    // Get weapon mastery damage bonus
+    const masteryBonus = getWeaponTypeDamageBonus(weapon.weaponType);
+    
+    // Calculate damage for hover information with mastery bonus
+    const calculatedDamage = ability.calculateDamage(weapon.baseDamage, masteryBonus);
     
     // Create ability button
     const abilityBtn = document.createElement('button');
@@ -649,8 +653,12 @@ function createAbilityButton(ability, weapon) {
     abilityBtn.dataset.abilityId = ability.id;
     abilityBtn.textContent = `${ability.name} (${hitChancePercent}%)`;
     
-    // Create hover text with detailed information
-    const hoverText = `${ability.description}\nDamage: ~${calculatedDamage}\nEnergy Cost: ${ability.energyCost}`;
+    // Create enhanced hover text with detailed information
+    let hoverText = `${ability.name}\n\n`;
+    hoverText += `${ability.description}\n`;
+    hoverText += `Damage: ~${calculatedDamage}\n`;
+    hoverText += `Energy Cost: ${ability.energyCost}`;
+    
     abilityBtn.title = hoverText;
     
     // Disable if not enough energy
@@ -714,19 +722,6 @@ function showWeaponAbilitySelection() {
         actionsContainer.appendChild(abilityRow);
     }
     
-    // Add ability descriptions
-    const descriptionContainer = document.createElement('div');
-    descriptionContainer.className = 'ability-descriptions';
-    
-    weapon.abilities.forEach(ability => {
-        const description = document.createElement('div');
-        description.className = 'ability-description';
-        description.textContent = `${ability.name}: ${ability.getDisplayDescription(weapon.baseDamage)}`;
-        descriptionContainer.appendChild(description);
-    });
-    
-    actionsContainer.appendChild(descriptionContainer);
-    
     // Add back button
     const backBtn = document.createElement('button');
     backBtn.className = 'battle-action back-button';
@@ -773,9 +768,14 @@ function handleWeaponAbility(ability) {
     // Apply energy cost
     battleState.playerEnergy = Math.max(0, battleState.playerEnergy - ability.energyCost);
     
-    // Get the weapon's base damage and calculate ability damage
+    // Get the weapon's base damage
     const weapon = battleState.equippedWeapon;
-    const potentialDamage = ability.calculateDamage(weapon.baseDamage);
+    
+    // Get the mastery damage bonus for this weapon type
+    const masteryBonus = getWeaponTypeDamageBonus(weapon.weaponType);
+    
+    // Calculate ability damage including mastery bonus
+    const potentialDamage = ability.calculateDamage(weapon.baseDamage, masteryBonus);
     
     // Update battle text
     updateBattleText(`You use ${ability.name} with your ${weapon.name}!`);

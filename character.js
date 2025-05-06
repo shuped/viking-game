@@ -1,5 +1,5 @@
 // Character management system
-import { playerState, getWeaponTypeLevel, getWeaponTypeLevelProgress } from './player.js';
+import { playerState, getWeaponTypeLevel, getWeaponTypeLevelProgress, getWeaponTypeDamageBonus } from './player.js';
 import { screens } from './main.js';
 
 // DOM Elements
@@ -374,6 +374,7 @@ function updateWeaponMasteryDisplay() {
         weaponTypes.forEach(type => {
             const level = getWeaponTypeLevel(type);
             const progress = getWeaponTypeLevelProgress(type);
+            const damageBonus = getWeaponTypeDamageBonus(type);
             
             const weaponRow = document.createElement('div');
             weaponRow.className = 'weapon-mastery-row';
@@ -386,7 +387,16 @@ function updateWeaponMasteryDisplay() {
             weaponLevel.className = 'weapon-type-level';
             weaponLevel.textContent = level;
             
+            const weaponBonus = document.createElement('div');
+            weaponBonus.className = 'weapon-type-bonus';
+            if (damageBonus > 0) {
+                weaponBonus.textContent = `+${damageBonus} dmg`;
+            } else {
+                weaponBonus.textContent = '-';
+            }
+            
             weaponRow.appendChild(weaponName);
+            weaponRow.appendChild(weaponBonus);
             weaponRow.appendChild(weaponLevel);
             
             weaponMasteryContainer.appendChild(weaponRow);

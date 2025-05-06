@@ -25,15 +25,15 @@ class WeaponAbility {
         this.effectFunction = effectFunction;
     }
     
-    // Calculate the damage based on weapon base damage and player stats
-    calculateDamage(weaponBaseDamage) {
-        // Pass weapon's base damage to the formula instead of ability's damageBase
-        return this.damageFormula(weaponBaseDamage, this.damageMultiplier, playerState);
+    // Calculate the damage based on weapon base damage, player stats and weapon mastery bonus
+    calculateDamage(weaponBaseDamage, masteryBonus = 0) {
+        // Pass weapon's base damage and mastery bonus to the formula
+        return this.damageFormula(weaponBaseDamage, this.damageMultiplier, playerState, masteryBonus);
     }
     
-    // Get a display description with damage calculation
-    getDisplayDescription(weaponBaseDamage) {
-        const calculatedDamage = this.calculateDamage(weaponBaseDamage);
+    // Get a display description with damage calculation including mastery bonus
+    getDisplayDescription(weaponBaseDamage, masteryBonus = 0) {
+        const calculatedDamage = this.calculateDamage(weaponBaseDamage, masteryBonus);
         return `${this.description} (Damage: ~${calculatedDamage}, Energy: ${this.energyCost})`;
     }
     
@@ -78,8 +78,8 @@ const thrust = new WeaponAbility({
     name: 'Thrust',
     description: 'A quick stabbing attack',
     energyCost: 6,
-    damageFormula: (weaponBaseDamage, multiplier, playerStats) => {
-        return Math.floor(weaponBaseDamage * multiplier + (playerStats.weaponSkill * 0.3));
+    damageFormula: (weaponBaseDamage, multiplier, playerStats, masteryBonus) => {
+        return Math.floor(weaponBaseDamage * multiplier + (playerStats.weaponSkill * 0.3) + masteryBonus);
     },
     hitChanceModifier: 0.05 // +5% hit chance
 });
@@ -90,8 +90,8 @@ const swing = new WeaponAbility({
     name: 'Swing',
     description: 'A wide arcing attack. Adds one-third of agility to damage.',
     energyCost: 9,
-    damageFormula: (weaponBaseDamage, multiplier, playerStats) => {
-        return Math.floor(weaponBaseDamage * multiplier + (playerStats.agility / 3) + + (playerStats.weaponSkill * 0.3));
+    damageFormula: (weaponBaseDamage, multiplier, playerStats, masteryBonus) => {
+        return Math.floor(weaponBaseDamage * multiplier + (playerStats.agility / 3) + (playerStats.weaponSkill * 0.3) + masteryBonus);
     },
     hitChanceModifier: -0.05 // -5% hit chance
 });
