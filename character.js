@@ -1,5 +1,5 @@
 // Character management system
-import { playerState } from './player.js';
+import { playerState, getWeaponTypeLevel, getWeaponTypeLevelProgress } from './player.js';
 import { screens } from './main.js';
 
 // DOM Elements
@@ -93,6 +93,9 @@ function updateCharacterUI() {
         updateStatBar('coordination', playerState.coordination, 20);
         updateStatBar('vitality', playerState.vitality, 20);
         updateStatBar('weaponSkill', playerState.weaponSkill, 20);
+        
+        // Update weapon mastery levels
+        updateWeaponMasteryDisplay();
         
         // Update health and energy
         updateResourceBar('health', playerState.health, playerState.maxHealth);
@@ -341,6 +344,84 @@ function updateInventoryItems(inventory) {
             });
         });
     }
+}
+
+// Update weapon mastery display
+function updateWeaponMasteryDisplay() {
+    try {
+        // Check if the section exists first
+        let weaponMasterySection = document.getElementById('weapon-mastery-section');
+        if (!weaponMasterySection) {
+            // Create the section if it doesn't exist
+            createWeaponMasterySection();
+            return updateWeaponMasteryDisplay(); // Try again after creating section
+        }
+        
+        // Get the container for weapon mastery levels
+        const weaponMasteryContainer = document.getElementById('weapon-mastery-container');
+        if (!weaponMasteryContainer) {
+            console.warn('Weapon mastery container not found');
+            return;
+        }
+        
+        // Clear existing content
+        weaponMasteryContainer.innerHTML = '';
+        
+        // Use the correct weapon types from our game
+        const weaponTypes = ['sword', 'mace', 'axe', 'polearm'];
+        
+        // Create display for each weapon type
+        weaponTypes.forEach(type => {
+            const level = getWeaponTypeLevel(type);
+            const progress = getWeaponTypeLevelProgress(type);
+            
+            const weaponRow = document.createElement('div');
+            weaponRow.className = 'weapon-mastery-row';
+            
+            const weaponName = document.createElement('div');
+            weaponName.className = 'weapon-type-name';
+            weaponName.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)}s`;
+            
+            const weaponLevel = document.createElement('div');
+            weaponLevel.className = 'weapon-type-level';
+            weaponLevel.textContent = level;
+            
+            weaponRow.appendChild(weaponName);
+            weaponRow.appendChild(weaponLevel);
+            
+            weaponMasteryContainer.appendChild(weaponRow);
+        });
+    } catch (error) {
+        console.error('Error updating weapon mastery display:', error);
+    }
+}
+
+// Create weapon mastery section if it doesn't exist
+function createWeaponMasterySection() {
+    const characterStats = document.getElementById('character-stats');
+    if (!characterStats) {
+        console.warn('Character stats section not found');
+        return;
+    }
+    
+    // Create weapon mastery section
+    const weaponMasterySection = document.createElement('div');
+    weaponMasterySection.id = 'weapon-mastery-section';
+    weaponMasterySection.className = 'stats-section';
+    
+    // Create section header
+    const sectionHeader = document.createElement('h3');
+    sectionHeader.textContent = 'Weapon Mastery';
+    weaponMasterySection.appendChild(sectionHeader);
+    
+    // Create container for weapon mastery levels
+    const weaponMasteryContainer = document.createElement('div');
+    weaponMasteryContainer.id = 'weapon-mastery-container';
+    weaponMasteryContainer.className = 'weapon-mastery-container';
+    weaponMasterySection.appendChild(weaponMasteryContainer);
+    
+    // Add to character stats section
+    characterStats.appendChild(weaponMasterySection);
 }
 
 // Public function to refresh character UI from other modules

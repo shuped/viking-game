@@ -1386,3 +1386,39 @@ h3 {
     color: #ffffff;
     text-shadow: 0 0 5px #d4af37; /* Gold glow */
 }
+
+/* Weapon Mastery Display */
+.weapon-mastery-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.weapon-mastery-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.weapon-type-name {
+    font-weight: bold;
+    color: #e0e0e0;
+}
+
+.weapon-type-level {
+    font-size: 18px;
+    font-weight: bold;
+    color: #d4af37;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+    border: 1px solid #d4af37;
+}
