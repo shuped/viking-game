@@ -1145,6 +1145,7 @@ h3 {
     width: max-content;
     max-width: 250px;
     text-align: left;
+    text-wrap: auto;
     z-index: 10;
     line-height: 1.4;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.7);

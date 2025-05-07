@@ -162,12 +162,20 @@ export const SkillTreeData = {
             devastatingBlows: {
                 id: 'devastatingBlows',
                 name: 'Devastating Blows',
-                description: 'Your critical hits now have a 20% chance to stun the enemy for 1 turn.',
+                description: 'Increases critical hit damage by 25%.',
                 maxRank: 1,
                 skillPointCost: 2,
                 icon: '🌋',
                 position: { row: 3, column: 2 },
-                modifiers: [],
+                modifiers: [
+                    {
+                        target: 'global',
+                        targetId: null,
+                        type: 'percent',
+                        value: 0.25,
+                        modifierType: ModifierType.CRITICAL_DAMAGE
+                    }
+                ],
                 prerequisites: [
                     { skillId: 'criticalPower', rank: 1 },
                     { skillId: 'statusIntensity', rank: 1 }
