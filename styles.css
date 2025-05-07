@@ -1432,3 +1432,42 @@ h3 {
     border-radius: 50%;
     border: 1px solid #d4af37;
 }
+
+/* Damage Multiplier Sliders */
+#damage-multiplier-sliders {
+    margin-top: 15px;
+}
+
+.slider-wrapper {
+    margin-bottom: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.slider-wrapper label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #f7d794;
+}
+
+.slider-wrapper input[type="range"] {
+    width: 85%;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+.slider-wrapper span {
+    display: inline-block;
+    width: 40px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+#reset-multipliers-btn {
+    margin-bottom: 15px;
+}

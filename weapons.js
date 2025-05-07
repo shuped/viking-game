@@ -1,6 +1,13 @@
 // Weapon System - Defines weapons and their abilities
 import { playerState } from './player.js';
 
+// Configurable damage multipliers for fine-tuning balance
+export const DAMAGE_MULTIPLIERS = {
+    WEAPON_SKILL_BONUS: 0.3,     // How much weapon skill contributes to damage
+    BASE_WEAPON_SKILL_DMG_MULTIPLIER: 1.0, // Base multiplier for thrust damage
+    BASE_WEAK_AGILITY_WEAPON_DMG_MULTIPLIER: 1.1,  // Base multiplier for swing damage
+};
+
 // Ability System
 // Each ability has standard properties and a damage calculation function
 // This allows for flexible ability definitions that can scale with player stats
@@ -79,7 +86,7 @@ const thrust = new WeaponAbility({
     description: 'A quick stabbing attack',
     energyCost: 6,
     damageFormula: (weaponBaseDamage, multiplier, playerStats, masteryBonus) => {
-        return Math.floor(weaponBaseDamage * multiplier + (playerStats.weaponSkill * 0.3) + masteryBonus);
+        return Math.floor(weaponBaseDamage * multiplier + (playerStats.weaponSkill * DAMAGE_MULTIPLIERS.BASE_WEAPON_SKILL_DMG_MULTIPLIER) + (playerStats.weaponSkill * DAMAGE_MULTIPLIERS.WEAPON_SKILL_BONUS) + masteryBonus);
     },
     hitChanceModifier: 0.05 // +5% hit chance
 });
@@ -91,7 +98,7 @@ const swing = new WeaponAbility({
     description: 'A wide arcing attack. Adds one-third of agility to damage.',
     energyCost: 9,
     damageFormula: (weaponBaseDamage, multiplier, playerStats, masteryBonus) => {
-        return Math.floor(weaponBaseDamage * multiplier + (playerStats.agility / 3) + (playerStats.weaponSkill * 0.3) + masteryBonus);
+        return Math.floor(weaponBaseDamage * multiplier + (playerStats.agility / DAMAGE_MULTIPLIERS.BASE_WEAK_AGILITY_WEAPON_DMG_MULTIPLIER) + (playerStats.weaponSkill * DAMAGE_MULTIPLIERS.WEAPON_SKILL_BONUS) + masteryBonus);
     },
     hitChanceModifier: -0.05 // -5% hit chance
 });

@@ -360,6 +360,18 @@ function getWeaponTypeDamageBonus(weaponType) {
     return (_playerState.weaponLevel[weaponType] - 1) * 2;
 }
 
+// Directly set weapon level and exp for testing/simulator purposes
+function setWeaponLevel(weaponType, level) {
+    if (!_playerState.weaponLevel.hasOwnProperty(weaponType)) {
+        console.error(`Weapon type ${weaponType} does not exist`);
+        return false;
+    }
+    
+    _playerState.weaponLevel[weaponType] = level;
+    _playerState.weaponExp[weaponType] = 0; // Reset exp when setting level directly
+    return true;
+}
+
 // For debugging purposes
 window.debugPlayerState = () => ({..._playerState});
 
@@ -381,5 +393,6 @@ export {
     getWeaponTypeLevel,
     getWeaponTypeLevelProgress,
     getWeaponTypeDamageBonus,
+    setWeaponLevel,
     STAT_BUNDLES
 };

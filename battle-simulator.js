@@ -1,8 +1,9 @@
 // Battle Simulator - For testing battle mechanics
-import { playerState, setPlayerAttribute, STAT_BUNDLES } from './player.js';
+import { playerState, setPlayerAttribute, setWeaponLevel, STAT_BUNDLES } from './player.js';
 import { screens } from './main.js';
 import { transitionToScreen } from './transitions.js';
 import { initBattle } from './battle.js';
+import { DAMAGE_MULTIPLIERS } from './weapons.js';
 
 // Stats that can be adjusted in simulator
 const ADJUSTABLE_STATS = [
@@ -18,12 +19,74 @@ const ADJUSTABLE_STATS = [
     'maxEnergy'
 ];
 
+// Weapon types for mastery level adjustment
+const WEAPON_TYPES = [
+    'sword',
+    'mace',
+    'axe',
+    'polearm'
+];
+
+// Function to generate slider config from the multiplier key
+function getMultiplierConfig(key, value) {
+    // Generate a human-readable label from the key
+    const label = key.split('_')
+        .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+        .join(' ');
+    
+    // Set sensible min/max/step based on the value
+    let min, max, step;
+    
+    if (value <= 0.1) {
+        min = 0;
+        max = 0.5;
+        step = 0.01;
+    } else if (value <= 0.5) {
+        min = 0;
+        max = 1;
+        step = 0.05;
+    } else if (value <= 1) {
+        min = 0.1;
+        max = 2;
+        step = 0.1;
+    } else {
+        min = 0.5;
+        max = Math.max(5, value * 2);
+        step = 0.1;
+    }
+    
+    // Generate a description based on the key
+    let description;
+    if (key.includes('BONUS')) {
+        description = `How much this stat contributes to damage`;
+    } else if (key.includes('MULTIPLIER')) {
+        description = `Base multiplier for damage calculation`;
+    } else {
+        description = `Damage adjustment parameter`;
+    }
+    
+    return {
+        min,
+        max,
+        step,
+        label,
+        description
+    };
+}
+
+// Store original multiplier values to allow resetting
+const ORIGINAL_MULTIPLIERS = { ...DAMAGE_MULTIPLIERS };
+
 // Initialize the simulator
 export function initBattleSimulator() {
     // Set up event listeners for simulator UI elements
     document.getElementById('battle-simulator').addEventListener('click', openSimulator);
     document.getElementById('close-simulator').addEventListener('click', closeSimulator);
     document.getElementById('start-battle-btn').addEventListener('click', startSimulatedBattle);
+    document.getElementById('reset-multipliers-btn').addEventListener('click', resetMultipliers);
+    
+    // Create damage multiplier sliders dynamically
+    createDamageMultiplierSliders();
     
     // Set up event listeners for template buttons
     document.querySelectorAll('.template-btn').forEach(button => {
@@ -49,7 +112,7 @@ export function initBattleSimulator() {
         });
     });
     
-    // Set up event listeners for all sliders
+    // Set up event listeners for all stat sliders
     ADJUSTABLE_STATS.forEach(stat => {
         const slider = document.getElementById(`${stat}-slider`);
         const valueDisplay = document.getElementById(`${stat}-value`);
@@ -57,6 +120,18 @@ export function initBattleSimulator() {
         slider.addEventListener('input', () => {
             valueDisplay.textContent = slider.value;
         });
+    });
+    
+    // Set up event listeners for all weapon mastery sliders
+    WEAPON_TYPES.forEach(weaponType => {
+        const slider = document.getElementById(`${weaponType}-mastery-slider`);
+        const valueDisplay = document.getElementById(`${weaponType}-mastery-value`);
+        
+        if (slider && valueDisplay) {
+            slider.addEventListener('input', () => {
+                valueDisplay.textContent = slider.value;
+            });
+        }
     });
     
     // Link health and maxHealth sliders
@@ -113,6 +188,29 @@ function openSimulator() {
     });
     document.querySelector('[data-battle-type="first"]').classList.add('selected');
     
+    // Reset weapon mastery sliders
+    WEAPON_TYPES.forEach(weaponType => {
+        const slider = document.getElementById(`${weaponType}-mastery-slider`);
+        const valueDisplay = document.getElementById(`${weaponType}-mastery-value`);
+        
+        if (slider && valueDisplay) {
+            slider.value = 0;
+            valueDisplay.textContent = slider.value;
+        }
+    });
+    
+    // Reset damage multiplier sliders
+    for (const key in ORIGINAL_MULTIPLIERS) {
+        const slider = document.getElementById(`${key}-slider`);
+        const valueDisplay = document.getElementById(`${key}-value`);
+        
+        if (slider && valueDisplay) {
+            slider.value = ORIGINAL_MULTIPLIERS[key];
+            valueDisplay.textContent = slider.value;
+            DAMAGE_MULTIPLIERS[key] = ORIGINAL_MULTIPLIERS[key];
+        }
+    }
+    
     // Transition to simulator screen
     transitionToScreen(screens.start, screens.simulator);
 }
@@ -146,6 +244,20 @@ function applyTemplate(templateName) {
     });
 }
 
+// Reset damage multipliers to original values
+function resetMultipliers() {
+    for (const key in ORIGINAL_MULTIPLIERS) {
+        const slider = document.getElementById(`${key}-slider`);
+        const valueDisplay = document.getElementById(`${key}-value`);
+        
+        if (slider && valueDisplay) {
+            slider.value = ORIGINAL_MULTIPLIERS[key];
+            valueDisplay.textContent = slider.value;
+            DAMAGE_MULTIPLIERS[key] = ORIGINAL_MULTIPLIERS[key];
+        }
+    }
+}
+
 // Start the simulated battle with custom stats
 function startSimulatedBattle() {
     // Get the selected battle type
@@ -157,8 +269,62 @@ function startSimulatedBattle() {
         setPlayerAttribute(stat, parseInt(slider.value));
     });
     
+    // Apply weapon mastery levels to player
+    WEAPON_TYPES.forEach(weaponType => {
+        const slider = document.getElementById(`${weaponType}-mastery-slider`);
+        if (slider) {
+            setWeaponLevel(weaponType, parseInt(slider.value));
+        }
+    });
+    
     // Start the battle
     transitionToScreen(screens.simulator, screens.battle, () => {
         initBattle(selectedBattleType);
     });
+}
+
+// Dynamically create damage multiplier sliders
+function createDamageMultiplierSliders() {
+    const container = document.getElementById('damage-multiplier-sliders');
+    container.innerHTML = ''; // Clear existing sliders
+
+    // Create sliders based on the DAMAGE_MULTIPLIERS from weapons.js
+    for (const key in DAMAGE_MULTIPLIERS) {
+        const value = DAMAGE_MULTIPLIERS[key];
+        const config = getMultiplierConfig(key, value);
+
+        const sliderWrapper = document.createElement('div');
+        sliderWrapper.className = 'slider-wrapper';
+
+        // Add label with help text
+        const label = document.createElement('label');
+        label.textContent = config.label;
+        label.title = config.description;
+        sliderWrapper.appendChild(label);
+
+        // Create slider element
+        const slider = document.createElement('input');
+        slider.type = 'range';
+        slider.id = `${key}-slider`;
+        slider.min = config.min;
+        slider.max = config.max;
+        slider.step = config.step;
+        slider.value = value;
+        sliderWrapper.appendChild(slider);
+
+        // Create value display
+        const valueDisplay = document.createElement('span');
+        valueDisplay.id = `${key}-value`;
+        valueDisplay.textContent = value;
+        sliderWrapper.appendChild(valueDisplay);
+
+        // Add slider to container
+        container.appendChild(sliderWrapper);
+
+        // Set up event listener for this slider
+        slider.addEventListener('input', () => {
+            valueDisplay.textContent = slider.value;
+            DAMAGE_MULTIPLIERS[key] = parseFloat(slider.value);
+        });
+    }
 }
