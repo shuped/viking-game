@@ -1,6 +1,7 @@
 // Character management system
 import { playerState, getWeaponTypeLevel, getWeaponTypeLevelProgress, getWeaponTypeDamageBonus } from './player.js';
 import { screens } from './main.js';
+import { initSkillTreeUI } from './skill-tree-ui.js';
 
 // DOM Elements
 const characterButton = document.getElementById('character-button');
@@ -22,6 +23,9 @@ export function initCharacter() {
     // Set up event listeners
     characterButton.addEventListener('click', openCharacterScreen);
     closeCharacterButton.addEventListener('click', closeCharacterScreen);
+
+    // Initialize the skill tree UI
+    initSkillTreeUI();
 
     // Initial UI update
     updateCharacterUI();

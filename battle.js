@@ -4,6 +4,7 @@ import { displayStoryText } from './story.js';
 import { screens } from './main.js';
 import { getEquippedWeapon  } from './weapons.js';
 import { refreshCharacterUI } from './character.js';
+import { applyModifiers,ModifierType, processStatusEffects, calculateCriticalHit } from './combat-modifiers.js';
 
 // Enemy types with their stats and experience rewards
 const ENEMY_TYPES = {
@@ -47,6 +48,13 @@ const ENEMY_TYPES = {
         expReward: 150
     }
 };
+
+// Function to calculate damage reduction from armor
+function calculateDamageReduction(armorValue) {
+    // Base formula: Each point of armor reduces damage by 2%, capped at 75%
+    const damageReduction = Math.min(0.75, armorValue * 0.02);
+    return damageReduction;
+}
 
 // Battle state
 let enemy = null;
@@ -124,8 +132,20 @@ function initBattle(battleType) {
     setupBattleEventListeners();
 }
 
-// New function: Calculate hit chance based on attacker's weapon skill and defender's stats
-function calculateHitChance(attackerWeaponSkill, defenderAgility, defenderEnergy, defenderMaxEnergy, defenderEndurance) {
+// New function: Calculate hit chance based on attacker's and defender's stats with full context
+function calculateHitChance(options = {}) {
+    // Extract parameters from options object with default values
+    const {
+        attackerWeaponSkill = 5,
+        defenderAgility = 5,
+        defenderEnergy = 50,
+        defenderMaxEnergy = 50,
+        defenderEndurance = 5,
+        abilityModifier = 0,
+        isDefending = false,
+        context = {}
+    } = options;
+    
     const baseHitChance = 0.60; // 60% base chance to hit
     const weaponSkillBonus = attackerWeaponSkill * 0.04; // Each point of weapon skill adds 4%
     const agilityPenalty = defenderAgility * 0.05; // Each point of agility reduces chance by 5%
@@ -134,18 +154,41 @@ function calculateHitChance(attackerWeaponSkill, defenderAgility, defenderEnergy
     const energyProportion = Math.max(0, defenderEnergy / defenderMaxEnergy);
     const energyFactor = (1 - energyProportion) * defenderEndurance * 0.03;
     
-    // Calculate final hit chance (capped between 0.1 and 0.95)
+    // Calculate initial hit chance
     let hitChance = baseHitChance + weaponSkillBonus - (agilityPenalty * energyProportion) + energyFactor;
-    hitChance = Math.min(0.95, Math.max(0.1, hitChance)); // Cap between 10% and 95% chance
-    console.log(`Hit chance: ${hitChance.toFixed(2)}`);
+    
+    // Apply ability-specific modifier
+    hitChance += abilityModifier;
+    
+    // Apply defending status (-30% chance to hit if defender is defending)
+    if (isDefending) {
+        hitChance -= 0.3;
+    }
+    
+    // Apply any modifiers from the combat modifiers system
+    if (context.abilityId || context.weaponType) {
+        hitChance = applyModifiers(hitChance, ModifierType.HIT_CHANCE, context);
+    }
+    
+    // Cap between 10% and 95% chance
+    hitChance = Math.min(0.95, Math.max(0.1, hitChance));
+    
     return hitChance;
 }
 
-// New function: Calculate feint success chance based on attacker's agility and defender's coordination
-function calculateFeintChance(attackerAgility, defenderCoordination) {
+// Calculate feint success chance based on attacker's agility and defender's coordination
+function calculateFeintChance(attackerAgility, defenderCoordination, context = {}) {
     // Calculate base success chance
     let successChance = 0.5 + ((attackerAgility - defenderCoordination) * 0.05);
-    successChance = Math.min(0.9, Math.max(0.2, successChance)); // Cap between 20% and 90%
+    
+    // Apply any modifiers from the combat modifiers system
+    if (context.abilityId || context.weaponType) {
+        const { ModifierType, applyModifiers } = require('./combat-modifiers.js');
+        successChance = applyModifiers(successChance, ModifierType.FEINT_CHANCE, context);
+    }
+    
+    // Cap between 20% and 90%
+    successChance = Math.min(0.9, Math.max(0.2, successChance));
     
     return successChance;
 }
@@ -306,14 +349,14 @@ function handlePlayerAction(action) {
     
     // Apply damage to enemy if applicable
     if (potentialDamage > 0) {
-        // Calculate hit chance based on player's weapon skill and enemy's stats
-        const hitChance = calculateHitChance(
-            playerState.weaponSkill,
-            battleState.enemyAgility,
-            battleState.enemyEnergy,
-            battleState.enemyMaxEnergy,
-            battleState.enemyEndurance
-        );
+        // Calculate hit chance using our centralized function with options object
+        const hitChance = calculateHitChance({
+            attackerWeaponSkill: playerState.weaponSkill,
+            defenderAgility: battleState.enemyAgility,
+            defenderEnergy: battleState.enemyEnergy,
+            defenderMaxEnergy: battleState.enemyMaxEnergy,
+            defenderEndurance: battleState.enemyEndurance
+        });
         
         // Play attack animation
         const playerCharacter = document.querySelector('.character-placeholder.viking');
@@ -354,11 +397,17 @@ function handlePlayerAction(action) {
             }, 1000);
         }, 500);
     } else if (action === 'feint') {
-        // For feint, calculate success chance using the new function
+        // For feint, use the centralized feint calculation with context
         const playerAgility = playerState.agility;
         const enemyCoordination = battleState.enemyCoordination || 5; // Default to 5 if not defined
         
-        const successChance = calculateFeintChance(playerAgility, enemyCoordination);
+        // Provide a context for modifiers to use
+        const context = {
+            abilityId: 'feint',
+            weaponType: battleState.equippedWeapon?.weaponType
+        };
+        
+        const successChance = calculateFeintChance(playerAgility, enemyCoordination, context);
         
         // Play feint animation
         const playerCharacter = document.querySelector('.character-placeholder.viking');
@@ -399,11 +448,56 @@ function handlePlayerAction(action) {
 function handleEnemyTurn() {
     battleState.battlePhase = 'enemy';
     
+    // Process any status effects on the enemy at the start of the turn
+    processStatusEffects(battleState);
+    
+    // If there's a status effect message, display it before continuing
+    if (battleState.lastStatusMessage) {
+        updateBattleText(battleState.lastStatusMessage);
+        battleState.lastStatusMessage = null;
+        
+        // Check if enemy is defeated by status effects
+        if (battleState.enemyHealth <= 0) {
+            setTimeout(() => {
+                handleEnemyDefeated();
+            }, 1000);
+            return;
+        }
+        
+        // Wait a moment before continuing with enemy turn
+        setTimeout(() => {
+            continueEnemyTurn();
+        }, 1000);
+        
+        return;
+    }
+    
+    // If no status effects, continue with enemy turn immediately
+    continueEnemyTurn();
+}
+
+function continueEnemyTurn() {
     // Reset defense and evasion flags
     const wasDefending = battleState.playerDefending || false;
     const wasEvading = battleState.playerEvading || false;
     battleState.playerDefending = false;
     battleState.playerEvading = false;
+    
+    // If enemy is stunned, skip their action
+    if (battleState.enemyStunned) {
+        updateBattleText(`The ${battleState.enemyName} is stunned and cannot act!`);
+        battleState.enemyStunned = false; // Clear stun after skipping turn
+        
+        // Return to player turn
+        setTimeout(() => {
+            battleState.battlePhase = 'player';
+            battleState.turnCount++;
+            updateBattleUI();
+            appendBattleText(" What will you do?");
+        }, 1000);
+        
+        return;
+    }
     
     // Enemy AI - simple random choice
     const enemyActions = ['attack', 'heavy_attack', 'special'];
@@ -461,22 +555,28 @@ function handleEnemyTurn() {
     // Reduce enemy energy
     battleState.enemyEnergy = Math.max(0, battleState.enemyEnergy - energyCost);
     
-    // Calculate hit chance based on enemy's weapon skill and player's stats
-    const hitChance = calculateHitChance(
-        battleState.enemyWeaponSkill,
-        playerState.agility,
-        battleState.playerEnergy,
-        battleState.playerMaxEnergy,
-        playerState.endurance
-    );
+    // Create context for combat modifiers
+    const context = {
+        abilityId: enemyAction,
+        weaponType: battleState.battleType === 'first' ? 'sword' : 'axe'
+    };
+    
+    // Calculate hit chance using our centralized function
+    const hitChance = calculateHitChance({
+        attackerWeaponSkill: battleState.enemyWeaponSkill,
+        defenderAgility: playerState.agility,
+        defenderEnergy: battleState.playerEnergy,
+        defenderMaxEnergy: battleState.playerMaxEnergy,
+        defenderEndurance: playerState.endurance,
+        isDefending: wasDefending,
+        context
+    });
     
     // Apply defense or evasion effects
     if (wasDefending) {
         potentialDamage = Math.floor(potentialDamage * 0.5);
-        hitChance * 0.7; // 30% less chance to hit when defending
         actionText += `, targeting your shield`;
     } else if (wasEvading) {
-        hitChance * 0.5; // 50% less chance to hit when evading
         actionText += `, as you try to dodge`;
     }
     
@@ -497,16 +597,24 @@ function handleEnemyTurn() {
                 playerCharacter.classList.remove('hurt-animation');
             }, 500);
             
+            // Apply damage reduction from armor
+            const damageReduction = calculateDamageReduction(playerState.armorValue);
+            const finalDamage = Math.floor(potentialDamage * (1 - damageReduction));
+            
             // Apply damage to player and reduce energy
-            battleState.playerHealth = Math.max(0, battleState.playerHealth - potentialDamage);
-            battleState.playerEnergy = Math.max(0, battleState.playerEnergy - Math.floor(potentialDamage * 0.2));
+            battleState.playerHealth = Math.max(0, battleState.playerHealth - finalDamage);
+            battleState.playerEnergy = Math.max(0, battleState.playerEnergy - Math.floor(finalDamage * 0.2));
             
             if (wasDefending) {
-                actionText += `, but your shield absorbs much of the impact, taking ${potentialDamage} damage!`;
+                actionText += `, but your shield absorbs much of the impact, taking ${finalDamage} damage!`;
             } else if (wasEvading) {
-                actionText += `, and despite your attempt to dodge, the attack connects for ${potentialDamage} damage!`;
+                actionText += `, and despite your attempt to dodge, the attack connects for ${finalDamage} damage!`;
             } else {
-                actionText += `, dealing ${potentialDamage} damage!`;
+                if (playerState.armorValue > 0) {
+                    actionText += `, dealing ${finalDamage} damage! (${Math.round(damageReduction * 100)}% reduced by armor)`;
+                } else {
+                    actionText += `, dealing ${finalDamage} damage!`;
+                }
             }
         } else {
             if (wasEvading) {
@@ -626,18 +734,22 @@ function returnToStory() {
 
 // Helper function for creating ability buttons
 function createAbilityButton(ability, weapon) {
-    // Calculate hit chance for this ability
-    const baseHitChance = calculateHitChance(
-        playerState.weaponSkill,
-        battleState.enemyAgility,
-        battleState.enemyEnergy,
-        battleState.enemyMaxEnergy,
-        battleState.enemyEndurance
-    );
+    // Create context for combat calculations
+    const context = {
+        weaponType: weapon.weaponType,
+        abilityId: ability.id
+    };
     
-    // Apply the ability's hit chance modifier
-    let hitChance = baseHitChance + (ability.hitChanceModifier || 0);
-    hitChance = Math.min(0.95, Math.max(0.1, hitChance)); // Cap between 10% and 95%
+    // Calculate hit chance for this ability using the centralized function
+    const hitChance = calculateHitChance({
+        attackerWeaponSkill: playerState.weaponSkill,
+        defenderAgility: battleState.enemyAgility,
+        defenderEnergy: battleState.enemyEnergy,
+        defenderMaxEnergy: battleState.enemyMaxEnergy,
+        defenderEndurance: battleState.enemyEndurance,
+        abilityModifier: ability.hitChanceModifier || 0,
+        context
+    });
     
     const hitChancePercent = Math.round(hitChance * 100);
     
@@ -775,23 +887,36 @@ function handleWeaponAbility(ability) {
     const masteryBonus = getWeaponTypeDamageBonus(weapon.weaponType);
     
     // Calculate ability damage including mastery bonus
-    const potentialDamage = ability.calculateDamage(weapon.baseDamage, masteryBonus);
+    let potentialDamage = ability.calculateDamage(weapon.baseDamage, masteryBonus);
+    
+    // Create context for combat calculations
+    const context = {
+        weaponType: weapon.weaponType,
+        abilityId: ability.id
+    };
+    
+    // Check for critical hit
+    const critInfo = calculateCriticalHit(context);
+    let critText = "";
+    if (critInfo.isCritical) {
+        // Apply critical damage multiplier
+        potentialDamage = Math.floor(potentialDamage * critInfo.critMultiplier);
+        critText = ` CRITICAL HIT! (x${critInfo.critMultiplier.toFixed(1)})`;
+    }
     
     // Update battle text
     updateBattleText(`You use ${ability.name} with your ${weapon.name}!`);
     
     // Calculate hit chance with this ability's modifier
-    let hitChance = calculateHitChance(
-        playerState.weaponSkill,
-        battleState.enemyAgility,
-        battleState.enemyEnergy,
-        battleState.enemyMaxEnergy,
-        battleState.enemyEndurance
-    );
-    
-    // Apply ability-specific hit chance modifier
-    hitChance += (ability.hitChanceModifier || 0);
-    hitChance = Math.min(0.95, Math.max(0.1, hitChance)); // Cap between 10% and 95%
+    let hitChance = calculateHitChance({
+        attackerWeaponSkill: playerState.weaponSkill,
+        defenderAgility: battleState.enemyAgility,
+        defenderEnergy: battleState.enemyEnergy,
+        defenderMaxEnergy: battleState.enemyMaxEnergy,
+        defenderEndurance: battleState.enemyEndurance,
+        abilityModifier: ability.hitChanceModifier || 0,
+        context
+    });
     
     // Play attack animation
     const playerCharacter = document.querySelector('.character-placeholder.viking');
@@ -818,9 +943,9 @@ function handleWeaponAbility(ability) {
             // Apply any special effects from the ability
             const effectResult = ability.executeEffect(battleState);
             if (effectResult) {
-                appendBattleText(`, ${effectResult}`);
+                appendBattleText(`,${critText} dealing ${potentialDamage} damage and ${effectResult}!`);
             } else {
-                appendBattleText(`, dealing ${potentialDamage} damage!`);
+                appendBattleText(`,${critText} dealing ${potentialDamage} damage!`);
             }
             
             // Check if enemy is defeated

@@ -1471,3 +1471,235 @@ h3 {
 #reset-multipliers-btn {
     margin-bottom: 15px;
 }
+
+/* Skill Tree UI styles */
+#character-skill-tree {
+    background-color: rgba(15, 15, 15, 0.8);
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 20px;
+    color: #d4d4d4;
+}
+
+.skill-tree-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.skill-points-container {
+    background-color: #2a2a2a;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: 1px solid #555;
+    font-size: 14px;
+}
+
+#available-skill-points {
+    color: #6eb2ff;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.skill-tree-tabs {
+    display: flex;
+    border-bottom: 1px solid #444;
+    margin-bottom: 15px;
+}
+
+.skill-tree-tab {
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    margin-right: 5px;
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-bottom: none;
+    position: relative;
+    top: 1px;
+}
+
+.skill-tree-tab.active {
+    background-color: #3a3a3a;
+    border-bottom: 1px solid #3a3a3a;
+    color: #e9e9e9;
+}
+
+.skill-tree-tab:hover {
+    background-color: #333333;
+}
+
+.skill-tree-branches {
+    position: relative;
+    min-height: 200px;
+    margin-bottom: 15px;
+}
+
+.skill-tree-branch {
+    display: none;
+    position: relative;
+}
+
+.skill-tree-branch.active {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.skill-node {
+    background-color: #2a2a2a;
+    border: 1px solid #555;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    margin: 10px auto;
+    transition: all 0.2s ease;
+}
+
+.skill-node:hover {
+    box-shadow: 0 0 10px rgba(110, 178, 255, 0.6);
+}
+
+.skill-node.selected {
+    border: 2px solid #6eb2ff;
+}
+
+.skill-node.locked {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.skill-node.max-rank {
+    border: 2px solid gold;
+}
+
+.skill-rank {
+    position: absolute;
+    bottom: -8px;
+    right: -8px;
+    background-color: #1a1a1a;
+    border: 1px solid #555;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.skill-icon {
+    font-size: 24px;
+}
+
+.skill-info-panel {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+#selected-skill-name {
+    margin-top: 0;
+    color: #e9e9e9;
+    border-bottom: 1px solid #444;
+    padding-bottom: 8px;
+}
+
+#selected-skill-description {
+    font-size: 14px;
+    line-height: 1.4;
+    margin-bottom: 10px;
+}
+
+.skill-rank-container {
+    background-color: #1a1a1a;
+    padding: 5px 10px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.skill-requirements-container {
+    font-size: 13px;
+    color: #aaa;
+    margin-bottom: 15px;
+}
+
+.requirement-met {
+    color: #6adb6a;
+}
+
+.requirement-unmet {
+    color: #ff6a6a;
+}
+
+#apply-skill-point {
+    background-color: #2c5f9b;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+#apply-skill-point:hover {
+    background-color: #3b7bc7;
+}
+
+#apply-skill-point:disabled {
+    background-color: #495766;
+    cursor: default;
+    opacity: 0.6;
+}
+
+/* Connection lines between skill nodes */
+.skill-connector {
+    position: absolute;
+    height: 2px;
+    background-color: #555;
+    z-index: 0;
+}
+
+/* Arrow icon for prerequisites */
+.prerequisite-arrow {
+    margin: 0 5px;
+}
+
+/* Tooltip styles */
+.skill-tooltip {
+    position: absolute;
+    background-color: rgba(20, 20, 20, 0.95);
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 10px;
+    width: 200px;
+    z-index: 100001;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.skill-tooltip-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #e9e9e9;
+}
+
+.skill-tooltip-desc, .skill-tooltip-rank, .skill-tooltip-cost {
+    color: grey;
+    font-size: 12px;
+    margin-bottom: 5px;
+}

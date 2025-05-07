@@ -21,7 +21,8 @@ const STAT_BUNDLES = {
         gold: 10,
         level: 1,
         exp: 0,
-        skillPoints: 0,
+        skillPoints: 10,
+        armorValue: 0, // Added armor value for damage reduction
         // Weapon experience and levels
         weaponExp: {
             sword: 0,
@@ -56,6 +57,7 @@ const STAT_BUNDLES = {
         level: 1,
         exp: 0,
         skillPoints: 0,
+        armorValue: 0, // Added armor value for damage reduction
         // Weapon experience and levels
         weaponExp: {
             sword: 0,
@@ -90,6 +92,7 @@ const STAT_BUNDLES = {
         level: 1,
         exp: 0,
         skillPoints: 0,
+        armorValue: 0, // Added armor value for damage reduction
         // Weapon experience and levels
         weaponExp: {
             sword: 0,
@@ -124,6 +127,7 @@ const STAT_BUNDLES = {
         level: 1,
         exp: 0,
         skillPoints: 0,
+        armorValue: 0, // Added armor value for damage reduction
         // Weapon experience and levels
         weaponExp: {
             sword: 0,

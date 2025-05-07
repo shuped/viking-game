@@ -561,6 +561,44 @@
                     </div>
                 </div>
                 
+                <!-- Skill Tree Section -->
+                <div id="character-skill-tree">
+                    <div class="skill-tree-header">
+                        <h3>Skill Tree</h3>
+                        <div class="skill-points-container">
+                            <span>Available Points:</span>
+                            <span id="available-skill-points">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="skill-tree-tabs">
+                        <div class="skill-tree-tab active" data-branch="accuracyBranch">Accuracy</div>
+                        <div class="skill-tree-tab" data-branch="damageBranch">Damage</div>
+                    </div>
+                    
+                    <div class="skill-tree-branches">
+                        <div class="skill-tree-branch active" id="accuracyBranch">
+                            <!-- Accuracy branch skills will be dynamically added here -->
+                        </div>
+                        <div class="skill-tree-branch" id="damageBranch">
+                            <!-- Damage branch skills will be dynamically added here -->
+                        </div>
+                    </div>
+                    
+                    <div class="skill-info-panel">
+                        <h4 id="selected-skill-name">Select a skill</h4>
+                        <p id="selected-skill-description">Click on a skill to view its details.</p>
+                        <div class="skill-rank-container">
+                            <span>Rank:</span>
+                            <span id="selected-skill-rank">0/0</span>
+                        </div>
+                        <div class="skill-requirements-container">
+                            <div id="selected-skill-requirements"></div>
+                        </div>
+                        <button id="apply-skill-point" class="skill-tree-button">Apply Skill Point</button>
+                    </div>
+                </div>
+                
                 <div id="character-inventory">
                     <h3>Inventory</h3>
                     <div id="inventory-items">
