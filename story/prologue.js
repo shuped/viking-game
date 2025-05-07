@@ -7,8 +7,6 @@ export const storyNodes = {
     0: {
         text: "Welcome to the Tale of Two Ravens...\nThis adventure is set in quasi-historical fictional universe based on the Viking Age... Death is Permanent, and every decision matters... how your tale unfolds is up to you...\n... and the will of the gods...",
         next: 1,
-                transitionTo: 'battle',
-        battleType: 'first'
     },
     1: {
         text: "You are...",
