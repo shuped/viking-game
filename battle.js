@@ -2,7 +2,7 @@ import { playerState, addExperience, addWeaponExperience, getWeaponTypeLevel, ge
 import { transitionToScreen } from './transitions.js';
 import { displayStoryText } from './story.js';
 import { screens } from './main.js';
-import { getEquippedWeapon  } from './weapons.js';
+import { getEquippedWeapon, weaponAbilities, findAbilityById } from './weapons.js';
 import { refreshCharacterUI } from './character.js';
 import { applyModifiers,ModifierType, processStatusEffects, calculateCriticalHit } from './combat-modifiers.js';
 
@@ -815,19 +815,37 @@ function showWeaponAbilitySelection() {
     weaponHeader.textContent = `${weapon.name} Abilities:`;
     actionsContainer.appendChild(weaponHeader);
     
+    // Get all abilities for this weapon type
+    let allAbilities = [...weapon.abilities];
+    
+    // Add unlocked abilities from the skill tree
+    if (playerState.unlockedAbilities && playerState.unlockedAbilities[weapon.weaponType]) {
+        const unlockedAbilityIds = playerState.unlockedAbilities[weapon.weaponType];
+        
+        for (const abilityId of unlockedAbilityIds) {
+            // Find the ability in the weaponAbilities collection
+            const unlockableAbilities = weaponAbilities[weapon.weaponType]?.unlockable || [];
+            const unlockedAbility = unlockableAbilities.find(a => a.id === abilityId);
+            
+            // Add unlocked ability if found and not already in the list
+            if (unlockedAbility && !allAbilities.some(a => a.id === unlockedAbility.id)) {
+                allAbilities.push(unlockedAbility);
+            }
+        }
+    }
+    
     // Create ability buttons in rows of 3
-    const abilities = weapon.abilities;
     const maxButtonsPerRow = 3;
     
-    for (let i = 0; i < abilities.length; i += maxButtonsPerRow) {
+    for (let i = 0; i < allAbilities.length; i += maxButtonsPerRow) {
         // Create a new row
         const abilityRow = document.createElement('div');
         abilityRow.className = 'action-row';
         
         // Add up to 3 ability buttons to this row
-        const endIndex = Math.min(i + maxButtonsPerRow, abilities.length);
+        const endIndex = Math.min(i + maxButtonsPerRow, allAbilities.length);
         for (let j = i; j < endIndex; j++) {
-            const abilityBtn = createAbilityButton(abilities[j], weapon);
+            const abilityBtn = createAbilityButton(allAbilities[j], weapon);
             abilityRow.appendChild(abilityBtn);
         }
         
@@ -935,6 +953,12 @@ function handleWeaponAbility(ability) {
             setTimeout(() => {
                 enemyCharacter.classList.remove('hurt-animation');
             }, 500);
+            
+            // Check for armor piercing ability
+            let armorPiercingPercentage = 0;
+            if (ability.id === 'armor_piercer') {
+                armorPiercingPercentage = 0.3; // 30% armor penetration
+            }
             
             // Apply damage and reduce enemy energy
             battleState.enemyHealth = Math.max(0, battleState.enemyHealth - potentialDamage);

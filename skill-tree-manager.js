@@ -224,14 +224,15 @@ function unlockSpecialAbility(abilityId, weaponType) {
         return false;
     }
     
-    // In a full implementation, we would track unlocked abilities
-    // and add them to the player's available abilities
-    // For now, we'll just log the unlock
+    // Add the ability to the player's unlocked abilities for this weapon type
+    if (!playerState.unlockedAbilities[weaponType]) {
+        playerState.unlockedAbilities[weaponType] = [];
+    }
     
-    // Example of how we could track this in player state:
-    // if (!playerState.unlockedAbilities) playerState.unlockedAbilities = {};
-    // if (!playerState.unlockedAbilities[weaponType]) playerState.unlockedAbilities[weaponType] = [];
-    // playerState.unlockedAbilities[weaponType].push(abilityId);
+    if (!playerState.unlockedAbilities[weaponType].includes(abilityId)) {
+        playerState.unlockedAbilities[weaponType].push(abilityId);
+        console.log(`Added ${ability.name} to player's unlocked abilities for ${weaponType}`);
+    }
     
     return true;
 }

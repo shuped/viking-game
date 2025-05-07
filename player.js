@@ -35,6 +35,13 @@ const STAT_BUNDLES = {
             mace: 1,
             axe: 1,
             polearm: 1
+        },
+        // Track abilities unlocked through skill tree
+        unlockedAbilities: {
+            sword: [],
+            mace: [],
+            axe: [],
+            polearm: []
         }
     },
     WARRIOR: {
@@ -70,6 +77,13 @@ const STAT_BUNDLES = {
             mace: 1,
             axe: 1,
             polearm: 1
+        },
+        // Track abilities unlocked through skill tree
+        unlockedAbilities: {
+            sword: [],
+            mace: [],
+            axe: [],
+            polearm: []
         }
     },
     EXPLORER: {
@@ -105,6 +119,13 @@ const STAT_BUNDLES = {
             mace: 1,
             axe: 1,
             polearm: 1
+        },
+        // Track abilities unlocked through skill tree
+        unlockedAbilities: {
+            sword: [],
+            mace: [],
+            axe: [],
+            polearm: []
         }
     },
     SHIELDMAIDEN: {
@@ -140,6 +161,13 @@ const STAT_BUNDLES = {
             mace: 1,
             axe: 1,
             polearm: 1
+        },
+        // Track abilities unlocked through skill tree
+        unlockedAbilities: {
+            sword: [],
+            mace: [],
+            axe: [],
+            polearm: []
         }
     }
 };

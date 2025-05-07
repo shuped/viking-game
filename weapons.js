@@ -305,20 +305,21 @@ function getEquippedWeapon() {
 
 // Function to check if a player has unlocked a specific ability
 function hasUnlockedAbility(abilityId) {
-    // This would be expanded to check skill tree unlocks
-    // For now, just return true for standard abilities
     const ability = findAbilityById(abilityId);
     if (!ability) return false;
     
-    // Look through standard abilities for each weapon type
+    // Check if it's a standard ability (always available)
     for (const weaponType in weaponAbilities) {
         if (weaponAbilities[weaponType].standard.some(a => a.id === abilityId)) {
             return true;
         }
     }
     
-    // For unlockable abilities, we'd check against player's skill tree
-    // This will be implemented later
+    // For unlockable abilities, check against player's unlocked abilities
+    if (ability.weaponType && playerState.unlockedAbilities[ability.weaponType]) {
+        return playerState.unlockedAbilities[ability.weaponType].includes(abilityId);
+    }
+    
     return false;
 }
 
